@@ -1,0 +1,542 @@
+Labtainer Lab Designer User Guide
+Fully provisioned cybersecurity labs October 15, 2025
+This document was created by United States Government employees at The Center for Cybersecurity and Cyber Operations (C3O) at the Naval Postgraduate School NPS. Please note that within the United States, copyright protection is not available for any works created by United States Government employees, pursuant to Title 17 United States Code Section
+105. This document is in the public domain and is not subject to copyright.
+
+Contents
+
+1 Introduction
+
+5
+
+1.1 Benefits of Labtainers . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 5
+
+1.2 Obtaining the Labtainer development kit . . . . . . . . . . . . . . . . . . . . . . 6
+
+1.3 Content of this guide . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+
+2 Overview of the student environment and workflow
+
+6
+
+3 Creating new labs
+
+7
+
+3.1 GUI-based lab creation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+
+3.1.1 Start the labedit UI . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+
+3.1.2 New lab creation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+
+3.1.3 Test initial lab . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+
+3.1.4 Stop the lab . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+
+3.1.5 Add a program to the container . . . . . . . . . . . . . . . . . . . . . . . 8
+
+3.1.6 Add a 2nd computer . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+
+3.1.7 Add a network . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+
+3.1.8 Connect computers to the network . . . . . . . . . . . . . . . . . . . . . 9
+
+3.1.9 Parameterize the lab . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+
+3.2 Command line lab creation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+
+3.2.1 Create the first lab computer . . . . . . . . . . . . . . . . . . . . . . . . 10
+
+3.2.2 Testing the new lab . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+
+3.2.3 Multiple containers . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11
+
+4 Defining the lab execution environment
+
+12
+
+4.1 Docker files . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 12
+
+4.2 Container definitions in start.config . . . . . . . . . . . . . . . . . . . . . . . . . 13
+
+4.3 Lab-specific files in the student's home directory . . . . . . . . . . . . . . . . . . 17
+
+4.3.1 Large or numerous files in the home directory . . . . . . . . . . . . . . . 17
+
+4.4 Lab-specific system files . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 18
+
+4.5 System services . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 18
+
+4.6 Lab Instructions for Students . . . . . . . . . . . . . . . . . . . . . . . . . . . . 19
+
+4.7 Running programs in Virtual Terminals . . . . . . . . . . . . . . . . . . . . . . . 19
+
+4.8 Final lab environment fixup . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+
+4.9 Persistent storage . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+
+5 Parameterizing a lab
+
+21
+
+5.1 Parameterization configuration file syntax . . . . . . . . . . . . . . . . . . . . . 21
+
+5.2 Synchronizing startup and parameterization . . . . . . . . . . . . . . . . . . . . 23
+
+5.3 Parameterizing start.config . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23
+
+5.4 Simple Parameterization for Checking Own-work . . . . . . . . . . . . . . . . . 23
+
+5.5 Debugging parameterizing . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23
+
+6 Automated assessment of student labs
+
+24
+
+6.1 Artifact files . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 24
+
+6.1.1 Capturing stdin and stdout . . . . . . . . . . . . . . . . . . . . . . . . . 24
+
+6.1.2 Capturing program file output . . . . . . . . . . . . . . . . . . . . . . . . 25
+
+6.1.3 Bash History . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 25
+
+6.1.4 System logs . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 25
+
+6.1.5 Capturing information about the environment . . . . . . . . . . . . . . . 26
+
+1
+
+6.1.6 Capturing file access events . . . . . . . . . . . . . . . . . . . . . . . . . 26 6.1.7 Generating results upon stopping the lab . . . . . . . . . . . . . . . . . . 27 6.1.8 Artifact archives . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 27 6.2 Artifact result values . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 28 6.2.1 Result field values . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 28 6.2.2 Converting artifact file formats . . . . . . . . . . . . . . . . . . . . . . . 30 6.3 Evaluating results . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 31 6.3.1 Goal definitions . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32 6.3.2 Distinguish between results generated before and after configuration changes 34 6.3.3 Replace answers with hashes . . . . . . . . . . . . . . . . . . . . . . . . . 35 6.3.4 Assessment Report . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 35 6.3.5 Document the meaning of goals . . . . . . . . . . . . . . . . . . . . . . . 35 6.4 Student self-assessment . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 36 6.4.1 Current state assessment . . . . . . . . . . . . . . . . . . . . . . . . . . . 36 6.5 Current state artifacts . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 36 6.6 Assessment examples . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 37 6.6.1 Did a program output an expected answer? . . . . . . . . . . . . . . . . 37 6.6.2 Do artifact files contain one of two specific strings? . . . . . . . . . . . . 37 6.6.3 Compare value of a field from a selected line in an artifact file . . . . . . 38 6.6.4 Was a log entry written while some command executed? . . . . . . . . . 38 6.6.5 My desired artifacts are not in stdin or stdout, the program outputs a file 38 6.6.6 Delimiting time using log file entries . . . . . . . . . . . . . . . . . . . . 38 6.6.7 Delimiting time via program invocations . . . . . . . . . . . . . . . . . . 39 6.7 Debugging automated assessment in labs . . . . . . . . . . . . . . . . . . . . . . 40
+
+7 Quizzes
+
+40
+
+7.1 True or False . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 41
+
+7.2 Preface . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 41
+
+8 Networking
+
+42
+
+8.1 Network Taps . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 42
+
+8.2 Realistic Network Routing and DNS . . . . . . . . . . . . . . . . . . . . . . . . 43
+
+8.3 Communicating with external hosts or VMs . . . . . . . . . . . . . . . . . . . . 43
+
+8.4 Network interface assignments . . . . . . . . . . . . . . . . . . . . . . . . . . . . 44
+
+9 Building, Maintaining and Publishing Labs
+
+44
+
+9.1 NPS Development Operations . . . . . . . . . . . . . . . . . . . . . . . . . . . . 45
+
+9.2 Alternate registry for testing . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 45
+
+9.3 Large lab files . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 46
+
+9.3.1 Reuse of large file sets . . . . . . . . . . . . . . . . . . . . . . . . . . . . 46
+
+9.4 Package sources for apt and yum . . . . . . . . . . . . . . . . . . . . . . . . . . 46
+
+9.5 Locale settings . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 47
+
+9.6 Lab versions . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 47
+
+9.7 Creating new base images . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 47
+
+9.8 Importing labs: Warning! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 48
+
+10 Labtainer Instructor Modules (IModules)
+
+48
+
+10.1 Labtainers distribution strategy . . . . . . . . . . . . . . . . . . . . . . . . . . . 48
+
+10.2 Imodule distribution strategy . . . . . . . . . . . . . . . . . . . . . . . . . . . . 48
+
+10.3 Testing IModules . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 49
+
+10.4 Custom lab manuals . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 49
+
+2
+
+10.5 Imodule examples . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 50 10.5.1 Modify a lab manual for the telnet-lab . . . . . . . . . . . . . . . . . . . 50 10.5.2 Create a new lab . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 51
+
+11 Remote access and control of Labtainer exercises
+
+52
+
+11.1 Remote management . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 52
+
+11.1.1 File copying . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 52
+
+11.1.2 Client and server setup . . . . . . . . . . . . . . . . . . . . . . . . . . . . 53
+
+11.2 Remote access to containers . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 53
+
+11.2.1 Remote access without GNS3 . . . . . . . . . . . . . . . . . . . . . . . . 53
+
+11.2.2 Remote access with GNS3 . . . . . . . . . . . . . . . . . . . . . . . . . . 54
+
+12 Multi-user Labtainers
+
+55
+
+12.0.1 Multi-user Labtainers, one Labtainer VM per student . . . . . . . . . . . 56
+
+12.0.2 Single Labtainers VM with multiple students . . . . . . . . . . . . . . . . 57
+
+12.1 Creating conformant multi-user labs . . . . . . . . . . . . . . . . . . . . . . . . . 57
+
+13 Limitations
+
+58
+
+14 Notes
+
+59
+
+14.1 Firefox . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 59
+
+14.1.1 Profile and configuration changes . . . . . . . . . . . . . . . . . . . . . . 59
+
+14.1.2 Browser history . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 59
+
+14.1.3 Slow browser startup . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 59
+
+14.1.4 Crashes in SimLab . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 60
+
+14.2 Wireshark . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 60
+
+14.3 Elgg . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 60
+
+14.4 Host OS dependencies . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 60
+
+14.5 Login Prompts . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 60
+
+14.6 Networking Notes . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 60
+
+14.6.1 SSH . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 60
+
+14.6.2 X11 over SSH . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 61
+
+14.6.3 Traffic mirroring . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 61
+
+14.6.4 DNS . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 61
+
+14.6.5 Overriding Docker routing and DNS . . . . . . . . . . . . . . . . . . . . 61
+
+14.6.6 Move to network2 base . . . . . . . . . . . . . . . . . . . . . . . . . . . . 61
+
+14.6.7 Ubuntu 22 base image . . . . . . . . . . . . . . . . . . . . . . . . . . . . 62
+
+14.7 User management and sudo . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 62
+
+14.8 DNS fixes for rebuild problems . . . . . . . . . . . . . . . . . . . . . . . . . . . . 62
+
+14.9 Suggestions for Developers . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 62
+
+14.9.1 Testing assessment directives . . . . . . . . . . . . . . . . . . . . . . . . . 62
+
+14.9.2 3rd party applications . . . . . . . . . . . . . . . . . . . . . . . . . . . . 62
+
+14.9.3 Msc . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 63
+
+14.9.4 Docker cache . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 63
+
+14.10Container isolation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 63
+
+14.10.1 Kernel logging . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 63
+
+14.11Test registry setup . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 63
+
+14.12CentOS containers . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 63
+
+14.13Side effects of stdin/stdout mirroring . . . . . . . . . . . . . . . . . . . . . . . . 63
+
+3
+
+A
+
+SimLab for testing labs
+
+65
+
+A.1 Preparations Before Running SimLab . . . . . . . . . . . . . . . . . . . . . . . . 65
+
+A.2 Running SimLab . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 65
+
+A.3 SimLab Directives . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 65
+
+A.4 SimLab application notes . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 67
+
+A.5 Common x11 keys . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 67
+
+A.6 Regression testing with smoketest.py . . . . . . . . . . . . . . . . . . . . . . . . 67
+
+4
+
+1 Introduction
+This manual is intended for use by lab designers wanting to create or adapt cybersecurity labs to use the Docker container-based lab framework known as "Labtainers". The Labtainer framework is designed for use with computer and network security laboratory exercises targeting Linux environments, and it is built around standard Linux Docker containers. A Labtainer exerciese may include multiple networked components, all running locally on a student's computer, but without the performance degredation associated with running multiple virtual machines.
+While most Labtainer exercises focus on exploring concepts via the Linux command line ­ GUI based applications, e.g., browsers and Wireshark are also supported.
+1.1 Benefits of Labtainers
+Deploying cybersecurity labs using this framework provides three primary benefits: 1. The lab execution environment is controlled and consistent across all student computers regardless of the Linux distribution and configuration present on individual student computers. This allows each lab designer to control which software packages are present, the versions of libraries and specific configuration settings, e.g., /etc file values. These configurations may vary between labs, and they may vary between multiple computers in a single lab. 2. Assessment of student lab activity can be automated through a set of configuration files that identify expected results, thus relieving lab instructors from having to individually review detailed lab results. 3. Labs may be automatically "parameterized" for each student such that students cannot easily copy results from another student or from internet repositories. Labtainers provide the advantages of a consistent execution environment without requiring
+an individual Virtual Machine (VM) per lab, and without requiring all labs to be adapted for a common Linux execution environment. These benefits can be realized whether or not labs are configured for automatic assessment, or are parameterized for each student.
+Figure 1: Example Labtainers network topology
+5
+
+Exercises that include multiple networked computers illustrate an advantage of using containers over VMs, namely, containers require significantly less resources than do VMs. A student laptop that struggles to run two or more VMs can readily run multiple containers simultaneously, as shown in this 50 second demonstration: https://youtu.be/JDV6jGF3Szw
+Lab designers enhance labs to include automated assessment using directives built into the famework. For example, ten rather simple directives can evaluate the following question regarding student work on a lab depicted in Figure 1:
+"Was there any single iptables configuration during which the student used nmap to demonstrate that:
+· The remote workstation could reach the HTTPS port but not the SQL port, and,
+· The local workstation could reach the HTTPS port and the SQL port."
+1.2 Obtaining the Labtainer development kit
+Installation of Labtainers is described in the Labtainer Student Guide. which also includes instructions for installing an Ubuntu VM (if you do not already have a Linux system), and the Labtainer framework. If you already have Docker installed on a Linux system, reference the Student Guide for other dependencies.
+The difference between the development kit and the standard Labtainer distribution is primarily the lab definition files, which are withheld from the general distribution for efficiency.
+If you have a Labtainer installation (e.g., our pre-packaged VM), you can get the developer files by going to your labtainers directory, e.g., ~/labtainer/ and running ./update-designer.sh 1 You may then want to logout and login again, or run a new bash shell because that script sets some environment variables.
+It is suggested that you periodically run that update script to get the latest lab definition files, and to update framework software.
+1.3 Content of this guide
+This guide describes how to build new labs, but first, section 2 gives an overview of how students interact with Labtainers. The steps taken to create a new lab are provided in section 3, and the mechanics of defining the lab execution environment are in section 4.
+Individualizing labs to discourage sharing of solutions is described in 5. Section 6 then describes how to define criteria to enable automated assessment of student work.
+Networking considerations are described in 8. Section 9 covers the process of building, publishing and maintaining labs.
+Strategies for creating mulit-user Labtainer exercises are discussed in section 12. Section 13 identifies limitations of the framework and section 14 includes application-specific notes, e.g., notes relavent to including Firefox in a lab.
+Automated testing of labs is supported using our SimLab tool as described in Appendix A.
+2 Overview of the student environment and workflow
+Labtainers support laboratory exercises designed for Linux environments, ranging from interaction with individual programs to labs that include what appear to be multiple components and networks. Students see and interact with Linux computers, primarily via bash shell commands and GUI-based applications. In general, the Labtainer framework implementation is not visible
+1The student password for the pre-packaged VM is "password123".
+6
+
+to the student, and the Linux environment as seen by the student is not noticeably augmented to support the framework.
+Labtainers are intended for use on individual student computers, e.g., a laptop, or potentially a VM allocated to the student from within a VM farm. 2 The computer utilized by a student must include the Linux operating system, e.g., as a single VM. This Linux operating system, referred to herein as the Linux host, can be any distribution and version which supports Docker. Most students will use a Linux VM appliance that is pre-configured with Labtainers and Docker, and is available at our website.
+It is suggested that the student's Linux host be a virtual machine that is not used for purposes requiring trust. Software programs contained in cybersecurity lab exercises are not, in general, trusted. And while Docker containers provide namespace isolation between the containers and the Linux host, the containers run as privileged processes.
+Labtainer exercises can include networking to external hosts, e.g., a Windows VM running alongside the Linux host VM, as described in section 8.3.
+Students initiate any and all labs from a single workspace directory on the Linux host. To perform a specific Labtainer exercise, the student runs a labtainer command from the Labtainer workspace, naming the lab exercise. This results in one or more containers starting up along with corresponding virtual terminals via which the student will interact with the containers. These virtual terminals typically present a bash shell. Each container appears to the student as a separate computer, and these computers may appear to be connected via one or more networks.
+When a student starts a given exercise for the first time, the framework fetches Docker images from the Docker registry. Docker manages container images as a set of layers, providing efficient storage and retrieval of images having common components. The initial Labtainer installation step pulls a few baseline images (about 1.5 GB) from the public Docker registry, known as the Docker hub. Images for specific labs are pulled from the Docker hub by downloading only those additional layers required by that lab, and which had not been previously pulled from the hub. This is transparent to the student, other than waiting for downloads to complete.
+After the student performs the lab exercise, artifacts from the container environments are automatically collected into an archive, (a zip file), that appears on the student's Linux host. The student forwards this archive file to the instructor, e.g., via email or a learning management system (LMS). The instructor collects student archive files into a common directory on his or her own Linux host, and then issues a command that results in automated assessment of student lab activity, (if the lab is designed for that), and the optional creation of an environment in which the instructor can review the work of each student. See the Instructor Guide for details of assessment functions.
+Many cybersecurity lab exercises are assessed through use of reports in which students describe their activities and answer specific questions posed by the instructor. Labtainers are intended to augment, rather than supplant this type of reporting. The framework includes mechanisms for automating the collection of student lab reports into the artifact archive files that are collected by instructors.
+3 Creating new labs
+The most challenging and critical part of designing a new cybersecurity lab is the design of the lab itself, i.e., identifying learning objectives and organizing exercises to achieve those
+2Labtainers can also support labs in which students collaborate (or compete) on shared infrastructure. Please see section 12 for information on multi-user environments. We have not yet created any multi-user labs.
+7
+
+objectives. The Labtainer framework does not specifically address any of that. Rather, the framework is intended to allow you to focus more time on the design of the lab and less time mitigating and explaining system administration and provisioning burdens you would otherwise place on students and instructors.
+Labtainers includes a GUI for creating and maintaining labs. Alternately, you can create and maintain labs using the command line as described in 3.2. Each approach is summerized below.
+3.1 GUI-based lab creation
+The following step-by-step instructions create a simple lab having two computers, one of which contains a lab-specific program, and connected by a network. 3
+3.1.1 Start the labedit UI
+Start the Labtainers Lab Editor using the labedit command from any directory, If the labedit command is not in your path, try logging out and back in (the update-designer.sh script should have added that to your path.)
+The GUI resulting from labedit will initially open the telnetlab.
+3.1.2 New lab creation
+Select File / New Lab to create a new lab. Give the lab a name in the resulting dialog, and accept the default base configuration. (See 4.1 for a summary of the different base images.) A new container having the same name as the lab is initially created for the lab.
+This simple lab that you have just created contains one container that does not yet include lab-specific files.
+3.1.3 Test initial lab
+You can test this simple container via Run / Build & run. Note: Popup menus will remain open while Labtainers builds and starts the lab. Depending on the lab, this may take some time. You will see a new virtual terminal opened with a title reflecting the name you have given your new lab. That terminal is connected to a simple Ubuntu computer, that is your running lab.
+3.1.4 Stop the lab
+Use Run / Stop lab to stop the lab.
+3.1.5 Add a program to the container
+Then right-click on the container name in the Containers pane and select Open shell in container dir, which will create a shell in the subdirectory used by Labtainers to determine what is to present on the container when it runs. Create an executable within that directory, e.g., a hello world.sh script and make it executable.
+Use Build and run to rebuild your lab and confirm the presence and function of the program that you added. Then stop the lab.
+3These instructions assume you are familiar with basics of Unix command line and file operations. The UI allows you to avoid many command line operations, however you still must create and manage files that will be present in the lab.
+8
+
+3.1.6 Add a 2nd computer Click the Add button above the Containers pane and provide a name for the new computer.
+3.1.7 Add a network Click the Add button above the Networks pane and provide a name for the network and give it a netmask of the form xxx.xxx.xxx.xxx/yy, e.g., 192.10.0.0/24. Assign a gateway IP address (this is the address via which Docker communicates between the host and components on the network.) This should not be an IP address of any component on your virtual network. Do not modify any of the other network configuration values. Use the Confirm button to close the network dialog.
+3.1.8 Connect computers to the network Click each of the two containers in the Containers pane and use the Networks Add button to add the network to the container and assign it a unique IP address. Use the Confirm button to close the container dialogs.
+Restart the lab and use ifconfig (or ip addr) on each computer to confirm IP address assignment and ping one computer from the other. Use stop lab to stop the lab.
+3.1.9 Parameterize the lab Edit your hello-world program to display a string literal called "REPLACEME". In the GUI click the "Parameterize" button, then click "Create". Give the parameter an identifier, select the initial container from the pulldown list, and enter the absolute path of the program file as it exists on the container, e.g., /home/ubuntu/myprog.sh4. Leave the operator as RAND REPLACE and provide a range for the random values. In the symbol field, enter the REPLACEME string that you put in your program. Then build and run the lab and run the hello world program to observe the random value.
+3.2 Command line lab creation
+Typical steps for developing a new lab using the command line are: 1. Give the lab a name and create its computers using the new lab setup.py script, identifying the desired based container images; 2. Add software packages within a Dockerfile; 3. Define networks and connections to the lab computers in the lab's start.config file. 4. Populate the user's HOME directory and system directories with lab-specific files.
+The remainder of this section covers the fist step and provides an example. The following section 4, covers the other three steps. After a lab is created, you can then optionally parameterize it per section 5 and/or define criteria for automated assessment per section 6
+4Be sure to press Enter in the file name text field, otherwise the value you type will disappear.
+9
+
+3.2.1 Create the first lab computer
+Labtainer exercises each have their own directory under the "labs" directory in the project repository. The first step in creating a new lab within the framework is to create a directory for the lab and then cd to it. The directory name will be the name used by students when starting the lab. It must be all lower case and not contain spaces.
+cd $LABTAINER_DIR/labs mkdir <new lab name> cd <new lab name>
+After the new lab directory is created, run the "new lab setup.py" script. 5
+new_lab_setup.py
+This will create a set of template files that you can then customize for the new lab. These template files are referenced in the discussion below. The result of running new lab setup.py is a new labtainer lab that can be immediately run. While this new lab will initially only present you with a bash shell to an empty directory on a Linux computer, it is worth testing the lab to understand the workflow.
+3.2.2 Testing the new lab
+Once a new lab directory is created, and the new lab setup.py has been run, then you can test the new, (currently empty) lab. All student labs are launched from the labtainer-student directory. Lab development workflow is easiest if at least two terminals or tabs are used, one in the new lab directory, and one in the labtainer-student directory. So, open a new tab or window, and then:
+cd $LABTAINER_DIR/scripts/labtainer-student
+Then start the lab using the:
+rebuild [labname]
+command, where labname is the name of the lab you just created. The rebuild command 6 will remove and recreate the lab containers each time the script
+is run. And it will rebuild the container images if any of their configuration information has changed. 7 This is often necessary when building and testing new labs, to ensure the new environment does not contain artifacts from previous runs. The progress of the build, and error messages can be viewed in the labtainer.log file. While developing, it is generally a good idea to tail this log in a separate terminal:
+tail -f labtainer.log
+5The $LABTAINER DIR will have been defined in your .bashrc file when you installed Labtainers. It should point to the labtainers/trunk directory. You may need to start a new bash shell to inherit the environment variable.
+6Previously named rebuild.py 7The build process may generate warnings in red text, some of which are expected. These include an unreferenced "user" variable and the lack of apt-utils if apt-get is used to install packages in Dockerfiles.
+10
+
+If the rebuild fails with a error reflecting a problem resolving hostnames, e.g., mirror.centos.com, please see 14.8.
+Note the rebuild command is not intended for use by students, they would use the "labtainer" command. The rebuild utility compares file modification dates to Docker image creation dates to determine if a given image needs to be rebuilt. The rebuild may miss file deletions. Thus, if files are deleted, you must force the rebuild using the -f option at the end of the rebuild command. Also, addition of symbolic links will not trigger a rebuild. Rebuild references git modify dates (vice file modify dates).
+Stop the lab with
+stoplab
+When you stop the lab, a path to saved results is displayed. This is the zip file that the student will forward to the instructor.
+To test adding a "hello world" program to the new labtainer, perform the following steps:
+· From the new lab directory window, cd $LABTAINER_DIR/labs/[labname]/[labname]
+· Create a "hello world" program, e.g., in python or compiled C.
+· From the labtainer-student window, run rebuild [labname]
+You should see the new program in the container's home directory. If you run the program from the container, and then stop the lab with stoplab, you will see the stdin and stdout results of the program within the saved zip file.
+The "hello world" program was placed in $LABTAINER_DIR/labs/[labname]/[labname]. The seemingly redundant "labname" directories are a naming convention in which the second directory names one of potentially many containers. In this simple example, the lab has but one container, whose name defaults to the lab name.
+The following sections describe how to further alter the lab execution environment seen by the student.
+3.2.3 Multiple containers The new lab setup.py script can be used to create additional containers for use in the lab. For example, from your new lab directory:
+new_lab_setup.py -a joe_computer
+will create a second container for your lab, named "joe computer". If you again run the rebuild script, you will see two virtual terminals, each connected to one of your two independent computers. Use
+new_lab_setup.py -h
+to view the operations available in that script. The following sections describe how to configure the execution environments on your com-
+ponents, and how to define virtual networks connected to the components.
+11
+
+4 Defining the lab execution environment
+A given lab typically requires some set of software packages, and some system configuration, e.g., network settings, and perhaps some lab-specific files. It can include multiple containers, each appearing as distinct computers connected via networks. The execution environment seen by a student when interacting with one of these "computers" is therefore defined by the configuration of the associated container.
+Software packages are defined in each container's Dockerfile, described in the subsection below. That is followed by subsection 4.2 describing network definitions, (and other computer attributes) in the start.config file or GUI. The remaining subsections then described populating the user HOME directory and system directories, and methods for starting system services and miscellaneous environment settings.
+Labtainer containers, by default, present students with a virtual terminal and a bash shell requiring no login. Alternate initial environments, including use of the login program, are described in section 4.7.
+Section 4.9 describes how to allow students to share tools they've developed between different labs.
+4.1 Docker files
+A Labtainer-specific Dockerfile is placed in the new lab's "Dockerfiles" directory when the new lab is created. And additional Dockerfiles are added when the new computers are added via the GUI, or via new lab setup.py -a script. We use standard Docker file syntax, which is described at https://docs.docker.com/engine/reference/builder/ The Dockerfile for container can be opened by clicking on the container and selecting the Docker tab.
+Dockerfiles vary depending on the base configuration selected for the computer in the GUI, or using the --base name option in the new lab setup.py script. The default base Dockerfile refers to a Labtainer image that contains the minimum set of Linux packages necessary to host a lab within the framework. The default execution environment builds off of a recent Ubuntu image. Each container has its own Dockerfile within the
+$LABTAINER_DIR/labs/[labname]/dockerfiles
+directory. The naming convention for Dockerfiles is
+Dockerfile.[labname].[container_name].student
+The first line of each Dockerfile identifies the baseline Labtainer image to be pulled from the Docker Hub. Base images include:
+· labtainer.base ­ Minimal Ubuntu system.
+· labtainer.network ­ Networking packages installed and xinetd running, but network services not activated
+· labtainer.network.ssh ­ Same as network, but with ssh active in the xinetd configuration.
+· labtainer.centos ­ A CentOS server with systemd and the true "init" initial process.
+· labtainer.lamp ­ A CentOS server with Apache, Mysql and PHP, (the LAMP stack)
+· labtainer.firefox ­ An Ubuntu container with the Firefox browser.
+· labtainer.wireshark ­ The labtainer.network with wireshark added.
+12
+
+· labtainer.java ­ An Ubuntu container with the Firefox browser and the open JDK.
+· labtainer.kali ­ A Kali Linux system with the Metasploit framework.
+· labtainer.metasploitable ­ The Metasploitable-2 vulnerable server.
+· labtainer.bird ­ The Bird router (See the bird labs).
+· labtainer.owasp ­ The firefox base with the OWASP zap toolset.
+· labtainer.juiceshop ­ The OWASP vulnerable Juice Shop web server.
+Refer to the Dockerfiles in $LABTAINER DIR/scripts/designer/base dockerfiles to see which software packages are included within each baseline image.
+The Dockerfile is used to add packages to your container, e.g.,
+RUN apt-get update && apt-get install -y some_package
+You will also see "ADD" commands in the Docker file that populate the container directories with lab-specific files such as described in section 4.3.
+4.2 Container definitions in start.config
+This section is primarily for designers who use the command line, though GUI users may find the descriptions below to be helpful. The GUI provides interfaces for setting these configuration values, and includes tool-tip for most of them.
+Most single container labs can use the automatically generated start.config file without modification. Adding networks to containers and defining users other than the default "ubuntu" user requires modification of the start.config file. The following describes the major sections of that configuration file. Most of the configuration entries can be left alone for most labs.
+· GLOBAL SETTINGS ­ These lab-wide parameters include:
+­ GRADE CONTAINER ­ Deprecated ­ HOST HOME XFER [dir name] ­ Deprecated ­ LAB MASTER SEED [seed] ­ The master seed string for this lab. It is combined
+with the student email address to create an instance seed that controls parameterization of individual student labs. ­ REGISTRY [registry] ­ The id of the Docker Hub registry that is to contain the lab images. This defaults to the registry value defined in the labtainers.config file. ­ BASE REGISTRY [base registry] ­ The id of the Docker Hub registry that contains the base image for the container. This defaults to the default registry per the labtainer.config file. See 9 for details on the use of this keyword. ­ COLLECT DOCS [yes/no] ­ Optional directive to collect lab/docs content as part of student artifacts. These are then available to the instructor in the labtainer xfer/[lab]/docs directory. Also see 4.6. ­ CHECKWORK [yes/no] ­ Optional directive to disable (set to "no") ability of student to check their own work from the labtainer-student directory.
+13
+
+· NETWORK [network name] ­ One of these sections is required for each network within the lab. The name is used within the start.config file to refer to the network. It is suggested that this name NOT be used in lab guides since it is not visible to students8. Where possible, name networks with their subnet mask, e.g., 10.1.0.0/24. In addition to providing a name for the network, the following values are defined for the NETOWRK:
+­ MASK [network address mask] ­ The network mask, e.g., 172.25.0.0./24
+­ GATEWAY [gateway address] ­ The IP address of the network gateway used by Docker to communicate with the host. Please note that to define a different network gateway for the component, you should use the LAB GATEWAY parameter for containers. This GATEWAY field should not name the IP of any of your other components.
+­ MACVLAN EXT [N] ­ Optional, causes the Docker network driver to create and use a macvlan tied to the given Nth ethernet interface (in alphabetical order) that lacks an assigned IP address. The network device is expected to be on a "host-only" VM network. The VMM should disable the DHCP server on this network. The network adaptor itself needs to be placed in primiscous mode on the Linux VM, e.g., using "sudo ifconfig enp0s8 promisc." These types of interfaces can be used to communicate with external hosts, e.g., other VMs as described in 8.3
+­ MACVLAN ­ Similar to MACVALN EXT, except a macvlan will not be created unless the Labtainer lab is started as a multi-user lab as descrbed in 12.
+­ IP RANGE [range] ­ Deprecated
+· CONTAINER [container name] ­ One of these sections is required for each container in the lab. Default values for container sections are automatically created by the new lab setup.py script. In addition to naming the container, the following values are defined:
+­ TERMINALS [quantity] ­ The number of virtual terminals to open and attach to this container when a lab starts. If missing, it defaults to 1. Terminal titles are set to the bash shell prompt. A value of 0 suppresses creation of a terminal, and a value of -1 prevents the student from attaching a terminal to the container.
+­ TERMINAL GROUP [name] ­ All virtual terminals within the same group are organized as tabs within a single virtual terminal. Terminal group names can be arbitrary strings.
+­ XTERM [title] [script] ­ The named script is executed in a virtual terminal with the given title. The system will change to the user's home directory prior to executing the script. The script should be placed in container bin directory, i.e.,
+$LABTAINER_DIR/labs/[labname]/[container]/_bin
+­ USER [user name] ­ The user name whose account will be accessed via the virtual terminals. This defaults to "ubuntu."
+­ PASSWORD [password] ­ The password for the user name whose account will be accessed via the virtual terminals. This defaults to the user name defined above.
+­ [network name] [ip address] ­ Network address assignments for each network (defined via a NETWORK section), that is to be connected to this container. A separate line should be entered for each network. The given ip address can be one of the following:
+8You may note several Labtainers labs failed to heed this advise.
+14
+
+ An IP address  An IP address with an optional MAC address assignment as a suffix following
+a colon, e.g., 172.25.0.1:2:34:ac:19:0:2.  An IP address with an optional clone offset, e.g., 172.25.0.1+CLONE to cause
+each clone to be assigned an address from a sequence starting with the given address. Only intended for use with containers having the CLONE option described below.  Similar to the use of the +CLONE suffix, CLONE MAC only takes effect if the lab is started in multi-user mode. When started with the --workstation switch, this directs the system to generate a MAC address whose last four bytes match those of the host network interface. When stated as a multi-user lab with all containers on one VM, e.g., the --client count switch, then the allocated IP address is incremeted by one less than the clone instance number.  If AUTO is provided as the address, an address is chosen for you from the subnet range.
+Multiple IP addresses per network interface by appending a :n to the network name, e.g.,
+MY_LAN:1 172.24.0.3 MY_LAN:2 172.24.0.4
+­ SCRIPT [script] ­ Optional script to provide to the Docker create command, defaults to "bash". This must be set to "NONE" for CentOS-based components, Ubuntu systemd components, or other images that run a true Linux init process.).
+­ ADD-HOST [host:ip -- network] ­ Optional addition to the /etc/hosts file, a container may have multiple ADD-HOST entries. If a network name is provided, then every component on that network will get an entry in the hosts file.
+­ X11 [YES/NO] ­ Optional, defaults to NO. If YES, the container mounts the TCP socket used by the hosts X11 server, enabling the container to run applications with GUIs, e.g., browsers or wireshark. See sql-inject as an example. See the Notes section (14) at the end of this manual for tips on using Firefox and Wireshark.
+­ CLONE [quantity] ­ optional quantity of copies of this container to create. Each copy is assigned a monotonically increasing integer starting with one, and this value can be used for the network address as describe above, and within parameterization as described in section 5. This option is not intended for use in creating multi-user labs.
+­ NO PULL [YES/NO] ­ Use a local instance of the container image rather than pulling it from the Docker hub.
+­ LAB GATEWAY ­ Optional IP address of the component's default network gateway. If set, this will replace the default Docker gateway. Students can toggle between gateways by using the togglegw.sh command, e.g., to enable communication with the host VM or the internet9. This option will also cause the static route to the my host address to be deleted.
+­ NAME SERVER ­ Optional IP address to provide with the nameserver directive to replace the content of /etc/resolv.conf
+­ NO GW [YES/NO] ­ Disable the Docker default gateway, preventing network communication with the host or external devices.
+9This replaces use of the set default gw.sh script from within fixlocal.sh scripts
+15
+
+­ REGISTRY [registry] ­ The id of the Docker Hub registry that is to contain the lab images. This overrides the value set in the GLOBAL section.
+­ BASE REGISTRY [base registry] ­ The id of the Docker Hub registry that contains the base image for the container. This defaults to the default registry per the labtainer.config file.
+­ THUMB VOLUME ­ Optional arguments to a mount command that will be executed in a GNS3 environment when the student selects insert thumb drive from a component menu. NOTE: Use of this option will cause the host /dev directory to be shared with the container. This allows the container to perform all kinds of mischief.
+­ THUMB COMMAND ­ Optional command that will run prior mounting the THUMB volume defined above.
+­ THUMB STOP ­ Optional command that will run when the container is stopped under GNS3.
+­ PUBLISH [publish] ­ Optional arguments to the Docker --publish argument for making container ports visible at the host interface. For example, a value of
+127.0.0.1:60022:22/tcp
+will bind host port 60022 to container port 22. ­ HIDE [hide] ­ If YES, the associated node will be hidden in GNS3 environments
+when the --student option if ­ NO PRIVILEGE ­ If YES, the container runs without Docker privilege. ­ MYSTUFF ­ if YES, the directory at labtainerstudent/mystuff is shared with
+the container in /home/<user>/mystuff. used. ­ MOUNT [hostv:containerv] ­ Intended for use with licensed software installations,
+e.g., IDA Free, will cause a directory located at:
+~/.local/share/labtainers/[hostv]
+at a mount point on the container at:
+~/[containerv]
+The purpose is allow that host directory to be reused across labs to avoid re-installing licensed software, i.e., something where the student takes a distinct action to acknowledge a license. ­ WAIT FOR ­ Optional name of another container whose parameterization and fixlocal processing should complete prior to this container starting its parameterization. ­ NUM CPUS ­ Optional allocation of CPUs to this container. Note the container sees all CPUs, e.g., every core allocated to the VM using lscpu, but Docker will limit the container utilization of CPUs per this value, which may be a decimal value. ­ CPU SET ­ Optional allocation of specific CPU sets to this container. Format is either a comma separated list or a range, e.g, 1-3.
+A simple example of a two-container lab with network settings in the start.config file can be found in
+$LABTAINER_DIR/labs/telnetlab
+Entries in the start.config file can be parameterized as described in section 5, e.g., to allocate random IP addresses to components.
+16
+
+4.3 Lab-specific files in the student's home directory
+Files that are to reside relative to the student's $HOME directory are placed in the new lab container directory. For example, if a lab is to include a source code file, that should be placed in the lab container directory. The file will appear in the student's home directory within the container when the container starts. The lab container directory is at:
+$LABTAINER_DIR/labs/[labname]/[container name]
+The container name in labs with a single container matches the labname by default. All files and directories in the lab container directory will be copied to the student's HOME
+directory except for the bin and system directories. Each initial Dockerfile from the templates include this line:
+ADD $labdir/$lab.tar.gz $HOME to accomplish the copying. Except as noted below, Dockerfiles should not include any other ADD commands to copy files to the HOME directory.
+4.3.1 Large or numerous files in the home directory If there are large sized, or a high quantity of files that are to be placed relative to a container home directory, those should be placed into a "home tar" directory at:
+$LABTAINER_DIR/labs/[labname]/[container_name]/home_tar/ Use of this technique prevents these files from being collected as student artifacts, which otherwise include copies of everything relative to the home directory 10. This can save considerable time and space, e.g., on the instructor's computer that must collect all student artifacts. The individual files should exist in the home tar directory, and the framework automatically creates the tar file for transfer to the Docker image, (and will do so if an existing tar file is older than any file in the directory). Manifests can be used for the home tar content as described in 9.3.1. You can force collection of selected files from the home tar by putting the filename into a file at:
+$LABTAINER_DIR/labs/[labname]/[container_name]/_bin/noskip Files whose basenames match any found in noskip will be collected.
+Alternately, a file at /var/tmp/home.tar will be expanded into the user home directory. Use the Docker COPY directive to place a file here. See the
+$LABTAINER_DIR/scripts/designer/base_dockerfiles/Dockerfile.labtainer.firefox for an example. These files will not be collected unless they are newer than the original file, or if the base file name appears in the noskip list described above.
+10Actually, we only collect files whose modify dates are more recent than the container, so use of home tar is not as important as it previously was.
+17
+
+4.4 Lab-specific system files
+All files in the
+$LABTAINER_DIR/labs/[labname]/[container name]/_system
+directory will be copied to their corresponding paths relative to the root directory. For example, configuration files for /etc should appear in system/etc/.
+The initial Dockerfile from the templates include this line:
+ADD $labdir/sys_$lab.tar.gz /
+to accomplish the copying. If a lab contains a large quantity of system files, or large files, those can be placed into the directory named:
+$LABTAINER_DIR/labs/[labname]/[container name]/sys_tar
+either as individual files, or in a "sys.tar" archive. In the former case, the framework will automatically create the sys.tar file. This technique can save time in building lab images because the files do not need to be archived for each build.
+In general, files modified and maintained by the designer should go into the system directory while static system files should go into the sys tar directory.
+NOTE: CentOS systems do not have a /bin directory, that is actually a link. If you create a system/bin directory for the lab, that will trash the /bin link and result in an obscure Docker build error.
+4.5 System services
+The general Docker model is that a single Docker container runs a single service started via the ENTRYPOINT command, with logging being forwarded to the host. Labtainers disregards this model because our goal is to make a container look more like a Linux system rather than a conformant Docker container. Labtainer Dockerfiles for Ubuntu and Centos containers use systemd based images that run the /usr/sbin/init process. 11 The labtainer.network configuration of the baseline Dockerfile also starts xinetd, which will then fork services, e.g., the sshd, per the /etc/xinet.d/ configuration files.
+Services should be added using systemd constructs. For those of us who often forget what those are, a simple web server service can be added to a container by unpacking this tar from the witin the container's directory:
+tar -xf $LABTAINER_DIR/scripts/designer/services/web-server.tar
+And enable the service in the bin/fixlocal.sh file with:
+echo $1 | sudo -S systemctl enable httpserver.service echo $1 | sudo -S systemctl start httpserver.service
+The centos-logs lab provides an example of forcing the student to login using the traditional login program, as described in section 4.7.
+See section 14.9 for guidance on including 3rd party applications within your labs (e.g., ones that are not simply added to your container via package managers.)
+11Now deprecated Ubuntu-based Labtainer Dockerfiles included an ENTRYPOINT command that launches a faux init script that starts rsyslog, (so that system logs appear in /var/log), and runs rc.local.
+18
+
+4.6 Lab Instructions for Students
+Create a 'docs' directory in the [labname] directory if there isn't one there. This is where most textual information about the lab, as well as the lab manual, should be stored and modified.
+Use LateX to write and create PDF files in the docs directory. Look at other lab's docs directory on how to create a Makefile for the LateX file.
+Display a message to the student before any of the lab virtual terminals are created by creating a read first.txt in the 'docs' directory. Any text within the
+$LABTAINER_DIR/labs/[labname]/docs/read_first.txt
+file will be displayed on the Linux host in the terminal in which the student starts the lab.
+· Any "LAB MANUAL" string in that file will be replaced with the full path to a [labname].pdf file within that same docs directory. And "LAB DOCS" is replaced by the path to the lab docs directory.
+· One intended use is to prompt the student to open a PDF lab manual and perhaps read parts of it prior to continuing with the lab. Another intended use is to display the path to a reporting template that a student is to use for answering lab-specific questions and note taking.
+· If the name of the symbols are prefaced by "file://", then the paths will display as links that can be opened via a right click.
+An about.txt file should be present in the 'config' directory of the lab. Any text inside will be displayed as a description to the lab when listed from running the labtainer command. This text will also appear when clicking on the logo in the GNS3 environment of Labtainers. That directory should also include a keywords.txt file that associates searchable keywords with the lab. Use the labtainer -k option to view a list of existing keywords. Do no create new keywords unless clearly needed.
+If the start.config file includes "COLLECT DOCS YES", the content of the lab/docs directory will be included with the student artifacts and available extracted into the instructor's labtainer xfer/[lab]/docs directory.
+4.7 Running programs in Virtual Terminals
+Programs can be started automatically within virtual terminals using two methods. The first is the "XTERM" directive in the container section in the start.config file described in 4.2. That is intended for programs whose results are displayed within the virtual terminal, (see the plc lab for examples). The second method is intended for user authentication and for starting GUI based programs that will use the Linux host Xserver. If a file exists at:
+$LABTAINER_DIR/labs/[labname]/[container name]/_bin/student_startup.sh
+it will be executed from each virtual terminal created for the container. See the sql-inject lab and the centos-log lab examples, with the latter running the login program to require students to login prior to getting a shell prompt. 12 Note that on CentOS systems, the student startup.sh
+12On CentOS systems, copy the login program from labs/centos-log/centos-log/ system/sbin/login to your container's system/sbin directory. The login program from Ubuntu works as is.
+19
+
+

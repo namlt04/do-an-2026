@@ -1,0 +1,9 @@
+[https://github.com/harish303118/Cloud-Engineer-Roadmap](https://github.com/harish303118/Cloud-Engineer-Roadmap)
+[https://github.com/iam-veeramalla/aws-devops-zero-to-hero](https://github.com/iam-veeramalla/aws-devops-zero-to-hero)
+[https://github.com/iam-veeramalla/Docker-Zero-to-Hero](https://github.com/iam-veeramalla/Docker-Zero-to-Hero)
+[https://github.com/iam-veeramalla/Jenkins-Zero-To-Hero](https://github.com/iam-veeramalla/Jenkins-Zero-To-Hero)
+[https://github.com/iam-veeramalla/Kubernetes-zero-to-hero](https://www.google.com/search?q=https://github.com/iam-veeramalla/Kubernetes-zero-to-hero)
+[https://github.com/OWASP/DevSecOps-Guideline](https://www.google.com/search?q=https://github.com/OWASP/DevSecOps-Guideline)
+[https://owasp.org/www-project-devsecops-guideline/latest/](https://owasp.org/www-project-devsecops-guideline/latest/)
+[https://github.com/coreruleset/coreruleset](https://github.com/coreruleset/coreruleset)
+https://nps.edu/web/c3o/labtainers

@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<!-- saved from url=(0056)https://seclab.ptit.edu.vn/student/question/fund-gdb-cpp -->
+<html lang="vi"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style>    .error_widget_wrapper {        background: inherit;        color: inherit;        border:none    }    .error_widget {        border-top: solid 2px;        border-bottom: solid 2px;        margin: 5px 0;        padding: 10px 40px;        white-space: pre-wrap;    }    .error_widget.ace_error, .error_widget_arrow.ace_error{        border-color: #ff5a5a    }    .error_widget.ace_warning, .error_widget_arrow.ace_warning{        border-color: #F1D817    }    .error_widget.ace_info, .error_widget_arrow.ace_info{        border-color: #5a5a5a    }    .error_widget.ace_ok, .error_widget_arrow.ace_ok{        border-color: #5aaa5a    }    .error_widget_arrow {        position: absolute;        border: solid 5px;        border-top-color: transparent!important;        border-right-color: transparent!important;        border-left-color: transparent!important;        top: -5px;    }</style><style id="ace-tm">.ace-tm .ace_gutter {background: #f0f0f0;color: #333;}.ace-tm .ace_print-margin {width: 1px;background: #e8e8e8;}.ace-tm .ace_fold {background-color: #6B72E6;}.ace-tm {background-color: #FFFFFF;color: black;}.ace-tm .ace_cursor {color: black;}.ace-tm .ace_invisible {color: rgb(191, 191, 191);}.ace-tm .ace_storage,.ace-tm .ace_keyword {color: blue;}.ace-tm .ace_constant {color: rgb(197, 6, 11);}.ace-tm .ace_constant.ace_buildin {color: rgb(88, 72, 246);}.ace-tm .ace_constant.ace_language {color: rgb(88, 92, 246);}.ace-tm .ace_constant.ace_library {color: rgb(6, 150, 14);}.ace-tm .ace_invalid {background-color: rgba(255, 0, 0, 0.1);color: red;}.ace-tm .ace_support.ace_function {color: rgb(60, 76, 114);}.ace-tm .ace_support.ace_constant {color: rgb(6, 150, 14);}.ace-tm .ace_support.ace_type,.ace-tm .ace_support.ace_class {color: rgb(109, 121, 222);}.ace-tm .ace_keyword.ace_operator {color: rgb(104, 118, 135);}.ace-tm .ace_string {color: rgb(3, 106, 7);}.ace-tm .ace_comment {color: rgb(76, 136, 107);}.ace-tm .ace_comment.ace_doc {color: rgb(0, 102, 255);}.ace-tm .ace_comment.ace_doc.ace_tag {color: rgb(128, 159, 191);}.ace-tm .ace_constant.ace_numeric {color: rgb(0, 0, 205);}.ace-tm .ace_variable {color: rgb(49, 132, 149);}.ace-tm .ace_xml-pe {color: rgb(104, 104, 91);}.ace-tm .ace_entity.ace_name.ace_function {color: #0000A2;}.ace-tm .ace_heading {color: rgb(12, 7, 255);}.ace-tm .ace_list {color:rgb(185, 6, 144);}.ace-tm .ace_meta.ace_tag {color:rgb(0, 22, 142);}.ace-tm .ace_string.ace_regex {color: rgb(255, 0, 0)}.ace-tm .ace_marker-layer .ace_selection {background: rgb(181, 213, 255);}.ace-tm.ace_multiselect .ace_selection.ace_start {box-shadow: 0 0 3px 0px white;}.ace-tm .ace_marker-layer .ace_step {background: rgb(252, 255, 0);}.ace-tm .ace_marker-layer .ace_stack {background: rgb(164, 229, 101);}.ace-tm .ace_marker-layer .ace_bracket {margin: -1px 0 0 -1px;border: 1px solid rgb(192, 192, 192);}.ace-tm .ace_marker-layer .ace_active-line {background: rgba(0, 0, 0, 0.07);}.ace-tm .ace_gutter-active-line {background-color : #dcdcdc;}.ace-tm .ace_marker-layer .ace_selected-word {background: rgb(250, 250, 255);border: 1px solid rgb(200, 200, 250);}.ace-tm .ace_indent-guide {background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bLly//BwAmVgd1/w11/gAAAABJRU5ErkJggg==") right repeat-y;}
+/*# sourceURL=ace/css/ace-tm */</style><style id="ace_editor.css">.ace_br1 {border-top-left-radius    : 3px;}.ace_br2 {border-top-right-radius   : 3px;}.ace_br3 {border-top-left-radius    : 3px; border-top-right-radius:    3px;}.ace_br4 {border-bottom-right-radius: 3px;}.ace_br5 {border-top-left-radius    : 3px; border-bottom-right-radius: 3px;}.ace_br6 {border-top-right-radius   : 3px; border-bottom-right-radius: 3px;}.ace_br7 {border-top-left-radius    : 3px; border-top-right-radius:    3px; border-bottom-right-radius: 3px;}.ace_br8 {border-bottom-left-radius : 3px;}.ace_br9 {border-top-left-radius    : 3px; border-bottom-left-radius:  3px;}.ace_br10{border-top-right-radius   : 3px; border-bottom-left-radius:  3px;}.ace_br11{border-top-left-radius    : 3px; border-top-right-radius:    3px; border-bottom-left-radius:  3px;}.ace_br12{border-bottom-right-radius: 3px; border-bottom-left-radius:  3px;}.ace_br13{border-top-left-radius    : 3px; border-bottom-right-radius: 3px; border-bottom-left-radius:  3px;}.ace_br14{border-top-right-radius   : 3px; border-bottom-right-radius: 3px; border-bottom-left-radius:  3px;}.ace_br15{border-top-left-radius    : 3px; border-top-right-radius:    3px; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px;}.ace_editor {position: relative;overflow: hidden;padding: 0;font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;direction: ltr;text-align: left;-webkit-tap-highlight-color: rgba(0, 0, 0, 0);}.ace_scroller {position: absolute;overflow: hidden;top: 0;bottom: 0;background-color: inherit;-ms-user-select: none;-moz-user-select: none;-webkit-user-select: none;user-select: none;cursor: text;}.ace_content {position: absolute;box-sizing: border-box;min-width: 100%;contain: style size layout;font-variant-ligatures: no-common-ligatures;}.ace_dragging .ace_scroller:before{position: absolute;top: 0;left: 0;right: 0;bottom: 0;content: '';background: rgba(250, 250, 250, 0.01);z-index: 1000;}.ace_dragging.ace_dark .ace_scroller:before{background: rgba(0, 0, 0, 0.01);}.ace_selecting, .ace_selecting * {cursor: text !important;}.ace_gutter {position: absolute;overflow : hidden;width: auto;top: 0;bottom: 0;left: 0;cursor: default;z-index: 4;-ms-user-select: none;-moz-user-select: none;-webkit-user-select: none;user-select: none;contain: style size layout;}.ace_gutter-active-line {position: absolute;left: 0;right: 0;}.ace_scroller.ace_scroll-left {box-shadow: 17px 0 16px -16px rgba(0, 0, 0, 0.4) inset;}.ace_gutter-cell {position: absolute;top: 0;left: 0;right: 0;padding-left: 19px;padding-right: 6px;background-repeat: no-repeat;}.ace_gutter-cell.ace_error {background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAABOFBMVEX/////////QRswFAb/Ui4wFAYwFAYwFAaWGAfDRymzOSH/PxswFAb/SiUwFAYwFAbUPRvjQiDllog5HhHdRybsTi3/Tyv9Tir+Syj/UC3////XurebMBIwFAb/RSHbPx/gUzfdwL3kzMivKBAwFAbbvbnhPx66NhowFAYwFAaZJg8wFAaxKBDZurf/RB6mMxb/SCMwFAYwFAbxQB3+RB4wFAb/Qhy4Oh+4QifbNRcwFAYwFAYwFAb/QRzdNhgwFAYwFAbav7v/Uy7oaE68MBK5LxLewr/r2NXewLswFAaxJw4wFAbkPRy2PyYwFAaxKhLm1tMwFAazPiQwFAaUGAb/QBrfOx3bvrv/VC/maE4wFAbRPBq6MRO8Qynew8Dp2tjfwb0wFAbx6eju5+by6uns4uH9/f36+vr/GkHjAAAAYnRSTlMAGt+64rnWu/bo8eAA4InH3+DwoN7j4eLi4xP99Nfg4+b+/u9B/eDs1MD1mO7+4PHg2MXa347g7vDizMLN4eG+Pv7i5evs/v79yu7S3/DV7/498Yv24eH+4ufQ3Ozu/v7+y13sRqwAAADLSURBVHjaZc/XDsFgGIBhtDrshlitmk2IrbHFqL2pvXf/+78DPokj7+Fz9qpU/9UXJIlhmPaTaQ6QPaz0mm+5gwkgovcV6GZzd5JtCQwgsxoHOvJO15kleRLAnMgHFIESUEPmawB9ngmelTtipwwfASilxOLyiV5UVUyVAfbG0cCPHig+GBkzAENHS0AstVF6bacZIOzgLmxsHbt2OecNgJC83JERmePUYq8ARGkJx6XtFsdddBQgZE2nPR6CICZhawjA4Fb/chv+399kfR+MMMDGOQAAAABJRU5ErkJggg==");background-repeat: no-repeat;background-position: 2px center;}.ace_gutter-cell.ace_warning {background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAmVBMVEX///8AAAD///8AAAAAAABPSzb/5sAAAAB/blH/73z/ulkAAAAAAAD85pkAAAAAAAACAgP/vGz/rkDerGbGrV7/pkQICAf////e0IsAAAD/oED/qTvhrnUAAAD/yHD/njcAAADuv2r/nz//oTj/p064oGf/zHAAAAA9Nir/tFIAAAD/tlTiuWf/tkIAAACynXEAAAAAAAAtIRW7zBpBAAAAM3RSTlMAABR1m7RXO8Ln31Z36zT+neXe5OzooRDfn+TZ4p3h2hTf4t3k3ucyrN1K5+Xaks52Sfs9CXgrAAAAjklEQVR42o3PbQ+CIBQFYEwboPhSYgoYunIqqLn6/z8uYdH8Vmdnu9vz4WwXgN/xTPRD2+sgOcZjsge/whXZgUaYYvT8QnuJaUrjrHUQreGczuEafQCO/SJTufTbroWsPgsllVhq3wJEk2jUSzX3CUEDJC84707djRc5MTAQxoLgupWRwW6UB5fS++NV8AbOZgnsC7BpEAAAAABJRU5ErkJggg==");background-position: 2px center;}.ace_gutter-cell.ace_info {background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAAAAAA6mKC9AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAJ0Uk5TAAB2k804AAAAPklEQVQY02NgIB68QuO3tiLznjAwpKTgNyDbMegwisCHZUETUZV0ZqOquBpXj2rtnpSJT1AEnnRmL2OgGgAAIKkRQap2htgAAAAASUVORK5CYII=");background-position: 2px center;}.ace_dark .ace_gutter-cell.ace_info {background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAJFBMVEUAAAChoaGAgIAqKiq+vr6tra1ZWVmUlJSbm5s8PDxubm56enrdgzg3AAAAAXRSTlMAQObYZgAAAClJREFUeNpjYMAPdsMYHegyJZFQBlsUlMFVCWUYKkAZMxZAGdxlDMQBAG+TBP4B6RyJAAAAAElFTkSuQmCC");}.ace_scrollbar {contain: strict;position: absolute;right: 0;bottom: 0;z-index: 6;}.ace_scrollbar-inner {position: absolute;cursor: text;left: 0;top: 0;}.ace_scrollbar-v{overflow-x: hidden;overflow-y: scroll;top: 0;}.ace_scrollbar-h {overflow-x: scroll;overflow-y: hidden;left: 0;}.ace_print-margin {position: absolute;height: 100%;}.ace_text-input {position: absolute;z-index: 0;width: 0.5em;height: 1em;opacity: 0;background: transparent;-moz-appearance: none;appearance: none;border: none;resize: none;outline: none;overflow: hidden;font: inherit;padding: 0 1px;margin: 0 -1px;contain: strict;-ms-user-select: text;-moz-user-select: text;-webkit-user-select: text;user-select: text;white-space: pre!important;}.ace_text-input.ace_composition {background: transparent;color: inherit;z-index: 1000;opacity: 1;}.ace_composition_placeholder { color: transparent }.ace_composition_marker { border-bottom: 1px solid;position: absolute;border-radius: 0;margin-top: 1px;}[ace_nocontext=true] {transform: none!important;filter: none!important;clip-path: none!important;mask : none!important;contain: none!important;perspective: none!important;mix-blend-mode: initial!important;z-index: auto;}.ace_layer {z-index: 1;position: absolute;overflow: hidden;word-wrap: normal;white-space: pre;height: 100%;width: 100%;box-sizing: border-box;pointer-events: none;}.ace_gutter-layer {position: relative;width: auto;text-align: right;pointer-events: auto;height: 1000000px;contain: style size layout;}.ace_text-layer {font: inherit !important;position: absolute;height: 1000000px;width: 1000000px;contain: style size layout;}.ace_text-layer > .ace_line, .ace_text-layer > .ace_line_group {contain: style size layout;position: absolute;top: 0;left: 0;right: 0;}.ace_hidpi .ace_text-layer,.ace_hidpi .ace_gutter-layer,.ace_hidpi .ace_content,.ace_hidpi .ace_gutter {contain: strict;will-change: transform;}.ace_hidpi .ace_text-layer > .ace_line, .ace_hidpi .ace_text-layer > .ace_line_group {contain: strict;}.ace_cjk {display: inline-block;text-align: center;}.ace_cursor-layer {z-index: 4;}.ace_cursor {z-index: 4;position: absolute;box-sizing: border-box;border-left: 2px solid;transform: translatez(0);}.ace_multiselect .ace_cursor {border-left-width: 1px;}.ace_slim-cursors .ace_cursor {border-left-width: 1px;}.ace_overwrite-cursors .ace_cursor {border-left-width: 0;border-bottom: 1px solid;}.ace_hidden-cursors .ace_cursor {opacity: 0.2;}.ace_hasPlaceholder .ace_hidden-cursors .ace_cursor {opacity: 0;}.ace_smooth-blinking .ace_cursor {transition: opacity 0.18s;}.ace_animate-blinking .ace_cursor {animation-duration: 1000ms;animation-timing-function: step-end;animation-name: blink-ace-animate;animation-iteration-count: infinite;}.ace_animate-blinking.ace_smooth-blinking .ace_cursor {animation-duration: 1000ms;animation-timing-function: ease-in-out;animation-name: blink-ace-animate-smooth;}@keyframes blink-ace-animate {from, to { opacity: 1; }60% { opacity: 0; }}@keyframes blink-ace-animate-smooth {from, to { opacity: 1; }45% { opacity: 1; }60% { opacity: 0; }85% { opacity: 0; }}.ace_marker-layer .ace_step, .ace_marker-layer .ace_stack {position: absolute;z-index: 3;}.ace_marker-layer .ace_selection {position: absolute;z-index: 5;}.ace_marker-layer .ace_bracket {position: absolute;z-index: 6;}.ace_marker-layer .ace_error_bracket {position: absolute;border-bottom: 1px solid #DE5555;border-radius: 0;}.ace_marker-layer .ace_active-line {position: absolute;z-index: 2;}.ace_marker-layer .ace_selected-word {position: absolute;z-index: 4;box-sizing: border-box;}.ace_line .ace_fold {box-sizing: border-box;display: inline-block;height: 11px;margin-top: -2px;vertical-align: middle;background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAJCAYAAADU6McMAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJpJREFUeNpi/P//PwOlgAXGYGRklAVSokD8GmjwY1wasKljQpYACtpCFeADcHVQfQyMQAwzwAZI3wJKvCLkfKBaMSClBlR7BOQikCFGQEErIH0VqkabiGCAqwUadAzZJRxQr/0gwiXIal8zQQPnNVTgJ1TdawL0T5gBIP1MUJNhBv2HKoQHHjqNrA4WO4zY0glyNKLT2KIfIMAAQsdgGiXvgnYAAAAASUVORK5CYII="),url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAA3CAYAAADNNiA5AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACJJREFUeNpi+P//fxgTAwPDBxDxD078RSX+YeEyDFMCIMAAI3INmXiwf2YAAAAASUVORK5CYII=");background-repeat: no-repeat, repeat-x;background-position: center center, top left;color: transparent;border: 1px solid black;border-radius: 2px;cursor: pointer;pointer-events: auto;}.ace_dark .ace_fold {}.ace_fold:hover{background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAJCAYAAADU6McMAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJpJREFUeNpi/P//PwOlgAXGYGRklAVSokD8GmjwY1wasKljQpYACtpCFeADcHVQfQyMQAwzwAZI3wJKvCLkfKBaMSClBlR7BOQikCFGQEErIH0VqkabiGCAqwUadAzZJRxQr/0gwiXIal8zQQPnNVTgJ1TdawL0T5gBIP1MUJNhBv2HKoQHHjqNrA4WO4zY0glyNKLT2KIfIMAAQsdgGiXvgnYAAAAASUVORK5CYII="),url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAA3CAYAAADNNiA5AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACBJREFUeNpi+P//fz4TAwPDZxDxD5X4i5fLMEwJgAADAEPVDbjNw87ZAAAAAElFTkSuQmCC");}.ace_tooltip {background-color: #FFF;background-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.1));border: 1px solid gray;border-radius: 1px;box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);color: black;max-width: 100%;padding: 3px 4px;position: fixed;z-index: 999999;box-sizing: border-box;cursor: default;white-space: pre;word-wrap: break-word;line-height: normal;font-style: normal;font-weight: normal;letter-spacing: normal;pointer-events: none;}.ace_folding-enabled > .ace_gutter-cell {padding-right: 13px;}.ace_fold-widget {box-sizing: border-box;margin: 0 -12px 0 1px;display: none;width: 11px;vertical-align: top;background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAANElEQVR42mWKsQ0AMAzC8ixLlrzQjzmBiEjp0A6WwBCSPgKAXoLkqSot7nN3yMwR7pZ32NzpKkVoDBUxKAAAAABJRU5ErkJggg==");background-repeat: no-repeat;background-position: center;border-radius: 3px;border: 1px solid transparent;cursor: pointer;}.ace_folding-enabled .ace_fold-widget {display: inline-block;   }.ace_fold-widget.ace_end {background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAANElEQVR42m3HwQkAMAhD0YzsRchFKI7sAikeWkrxwScEB0nh5e7KTPWimZki4tYfVbX+MNl4pyZXejUO1QAAAABJRU5ErkJggg==");}.ace_fold-widget.ace_closed {background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAAGCAYAAAAG5SQMAAAAOUlEQVR42jXKwQkAMAgDwKwqKD4EwQ26sSOkVWjgIIHAzPiCgaqiqnJHZnKICBERHN194O5b9vbLuAVRL+l0YWnZAAAAAElFTkSuQmCCXA==");}.ace_fold-widget:hover {border: 1px solid rgba(0, 0, 0, 0.3);background-color: rgba(255, 255, 255, 0.2);box-shadow: 0 1px 1px rgba(255, 255, 255, 0.7);}.ace_fold-widget:active {border: 1px solid rgba(0, 0, 0, 0.4);background-color: rgba(0, 0, 0, 0.05);box-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);}.ace_dark .ace_fold-widget {background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHklEQVQIW2P4//8/AzoGEQ7oGCaLLAhWiSwB146BAQCSTPYocqT0AAAAAElFTkSuQmCC");}.ace_dark .ace_fold-widget.ace_end {background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAH0lEQVQIW2P4//8/AxQ7wNjIAjDMgC4AxjCVKBirIAAF0kz2rlhxpAAAAABJRU5ErkJggg==");}.ace_dark .ace_fold-widget.ace_closed {background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAAFCAYAAACAcVaiAAAAHElEQVQIW2P4//+/AxAzgDADlOOAznHAKgPWAwARji8UIDTfQQAAAABJRU5ErkJggg==");}.ace_dark .ace_fold-widget:hover {box-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);background-color: rgba(255, 255, 255, 0.1);}.ace_dark .ace_fold-widget:active {box-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);}.ace_inline_button {border: 1px solid lightgray;display: inline-block;margin: -1px 8px;padding: 0 5px;pointer-events: auto;cursor: pointer;}.ace_inline_button:hover {border-color: gray;background: rgba(200,200,200,0.2);display: inline-block;pointer-events: auto;}.ace_fold-widget.ace_invalid {background-color: #FFB4B4;border-color: #DE5555;}.ace_fade-fold-widgets .ace_fold-widget {transition: opacity 0.4s ease 0.05s;opacity: 0;}.ace_fade-fold-widgets:hover .ace_fold-widget {transition: opacity 0.05s ease 0.05s;opacity:1;}.ace_underline {text-decoration: underline;}.ace_bold {font-weight: bold;}.ace_nobold .ace_bold {font-weight: normal;}.ace_italic {font-style: italic;}.ace_error-marker {background-color: rgba(255, 0, 0,0.2);position: absolute;z-index: 9;}.ace_highlight-marker {background-color: rgba(255, 255, 0,0.2);position: absolute;z-index: 8;}.ace_mobile-menu {position: absolute;line-height: 1.5;border-radius: 4px;-ms-user-select: none;-moz-user-select: none;-webkit-user-select: none;user-select: none;background: white;box-shadow: 1px 3px 2px grey;border: 1px solid #dcdcdc;color: black;}.ace_dark > .ace_mobile-menu {background: #333;color: #ccc;box-shadow: 1px 3px 2px grey;border: 1px solid #444;}.ace_mobile-button {padding: 2px;cursor: pointer;overflow: hidden;}.ace_mobile-button:hover {background-color: #eee;opacity:1;}.ace_mobile-button:active {background-color: #ddd;}.ace_placeholder {font-family: arial;transform: scale(0.9);transform-origin: left;white-space: pre;opacity: 0.7;margin: 0 10px;}
+/*# sourceURL=ace/css/ace_editor.css */</style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    
+    <link rel="shortcut icon" href="https://seclab.ptit.edu.vn/favicon.png">
+    <meta name="csrf-token" content="q3BKUyK3kdQw57VZZqdfumv7VXGE3IlyJO1MEYEN">
+    <title>fund-gdb-cpp - Gỡ rối chương trình với GDB</title>
+    <!-- Scripts -->
+    <script src="./fund-gdb-cpp - Gỡ rối chương trình với GDB_files/app.js.download"></script>
+        <!-- Styles -->
+    <link href="./fund-gdb-cpp - Gỡ rối chương trình với GDB_files/app.css" rel="stylesheet">
+    <link rel="stylesheet" href="./fund-gdb-cpp - Gỡ rối chương trình với GDB_files/style.css">
+    <link rel="stylesheet" href="./fund-gdb-cpp - Gỡ rối chương trình với GDB_files/font-awesome.min.css">
+
+    <link rel="stylesheet" type="text/css" href="./fund-gdb-cpp - Gỡ rối chương trình với GDB_files/jquery.datetimepicker.css">
+
+    <!-- Default Theme (Core) -->
+    <link rel="stylesheet" href="./fund-gdb-cpp - Gỡ rối chương trình với GDB_files/default.css">
+    <!-- Default Theme (Date Picker) -->
+    <link rel="stylesheet" href="./fund-gdb-cpp - Gỡ rối chương trình với GDB_files/default.date.css">
+    <!-- Default Theme (Time Picker If Needed)-->
+    <link rel="stylesheet" href="./fund-gdb-cpp - Gỡ rối chương trình với GDB_files/default.time.css">
+
+    <!-- For RTL Layout -->
+    <link rel="stylesheet" href="./fund-gdb-cpp - Gỡ rối chương trình với GDB_files/rtl.css">
+
+</head>
+<body>
+<div class="container-fluid">
+    <!-- NAVIGATION BAR  -->
+    <div class="nav">
+        <div class="row">
+            <div class="menu__icon">
+                <a href="javascript:void(0);" onclick="clickMenu()">
+                    <i class="fa fa-bars"></i>
+                </a>
+            </div>
+            <div class="col-6 menu">
+                <div id="nav__menu" class="nav__menu">
+                    <div class="nav__menu__item" id="nav__logo">
+                        <a class="nav__menu__item__logo" href="https://seclab.ptit.edu.vn/">
+                            <img src="./fund-gdb-cpp - Gỡ rối chương trình với GDB_files/logo_ptit.png" alt="">
+                        </a>
+                    </div>
+                    <div class="nav__menu__item homepage">
+                        <a href="https://seclab.ptit.edu.vn/">
+                            Trang chủ
+                        </a>
+                    </div>
+                                            <div class="nav__menu__item">
+                            <a href="https://seclab.ptit.edu.vn/student/question">
+                                Bài tập
+                            </a>
+                        </div>
+                        <div class="nav__menu__item">
+                            <a href="https://seclab.ptit.edu.vn/student/solution">
+                                Trạng thái
+                            </a>
+                        </div>
+                        <div class="nav__menu__item">
+                            <a href="https://seclab.ptit.edu.vn/student/history">
+                                Lịch sử
+                            </a>
+                        </div>
+                        <div class="nav__menu__item">
+                            <a href="https://seclab.ptit.edu.vn/student/ranking">
+                                Bảng xếp hạng
+                            </a>
+                        </div>
+                        <div class="nav__menu__item">
+                            <a href="https://seclab.ptit.edu.vn/guide">
+                                Hướng dẫn
+                            </a>
+                        </div>
+                                    </div>
+            </div>
+            <div class="col-6">
+                <div id="nav__profile" class="nav__profile">
+                    <div class="nav__profile__img nav__lang">
+                        <img onclick="toggleMenu('lang__dropdown')" src="./fund-gdb-cpp - Gỡ rối chương trình với GDB_files/VN.png" alt="">
+                        <div class="nav__profile__menu lang__dropdown disappear">
+                            <ul>
+                                <li onclick="location.href='https://seclab.ptit.edu.vn/change-language/en'">
+                                    <img src="./fund-gdb-cpp - Gỡ rối chương trình với GDB_files/Eng.png" alt=""> English
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+
+                                                            <div class="nav__profile__img nav__profile__user">
+
+                                                <img class="nav__profile__avatar" onclick="toggleMenu('profile__dropdown')" src="./fund-gdb-cpp - Gỡ rối chương trình với GDB_files/avt.png" alt="">
+                        <div class="nav__profile__menu profile__dropdown disappear">
+                            <ul>
+                                <li>
+                                    <p class="nav__profile__menu__name">Lê Thành Nam</p>
+                                    <p class="nav__profile__menu__code">B22DCAT202</p>
+                                </li>
+                                <li><a href="https://seclab.ptit.edu.vn/user/profile">Hồ sơ</a></li>
+                                                                                                <li><a href="https://seclab.ptit.edu.vn/student/courses">Lớp học</a></li>
+                                                                                                <li><a href="https://seclab.ptit.edu.vn/logout" onclick="event.preventDefault();
+                                             document.getElementById('logout-form').submit();">
+                                    Đăng xuất
+                                </a>
+                                    <form id="logout-form" action="https://seclab.ptit.edu.vn/logout" method="POST" style="display: none;">
+                                        <input type="hidden" name="_token" value="q3BKUyK3kdQw57VZZqdfumv7VXGE3IlyJO1MEYEN">                                    </form>
+                                </li>
+                                                            </ul>
+                        </div>
+                        <button onclick="toggleMenu('profile__dropdown')">
+                            <i class="fa fa-caret-down" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                                    </div>
+            </div>
+        </div>
+    </div>
+    
+
+
+        <div class="wrapper">
+        <div class="main--fluid">
+                    <div class="submit student__submit">
+        <div class="submit__nav">
+            <p>
+
+
+
+                    <span><a class="link--red" href="https://seclab.ptit.edu.vn/student/question/fund-gdb-cpp">Gỡ rối chương trình với GDB</a></span>
+
+            </p>
+            <div class="submit__nav__left">
+                                    <a class="link--red" href="https://seclab.ptit.edu.vn/student/question/fund-gdb-cpp/top">Bài làm tốt nhất</a>
+                                
+                            </div>
+        </div>
+                        <div class="submit__des">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title></title>
+<style type="text/css">* { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Times New Roman", Times, serif; font-size: 13pt; line-height: 1.8; color: #1a1a1a; background: #f4f6f9; padding: 30px 20px; }
+    .page { max-width: 860px; margin: 0 auto; background: #fff; padding: 50px 60px; border: 1px solid #d0d5dd; box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .header { text-align: center; border-bottom: 3px solid #003087; padding-bottom: 20px; margin-bottom: 30px; }
+    .header .institution { font-size: 11pt; color: #555; text-transform: uppercase; letter-spacing: 1px; }
+    .header h1 { font-size: 20pt; color: #003087; margin-top: 8px; font-weight: bold; }
+    .header .subtitle { font-size: 13pt; color: #444; margin-top: 4px; font-style: italic; }
+    .header .meta { margin-top: 14px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .badge { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 10pt; font-weight: bold; }
+    .badge-medium { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
+    .badge-network { background: #d9ecff; color: #0b4f8a; border: 1px solid #a9d1f7; }
+    .badge-protocol { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+    h2 { font-size: 14pt; color: #003087; border-left: 5px solid #003087; padding-left: 10px; margin: 32px 0 12px; font-weight: bold; }
+    h3 { font-size: 12.5pt; color: #1a5276; margin: 20px 0 8px; font-weight: bold; }
+    h4 { font-size: 12pt; color: #2e4053; margin: 16px 0 6px; font-weight: bold; }
+    p { margin-bottom: 10px; }
+    ul, ol { margin: 8px 0 10px 24px; }
+    li { margin-bottom: 5px; }
+    code { background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; padding: 2px 7px; font-family: "Courier New", monospace; font-size: 11pt; color: #b03a2e; word-break: break-all; overflow-wrap: anywhere; }
+    pre { background: #1e1e2e; color: #cdd6f4; border-radius: 8px; padding: 16px 20px; font-family: "Courier New", monospace; font-size: 10.5pt; overflow-x: auto; margin: 10px 0 14px; line-height: 1.6; white-space: pre-wrap; }
+    pre .cmd { color: #89dceb; }
+    pre .comment { color: #8b93a8; font-style: italic; }
+    pre .kw { color: #cba6f7; }
+    pre .str { color: #a6e3a1; }
+    pre .num { color: #fab387; }
+    .box { border-radius: 6px; padding: 12px 16px; margin: 14px 0; font-size: 12pt; }
+    .box-info { background: #e8f4fd; border-left: 5px solid #2196f3; }
+    .box-warning { background: #fff3cd; border-left: 5px solid #ffc107; }
+    .box-danger { background: #fdecea; border-left: 5px solid #f44336; }
+    .box-success { background: #e8f5e9; border-left: 5px solid #4caf50; }
+    .box strong { display: inline-block; margin-bottom: 4px; }
+    .task-block { border: 1px solid #b0c4de; border-radius: 8px; margin: 18px 0; overflow: hidden; }
+    .task-header { background: #003087; color: #fff; padding: 10px 18px; font-size: 12.5pt; font-weight: bold; }
+    .task-body { padding: 14px 18px; }
+    .task-optional .task-header { background: #5d6d7e; }
+    table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 12pt; }
+    th { background: #003087; color: #fff; padding: 10px 12px; text-align: left; }
+    td { padding: 9px 12px; border: 1px solid #d0d5dd; vertical-align: top; }
+    tr:nth-child(even) td { background: #f5f7fa; }
+    .footer { margin-top: 40px; border-top: 1px solid #d0d5dd; padding-top: 14px; text-align: center; font-size: 10pt; color: #777; }
+    @media print { body { background: #fff; padding: 0; } .page { border: none; box-shadow: none; padding: 30px 40px; max-width: 100%; } }
+</style>
+<div class="page">
+<div class="header">
+<div class="institution">Học viện Công nghệ Bưu chính Viễn thông - SecLab PTIT</div>
+
+<h1>HƯỚNG DẪN THỰC HÀNH</h1>
+
+<div class="subtitle">Gỡ rối chương trình C++ với GDB</div>
+
+<div class="meta"><span class="badge badge-medium">Mức độ: Trung bình</span> <span class="badge badge-network">Công cụ debug</span> <span class="badge badge-protocol">GDB / C++</span></div>
+</div>
+
+<h2>1. Giới thiệu Lab</h2>
+
+<table>
+	<tbody>
+		<tr>
+			<th style="width:220px;">Thông tin</th>
+			<th>Chi tiết</th>
+		</tr>
+		<tr>
+			<td><strong>Tên Lab</strong></td>
+			<td><code>fund-gdb-cpp</code></td>
+		</tr>
+		<tr>
+			<td><strong>Mức độ</strong></td>
+			<td>Trung bình</td>
+		</tr>
+		<tr>
+			<td><strong>Công cụ sử dụng</strong></td>
+			<td><code>gdb</code>, <code>make</code>, <code>g++</code></td>
+		</tr>
+		<tr>
+			<td><strong>Ngôn ngữ</strong></td>
+			<td>C++</td>
+		</tr>
+		<tr>
+			<td><strong>Kiến thức yêu cầu</strong></td>
+			<td>Lập trình C++, biên dịch và chạy chương trình C++</td>
+		</tr>
+	</tbody>
+</table>
+
+<h3>Mục tiêu học tập</h3>
+
+<ul>
+	<li>Làm quen với trình gỡ lỗi <strong>GDB</strong> và các lệnh cơ bản.</li>
+	<li>Biết cách nạp chương trình vào GDB, chạy và quan sát khi chương trình bị crash.</li>
+	<li>Sử dụng <strong>backtrace</strong> để xác định chuỗi gọi hàm dẫn đến lỗi.</li>
+	<li>Đặt <strong>breakpoint có điều kiện</strong> để dừng chương trình tại điểm cần kiểm tra.</li>
+	<li>Dùng lệnh <strong>step</strong> để thực thi từng dòng và quan sát luồng chương trình.</li>
+</ul>
+
+<h3>Kỹ năng đạt được</h3>
+
+<ul>
+	<li>Sử dụng GDB để phân tích lỗi Segmentation Fault trong chương trình C++.</li>
+	<li>Đọc và hiểu output của <code>backtrace</code> để xác định nguồn gốc lỗi.</li>
+	<li>Đặt breakpoint thông thường và breakpoint có điều kiện.</li>
+	<li>Dùng lệnh <code>step</code> để theo dõi luồng thực thi từng dòng.</li>
+</ul>
+
+<h2>2. Kịch bản</h2>
+
+<p><strong>Tình huống:</strong><br>
+Sinh viên được cung cấp một chương trình C++ cài đặt cấu trúc dữ liệu <strong>Linked List</strong>. Chương trình bị lỗi <strong>Segmentation Fault</strong> khi chạy — nghĩa là chương trình cố truy cập vùng nhớ không hợp lệ. Nhiệm vụ là dùng GDB để xác định chính xác nguyên nhân gây ra lỗi.</p>
+
+<p><strong>Vai trò của sinh viên:</strong></p>
+
+<ul>
+	<li>Build và chạy chương trình để quan sát lỗi.</li>
+	<li>Nạp chương trình vào GDB, chạy và xem thông tin khi crash.</li>
+	<li>Dùng <code>backtrace</code> để xác định hàm nào gây ra lỗi.</li>
+	<li>Đặt breakpoint có điều kiện và dùng <code>step</code> để theo dõi từng dòng.</li>
+	<li>Xác định được dòng code gây ra lỗi và giải thích nguyên nhân.</li>
+</ul>
+
+<h2>3. Kiến thức bổ trợ</h2>
+
+<h3>Segmentation Fault là gì?</h3>
+
+<p>Segmentation Fault (segfault) xảy ra khi chương trình cố truy cập vùng nhớ không được phép — thường là do truy cập con trỏ <code>NULL</code> hoặc con trỏ chưa được khởi tạo. Lỗi này khiến hệ điều hành dừng chương trình ngay lập tức.</p>
+
+<h3>Các lệnh GDB cơ bản dùng trong bài</h3>
+
+<table>
+	<tbody>
+		<tr>
+			<th style="width:200px;">Lệnh</th>
+			<th>Tác dụng</th>
+		</tr>
+		<tr>
+			<td><code>run</code></td>
+			<td>Chạy chương trình trong GDB</td>
+		</tr>
+		<tr>
+			<td><code>backtrace</code></td>
+			<td>Hiển thị chuỗi gọi hàm (call stack) tại thời điểm crash</td>
+		</tr>
+		<tr>
+			<td><code>x &lt;địa chỉ&gt;</code></td>
+			<td>Xem giá trị tại một địa chỉ bộ nhớ</td>
+		</tr>
+		<tr>
+			<td><code>break &lt;dòng&gt;</code></td>
+			<td>Đặt breakpoint tại dòng chỉ định</td>
+		</tr>
+		<tr>
+			<td><code>condition &lt;n&gt; &lt;điều kiện&gt;</code></td>
+			<td>Thêm điều kiện cho breakpoint số n</td>
+		</tr>
+		<tr>
+			<td><code>step</code></td>
+			<td>Thực thi từng dòng, bước vào trong hàm được gọi</td>
+		</tr>
+		<tr>
+			<td><code>quit</code></td>
+			<td>Thoát GDB</td>
+		</tr>
+	</tbody>
+</table>
+
+<h2>4. Các nhiệm vụ của bài thực hành</h2>
+
+<div class="box box-info">Để tải bài thực hành, sinh viên thực hiện câu lệnh:<br>
+<code>imodule https://github.com/ptit2026/pen_lab_2026/raw/refs/heads/main/fund-gdb-cpp.tar</code><br>
+Để khởi động bài thực hành, sinh viên dùng câu lệnh:<br>
+<code>labtainer fund-gdb-cpp</code><br>
+<em>(chú ý: sinh viên sử dụng mã sinh viên của mình để nhập thông tin email người thực hiện bài lab khi có yêu cầu, để sử dụng khi chấm điểm)</em></div>
+<!-- NHIỆM VỤ CHÍNH -->
+
+<div class="task-block">
+<div class="task-header">Nhiệm vụ — gdb_commands: Dùng GDB gỡ lỗi chương trình C++</div>
+
+<div class="task-body">
+<p>Sinh viên thực hiện lần lượt các bước dưới đây để học cách sử dụng GDB phân tích và xác định nguyên nhân lỗi Segmentation Fault trong chương trình C++.</p>
+
+<h4>Bước 1: Build và chạy chương trình</h4>
+
+<p>Biên dịch chương trình bằng Makefile và chạy thử để quan sát lỗi:</p>
+
+<pre><span class="cmd">make</span>
+<span class="cmd">./main</span></pre>
+
+<p>Chương trình sẽ in ra một số thông báo rồi bị crash với thông báo <code>Segmentation fault</code>. Với thông tin này, rất khó xác định nguyên nhân — đó là lý do cần dùng GDB.</p>
+
+<h4>Bước 2: Nạp chương trình vào GDB và chạy</h4>
+
+<p>Mở GDB với chương trình <code>main</code>:</p>
+
+<pre><span class="cmd">gdb main</span></pre>
+
+<p>Trong GDB, chạy chương trình:</p>
+
+<pre><span class="comment">(gdb)</span> <span class="cmd">run</span></pre>
+
+<p>Chương trình sẽ chạy và dừng lại tại điểm crash. GDB hiển thị dòng code và hàm đang thực thi tại thời điểm xảy ra lỗi.</p>
+
+<h4>Bước 3: Xem backtrace</h4>
+
+<p>Dùng lệnh <code>backtrace</code> để xem toàn bộ chuỗi gọi hàm dẫn đến crash:</p>
+
+<pre><span class="comment">(gdb)</span> <span class="cmd">backtrace</span></pre>
+
+<div class="box box-info"><strong>Đọc kết quả backtrace:</strong><br>
+Mỗi dòng (#0, #1, #2...) là một frame trong call stack — #0 là hàm đang chạy khi crash, #1 là hàm đã gọi #0, và tiếp tục như vậy. Chú ý đến tên hàm, tham số và số dòng trong file để xác định luồng thực thi dẫn đến lỗi.</div>
+
+<h4>Bước 4: Kiểm tra giá trị tại địa chỉ bộ nhớ</h4>
+
+<p>Từ backtrace, lấy địa chỉ của tham số quan tâm và dùng lệnh <code>x</code> để xem giá trị:</p>
+
+<pre><span class="comment">(gdb)</span> <span class="cmd">x &lt;địa_chỉ&gt;</span>   <span class="comment"># thay bằng địa chỉ thực từ backtrace</span></pre>
+
+<h4>Bước 5: Đặt breakpoint có điều kiện</h4>
+
+<p>Đặt breakpoint tại dòng 52 — điểm bắt đầu của hàm <code>LinkedList::remove()</code> — và thêm điều kiện chỉ dừng khi tham số có giá trị gây lỗi:</p>
+
+<pre><span class="comment">(gdb)</span> <span class="cmd">break 52</span>
+<span class="comment">(gdb)</span> <span class="cmd">condition 1 item_to_remove==1</span></pre>
+
+<div class="box box-info"><strong>Tại sao dùng breakpoint có điều kiện?</strong><br>
+Hàm <code>remove()</code> được gọi nhiều lần với các giá trị khác nhau. Nếu không có điều kiện, GDB sẽ dừng mỗi lần hàm được gọi. Breakpoint có điều kiện giúp chỉ dừng đúng lần gọi có vấn đề, tiết kiệm thời gian debug.</div>
+
+<h4>Bước 6: Chạy lại và step từng dòng</h4>
+
+<p>Chạy lại chương trình — nó sẽ dừng tại breakpoint:</p>
+
+<pre><span class="comment">(gdb)</span> <span class="cmd">run</span>
+y   <span class="comment"># xác nhận chạy lại từ đầu</span></pre>
+
+<p>Khi dừng tại breakpoint, dùng lệnh <code>step</code> để thực thi từng dòng. Nhấn <strong>Enter</strong> để lặp lại lệnh step mà không cần gõ lại:</p>
+
+<pre><span class="comment">(gdb)</span> <span class="cmd">step</span>
+<span class="comment"># nhấn Enter liên tục để step từng dòng</span></pre>
+
+<div class="box box-warning"><strong>Quan sát kỹ thứ tự các dòng được thực thi:</strong><br>
+Chú ý đến các dòng liên quan đến con trỏ <code>marker</code> và <code>temp</code>. Hãy tự hỏi: tại mỗi bước, giá trị của các con trỏ này là gì? Có dòng nào gán giá trị sai thứ tự không?</div>
+
+<div class="box box-success"><strong>Điều kiện hoàn thành nhiệm vụ (gdb_commands):</strong> Đã thực hiện đủ các lệnh GDB trong bài — hệ thống tự động đếm số lệnh đã dùng.</div>
+
+<h4>Bước 7: Thoát GDB</h4>
+
+<pre><span class="comment">(gdb)</span> <span class="cmd">quit</span></pre>
+
+<div class="box box-danger"><strong>Câu hỏi:</strong><br>
+Dựa vào kết quả step từng dòng, hãy xác định chính xác dòng code nào gây ra lỗi Segmentation Fault và giải thích tại sao. Nếu phải sửa lỗi, bạn sẽ sửa như thế nào?<br>
+<strong>Trả lời:</strong> _______________________________________</div>
+</div>
+</div>
+<!-- TÙY CHỌN -->
+
+<div class="task-block task-optional">
+<div class="task-header">Nhiệm vụ tùy chọn — Sửa lỗi và kiểm tra lại</div>
+
+<div class="task-body">
+<p>Sau khi đã xác định được nguyên nhân lỗi, sinh viên có thể thử sửa file <code>main.cc</code> để chương trình chạy đúng, rồi build và chạy lại để kiểm tra.</p>
+
+<pre><span class="cmd">nano main.cc</span>   <span class="comment"># sửa dòng code gây lỗi</span>
+<span class="cmd">make</span>
+<span class="cmd">./main</span></pre>
+
+<div class="box box-info"><strong>Gợi ý:</strong><br>
+Lỗi nằm trong hàm <code>LinkedList::remove()</code>. Xem lại thứ tự các dòng gán giá trị cho con trỏ <code>marker</code> và <code>temp</code> — có dòng nào bị đặt sai vị trí không?</div>
+</div>
+</div>
+
+<div class="footer">
+<p>Học viện Công nghệ Bưu chính Viễn thông – SecLab PTIT &nbsp;|&nbsp; seclab.ptit.edu.vn</p>
+
+<p style="margin-top:4px">Bài thực hành này được chỉnh sửa và biên soạn từ bài “gdb-cpp” trong hệ thống Labtainer của Trung tâm An ninh mạng và Tác chiến không gian mạng, Trường Sau đại học Hải quân Hoa Kỳ.</p>
+</div>
+</div>
+            <p style="clear: left"></p>
+        </div>
+        <div class="submit__req">
+                        <p>Giới hạn thời gian: <span>2s</span></p>
+            <p>Giới hạn bộ nhớ: <span>65536 Kb</span></p>
+        </div>
+                                    <div class="submit__pad">
+                <form method="POST" action="https://seclab.ptit.edu.vn/student/solution" enctype="multipart/form-data">
+                    <input type="hidden" name="_token" value="q3BKUyK3kdQw57VZZqdfumv7VXGE3IlyJO1MEYEN">
+                    <input type="hidden" name="question" value="fund-gdb-cpp">
+                    <div class="submit__pad__nav">
+                        <div class="col-md-6">
+                        </div>
+                        <div class="submit__pad__nav__input col-md-6">
+                            <label class="fileInput__label" for="fileInput">
+                                <p class="fileInput__value">Chọn tệp</p>
+                                <p class="fileInput__browser">Duyệt</p>
+                            </label>
+                            <input type="file" accept=".zip, .lab" name="submission_file" id="fileInput">
+                        </div>
+                    </div>
+                    <button type="submit" class="submit__pad__btn">Nộp bài</button>
+                </form>
+            </div>
+                            <div class="submit__comm">
+                <div class="submit__comm__nav">
+                    <p class="submit__comm__nav__title">Bình luận</p>
+                    <p class="submit__comm__nav__des">Sinh viên có thể đặt câu hỏi về bài tập, chia sẻ cách giải bài tập, nhưng không nên chia sẻ mã nguồn bài giải trực tiếp.</p>
+                </div>
+                <div class="submit__comm__main">
+                    <form action="https://seclab.ptit.edu.vn/question/fund-gdb-cpp/comment" method="POST">
+                        <input type="hidden" name="_token" value="q3BKUyK3kdQw57VZZqdfumv7VXGE3IlyJO1MEYEN">
+                        <textarea name="comment" id="submit__comm__textarea" placeholder="Bây giờ các bạn đã có thể sử dụng tính năng bình luận để thắc mắc, hỏi đáp và trả lời các câu hỏi của các thành viên khác.
+Chúc các bạn học tập tốt." onfocus="this.placeholder = ''" onblur="this.placeholder = 'Bây giờ các bạn đã có thể sử dụng tính năng bình luận để thắc mắc, hỏi đáp và trả lời các câu hỏi của các thành viên khác.' + '\n' +
+'Chúc các bạn học tập tốt.'"></textarea>
+                                                <button type="submit" class="submit__pad__btn">Bình luận</button>
+                    </form>
+                </div>
+                                    <div class="submit__comm__list">
+                        <div class="submit__comm__stick"></div>
+                                            </div>
+                            </div>
+                            <div class="card-body">
+                            </div>
+            </div>
+        </div>
+    </div>
+            <div class="chat__icon__wrapper">
+        <div class="chat__icon__noti" id="chat__icon__noti"><span id="chat__icon__noti__number">1</span> </div>
+        <i class="fa fa-comment-o chat__icon" aria-hidden="true" onclick="toggleChat()"></i>
+    </div>
+        </div>
+<div class="chat__panel disappear">
+    <div class="chat__panel__box">
+        <div class="chat__panel__box__head">
+            <select name="channel" id="channel">
+                                                                                                <option value="public">Chat</option>
+                                    <option value="COURSE_INT1490_Nhóm 4-D22_20252">INT1490 - Nhóm 4-D22</option>
+                                    <option value="COURSE_INT1429M_04_20252">INT1429M - 04</option>
+                                    <option value="COURSE_INT1483_INT1483-04_20252">INT1483 - INT1483-04</option>
+                                    <option value="COURSE_INT14105_02_20251">INT14105 - 02</option>
+                                    <option value="COURSE_INT1482_ATM-02_20251">INT1482 - ATM-02</option>
+                                    <option value="COURSE_INT14164_02_20251">INT14164 - 02</option>
+                                    <option value="COURSE_INT1484_Nhóm 2_20242">INT1484 - Nhóm 2</option>
+                                    <option value="COURSE_INT1344_Nhóm 2_20242">INT1344 - Nhóm 2</option>
+                                            </select>
+            <button class="closeBtn" onclick="toggleChat()"><i class="fa fa-times"></i></button>
+        </div>
+        <div class="chat__panel__box__body" id="chat__body">
+
+        </div>
+    </div>
+
+    <div class="chat__panel__input">
+        <form action="https://seclab.ptit.edu.vn/student/question/fund-gdb-cpp">
+            <div class="chat__panel__input__head">
+                <div class="chat__panel__input__head__info">
+                    <label for="to">Đến </label>
+                    <select name="to" id="rec">
+                        <option value="">Mọi người</option>
+                    </select>
+                </div>
+            </div>
+            <textarea name="" id="msg" cols="30" rows="3.5" placeholder="Nhập nội dung tin nhắn..."></textarea>
+        </form>
+    </div>
+</div>
+<script>
+    function toggleMenu(){
+        $('.nav__profile__menu').toggleClass('appear').toggleClass('disappear');
+    }
+    function close_popup(){
+        $('.main__user__welcome').addClass('disappear');
+    }
+    function customSelect(className){
+        var x, i, j, l, ll, selElmnt, a, b, c;
+        /* Look for any elements with the class "custom-select": */
+        x = document.getElementsByClassName(className);
+        l = x.length;
+        for (i = 0; i < l; i++) {
+            selElmnt = x[i].getElementsByTagName("select")[0];
+            ll = selElmnt.length;
+            /* For each element, create a new DIV that will act as the selected item: */
+            a = document.createElement("DIV");
+            a.setAttribute("class", "select-selected");
+            let name = '';
+            if (selElmnt.options[selElmnt.selectedIndex] !== undefined) {
+                name = selElmnt.options[selElmnt.selectedIndex].innerHTML;
+            }
+            let limit;
+            if(className == "select__lang"){
+                limit = 10;
+            }else if(className == "select__subject"){
+                limit = 35;
+            }else if(className == "select__group"){
+                limit = 7;
+            }else if(className == "select__term"){
+                limit = 18;
+            }
+            if(name.length > limit){
+                name = name.substring(0, limit) + "...";
+            }
+            a.innerHTML = name;
+            x[i].appendChild(a);
+            /* For each element, create a new DIV that will contain the option list: */
+            b = document.createElement("DIV");
+            b.setAttribute("class", "select-items select-hide");
+            for (j = 0; j < ll; j++) {
+                /* For each option in the original select element,
+                create a new DIV that will act as an option item: */
+                c = document.createElement("DIV");
+                c.innerHTML = selElmnt.options[j].innerHTML;
+                if(j != selElmnt.selectedIndex){
+
+                    c.addEventListener("click", function(e) {
+                        /* When an item is clicked, update the original select box,
+                        and the selected item: */
+                        var y, i, k, s, h, sl, yl;
+                        s = this.parentNode.parentNode.getElementsByTagName("select")[0];
+                        sl = s.length;
+                        h = this.parentNode.previousSibling;
+                        for (i = 0; i < sl; i++) {
+                            if (s.options[i].innerHTML == this.innerHTML) {
+                                s.selectedIndex = i;
+                                h.innerHTML = this.innerHTML;
+                                y = this.parentNode.getElementsByClassName("same-as-selected");
+                                yl = y.length;
+                                for (k = 0; k < yl; k++) {
+                                    y[k].removeAttribute("class");
+                                }
+                                this.setAttribute("class", "same-as-selected");
+                                break;
+                            }
+                        }
+                        if(className == "select__lang"){
+                            if (document.getElementById('editor')) {
+                                if(h.innerHTML == 'C/C++'){
+                                    var editor = ace.edit("editor");
+                                    editor.session.setMode("ace/mode/c_cpp");
+                                } else if(h.innerHTML == 'Java'){
+                                    var editor = ace.edit("editor");
+                                    editor.session.setMode("ace/mode/java");
+                                } else{
+                                    var editor = ace.edit("editor");
+                                    editor.session.setMode("ace/mode/python");
+                                }
+                            }
+                        }else if(className == "select__subject"){
+                            let len = selElmnt.length;
+                            for(let i = 0; i < len; i++){
+                                if(h.innerHTML == selElmnt.options[i].innerHTML){
+                                    if (!selElmnt.options[i].disabled) {
+                                        window.location = '?' + selElmnt.name + '=' + selElmnt.options[i].value;
+                                        break;
+                                    }
+                                }
+                            }
+                        }else if(className == "select__group"){
+                            let len = selElmnt.length;
+                            for(let i = 0; i < len; i++){
+                                if(h.innerHTML == selElmnt.options[i].innerHTML) {
+                                    if (!selElmnt.options[i].disabled) {
+                                        window.location = '?semester=' + selElmnt.options[selElmnt.selectedIndex].getAttribute('data-semester') + '&' + selElmnt.name + '=' + selElmnt.options[i].value;
+                                        break;
+                                    }
+                                }
+                            }
+                        }else if(className == "select__term"){
+                            let len = selElmnt.length;
+                            for(let i = 0; i < len; i++){
+                                if(h.innerHTML == selElmnt.options[i].innerHTML) {
+                                    if (!selElmnt.options[i].disabled) {
+                                        window.location = '?' + selElmnt.name + '=' + selElmnt.options[i].value;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        h.click();
+                    });
+                }
+                b.appendChild(c);
+            }
+            x[i].appendChild(b);
+            a.addEventListener("click", function(e) {
+                /* When the select box is clicked, close any other select boxes,
+                and open/close the current select box: */
+                e.stopPropagation();
+                closeAllSelect(this);
+                this.nextSibling.classList.toggle("select-hide");
+                this.classList.toggle("select-arrow-active");
+            });
+        }
+
+    }
+
+    customSelect('select__lang');
+    customSelect('select__subject');
+    customSelect('select__group');
+    customSelect('select__term');
+
+    function closeAllSelect(elmnt) {
+        /* A function that will close all select boxes in the document,
+        except the current select box: */
+        var x, y, z, i, xl, yl, zl, arrNo = [];
+        x = document.getElementsByClassName("select-items");
+        y = document.getElementsByClassName("select-selected");
+        xl = x.length;
+        yl = y.length;
+        for (i = 0; i < yl; i++) {
+            if (elmnt == y[i]) {
+                arrNo.push(i)
+            } else {
+                y[i].classList.remove("select-arrow-active");
+            }
+        }
+        for (i = 0; i < xl; i++) {
+            if (arrNo.indexOf(i)) {
+                x[i].classList.add("select-hide");
+            }
+        }
+    }
+
+    /* If the user clicks anywhere outside the select box,
+    then close all select boxes: */
+    document.addEventListener("click", closeAllSelect);
+    function popup_disappear(a){
+        let input = document.getElementsByClassName(a);
+        $(`.${a}`).addClass('disappear');
+    }
+    function toggleMenu(str){
+        if($('.' + str).data('clicked')){
+            $('.' + str).data('clicked', false);
+        }else{
+            $('.' + str).data('clicked', true);
+        }
+    }
+        $("body").click(function(){
+            var z = document.getElementsByClassName("nav__profile__menu");
+            var zl = z.length;
+            for (let i = 0; i < zl; i++) {
+                for(let j = 0; j < z[i].classList.length; j++){
+                    let str = z[i].classList.item(j);
+                    if(str.includes('dropdown')){
+                        if($('.' + str).data('clicked')){
+                            z[i].classList.toggle('appear');
+                            z[i].classList.toggle('disappear');
+                            $('.' + str).data('clicked', false);
+                            break;
+                        }else{
+                            z[i].classList.toggle('appear', false);
+                            z[i].classList.toggle('disappear', true);
+                        }
+                    }
+                }
+            }
+        });
+    function input_active(a){
+        let input = document.getElementById(a);
+        if(input.value !== ""){
+            $(`#${a}`).addClass('setting__input--active');
+        }else{
+            $(`#${a}`).removeClass('setting__input--active');
+        }
+    }
+
+    var loadFile = function(event) {
+        var image = document.getElementById('loadFileImg');
+        image.src = URL.createObjectURL(event.target.files[0]);
+        var fileReader = new FileReader();
+        fileReader.onload = function(fileLoadedEvent) {
+            var srcData = fileLoadedEvent.target.result;
+        };
+        fileReader.readAsDataURL(event.target.files[0]);
+    };
+
+    </script>
+<script src="./fund-gdb-cpp - Gỡ rối chương trình với GDB_files/socket.io.js.download"></script>
+<script>
+    function open_chat_popup() {
+        let icon_wrapper = document.querySelector('.chat__icon__wrapper');
+        let panel = document.getElementsByClassName("chat__panel")[0];
+        $(".chat__icon").removeClass('fa-comment-o').addClass('fa-comment');
+        panel.classList.remove('disappear');
+        panel.style.right = "0vw";
+        panel.style.boxShadow = "-2px 2px 2px 2px rgba(0, 0, 0, 0.1)";
+        var elem = document.getElementById('chat__body');
+        elem.scrollTop = elem.scrollHeight;
+        new_message = 0;
+        chat_open = true;
+        localStorage.setItem("show_chat_popup", 1);
+        $('#chat__icon__noti').hide();
+    }
+
+    function close_chat_popup() {
+        let icon_wrapper = document.querySelector('.chat__icon__wrapper');
+        let panel = document.getElementsByClassName("chat__panel")[0];
+        $(".chat__icon").removeClass('fa-comment').addClass('fa-comment-o');
+        icon_wrapper.style.right = "2.5vw";
+        panel.style.right = "-30vw";
+        panel.style.boxShadow = "";
+        panel.classList.add('disappear');
+        chat_open = false;
+        localStorage.setItem("show_chat_popup", 0);
+    }
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    var chat_channel = localStorage.getItem('chat_channel') || 'public';
+
+    var channel_select = document.getElementById('channel');
+    var channel_opts = channel_select.options;
+    var chat_channel_option = [];
+    for (i = 0; i < channel_opts.length; i++) {
+        chat_channel_option.push(channel_opts[i].value);
+        if (channel_opts[i].value == chat_channel) {
+            channel_select.selectedIndex = i;
+        }
+    }
+
+    if (!chat_channel_option.includes(chat_channel)) {
+        chat_channel = chat_channel_option[0];
+    }
+    localStorage.setItem('chat_channel', chat_channel);
+
+    function update_message(data) {
+        $('#chat__body').empty();
+        data.messages.forEach(function(json_msg) {
+            html_node = '<div class="chat__message">\n' +
+                '                <div class="chat__message__inf">\n' +
+                '                    <p class="chat__message__inf__name">Từ <span class="chat__message__inf__actor" onclick="sendTo(\'' + json_msg.user.username + '\', \'' + json_msg.user.full_name + '\')">' + json_msg.user.username + ' (' + json_msg.user.full_name + ')</span> đến <span class="chat__message__inf__actor" onclick="sendTo(' + (json_msg.dest_user.username != null ? '\'' + json_msg.dest_user.username +'\'' : null) + ')">' + ((json_msg.dest_user.username != null) ? (json_msg.dest_user.username + '(' + json_msg.dest_user.full_name + ')') : json_msg.dest_user.full_name) + '</span>:</p>\n' +
+                '                    <p class="chat__message__inf__time">' + json_msg.time + '</p>\n' +
+                '                </div>\n' +
+                '                <div class="chat__message__cont">\n' +
+                '                    <p>' + json_msg.message.replace("\n", '<br />') + '</p>\n' +
+                '                </div>\n' +
+                '            </div>';
+            $('#chat__body').append(html_node);
+        });
+        $("#chat__body").scrollTop(function() { return this.scrollHeight; });
+    }
+    $('#channel').change(function() {
+        chat_channel = $(this).val();
+        $.ajax({
+            type: "POST",
+            url: '/chat_channel',
+            dataType: "json",
+            data: {'channel': $(this).val()},
+            success: function (data) {
+                localStorage.setItem('chat_channel', chat_channel);
+                update_message(data);
+            }
+        });
+    });
+    var new_message = 1;
+    var chat_open = false;
+    var show_chat_popup = localStorage.getItem('show_chat_popup') || 0;
+    if (show_chat_popup == 1) {
+        let icon = document.querySelector('.chat__icon');
+        if(icon.classList.contains('fa-comment-o')){
+            open_chat_popup();
+        }
+    }
+
+    let toggleChat = () => {
+        let icon = document.querySelector('.chat__icon');
+        if(icon.classList.contains('fa-comment-o')){
+            open_chat_popup();
+        }else{
+            close_chat_popup();
+        }
+    };
+
+    var socket = io('203.162.88.107:8888');
+    socket.on('connect', function() {
+        $.ajax({
+            type: "POST",
+            url: '/chat_auth',
+            dataType: "json",
+            data: {'socket_id': socket.id, 'channel': chat_channel},
+            success:function(data){
+                $(".msg").val('');
+                update_message(data);
+            }
+        });
+    });
+    socket.on('chat message', function(msg) {
+        json_msg = msg;
+        html_node = '<div class="chat__message">\n' +
+            '                <div class="chat__message__inf">\n' +
+            '                    <p class="chat__message__inf__name">Từ <span class="chat__message__inf__actor" onclick="sendTo(\'' + json_msg.user.username + '\', \'' + json_msg.user.full_name + '\')">' + json_msg.user.username + ' (' + json_msg.user.full_name + ')</span> đến <span class="chat__message__inf__actor" onclick="sendTo(' + (json_msg.dest_user.username != null ? '\'' + json_msg.dest_user.username +'\'' : null) + ')">' + ((json_msg.dest_user.username != null) ? (json_msg.dest_user.username + '(' + json_msg.dest_user.full_name + ')') : json_msg.dest_user.full_name) + '</span>:</p>\n' +
+            '                    <p class="chat__message__inf__time">' + json_msg.time + '</p>\n' +
+            '                </div>\n' +
+            '                <div class="chat__message__cont">\n' +
+            '                    <p>' + json_msg.message.replace("\n", '<br />') + '</p>\n' +
+            '                </div>\n' +
+            '            </div>';
+        $('#chat__body').append(html_node);
+        $("#chat__body").scrollTop(function() { return this.scrollHeight; });
+        if (!chat_open) {
+            new_message++;
+            $('#chat__icon__noti__number').html(new_message);
+            $('#chat__icon__noti').show();
+        }
+    });
+    socket.on('change_channel', function(msg) {
+        chat_channel = msg;
+        $('#channel').val(chat_channel);
+        $.ajax({
+            type: "POST",
+            url: '/chat_message',
+            dataType: "json",
+            data: {'channel': chat_channel},
+            success: function (data) {
+                update_message(data);
+            }
+        });
+    });
+    $(function() {
+        $("#msg").keypress(function (e) {
+            if(e.which === 13) {
+                chat_channel = localStorage.getItem('chat_channel');
+                dest_username = $('#rec').val();
+                $.ajax({
+                    type: "POST",
+                    url: '/chat',
+                    dataType: "json",
+                    data: {'message': $(this).val(), 'username': dest_username, 'channel': chat_channel},
+                    success:function(data){
+                        $(".msg").val('');
+                    }
+                });
+                $(this).val("");
+                e.preventDefault();
+            }
+        });
+    });
+
+    let sendTo = function(username, full_name){
+        var rec = document.getElementById('rec');
+        if (username == null) {
+            rec.selectedIndex = 0;
+            return;
+        }
+        var opts = rec.options;
+        old_option = false;
+        for (var opt, j = 0; opt = opts[j]; j++) {
+            if (opt.value == username) {
+                rec.selectedIndex = j;
+                old_option = true;
+                break;
+            }
+        }
+        if (!old_option) {
+            new_option = document.createElement('option');
+            new_option.value = username;
+            if (typeof new_option.textContent === 'undefined')
+            {
+                new_option.innerText = username + ' (' + full_name + ')';
+            }
+            else
+            {
+                new_option.textContent = username + ' (' + full_name + ')';
+            }
+            rec.appendChild(new_option);
+            rec.selectedIndex = rec.options.length - 1;
+        }
+    }
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    function clickMenu() {
+        var x = document.getElementById("nav__profile");
+        if (x.className === "nav__profile") {
+            x.className += " show";
+        } else {
+            x.className = "nav__profile";
+        }
+    }
+</script>
+    <script src="./fund-gdb-cpp - Gỡ rối chương trình với GDB_files/ace.js.download" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+            var ids = [];
+            $('.solution_ids').each(function () {
+                ids.push(parseInt($(this).val()));
+            });
+            var loop_status;
+
+            function load_status() {
+                $.ajax({
+                    url: "/api/solution/status",
+                    type: "post",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({id: ids}),
+                    success: function (result) {
+                        solutions = result.solutions;
+                        count_waiting = 0;
+                        for (i = 0; i < solutions.length; i++) {
+                            if (solutions[i].status > 1) {
+                                $('#status_' + solutions[i].id).html('<a href="/student/solution/' + solutions[i].id + '/edit"><span style="color: ' + solutions[i].color + ';">' + solutions[i].result + '</span></a>');
+                                $('#run_time_' + solutions[i].id).html(solutions[i].run_time);
+                                $('#memory_' + solutions[i].id).html(solutions[i].memory);
+                            } else {
+                                count_waiting++;
+                            }
+                        }
+                        if (count_waiting === 0) {
+                            clearInterval(loop_status);
+                        }
+                    }
+                });
+            }
+
+            if (ids.length > 0) {
+                loop_status = setInterval(load_status, 3000);
+            }
+                    };
+    </script>
+            <script>
+            const fileInput = document.querySelector('#fileInput');
+            fileInput.addEventListener('change', (event) => {
+                const files = event.target.files;
+                if(files.length === 0){
+                    document.getElementsByClassName("fileInput__value")[0].innerHTML = "Chọn tệp";
+                } else {
+                    for (let file of files) {
+                        document.getElementsByClassName("fileInput__value")[0].innerHTML = document.getElementById("fileInput").value;
+                    }
+                }
+            });
+        </script>
+        
+
+</body></html>

@@ -1,0 +1,180 @@
+Học viện Công nghệ Bưu chính Viễn thông - SecLab PTIT
+HƯỚNG DẪN THỰC HÀNH
+T1057 - Process Discovery
+Mức độ: Trung bình
+Discovery / Recon
+MITRE ATT&amp;CK T1057
+1. Giới thiệu lab
+Thông tin
+Chi tiết
+Tên Lab
+atk-mitre-t1057
+Mức độ
+Trung bình
+Công cụ sử dụng
+nmap
+, 
+onesixtyone
+, 
+snmpwalk
+, 
+curl
+Mục tiêu học tập
+Hiểu rõ cách kẻ tấn công sử dụng để liệt kê các tiến trình đang chạy trong hệ thống mục tiêu, từ đó nâng cao khả năng nhận diện và đánh giá các hoạt động bất thường trên hệ thống.
+Hiểu cơ chế hoạt động của giao thức SNMP và quy trình thu thập thông tin về đối tượng mục tiêu.
+Kỹ năng đạt được
+Kỹ năng sử dụng 
+nmap
+ để quét toàn bộ cổng TCP/UDP và xác định dịch vụ đang chạy.
+Kỹ năng khai thác lỗ hổng cấu hình sai community string của SNMP bằng kỹ thuật brute-force.
+Kỹ năng sử dụng 
+snmpwalk
+ cùng các OID trong MIB để truy vấn thông tin hệ thống, bao gồm danh sách tiến trình đang chạy.
+Kỹ năng nhận diện thông tin nhạy cảm bị lộ lọt qua dữ liệu thu thập được và khai thác để truy cập dịch vụ yêu cầu xác thực.
+2. Kịch bản
+Tình huống:
+Sinh viên đóng vai một kẻ tấn công đã có khả năng kết nối mạng tới một máy chủ mục tiêu (
+172.50.2.20
+) nhưng chưa có bất kỳ thông tin gì về các dịch vụ đang chạy trên đó. Trước khi có thể tiến hành khai thác, attacker cần thực hiện trinh sát để xác định các cổng và dịch vụ đang mở, từ đó phát hiện ra một dịch vụ SNMP bị cấu hình sai (community string dễ đoán), cho phép truy vấn được danh sách tiến trình đang chạy trên server - và vô tình làm lộ thông tin đăng nhập của một dịch vụ xác thực khác.
+Vai trò của sinh viên:
+Đóng vai attacker trên máy 
+client
+, thực hiện quét toàn diện cổng TCP/UDP và dịch vụ đang chạy trên server mục tiêu.
+Khai thác lỗ hổng cấu hình sai của SNMP để truy vấn thông tin hệ thống, tập trung vào danh sách tiến trình đang chạy nhằm tìm kiếm thông tin nhạy cảm.
+Sử dụng thông tin đăng nhập tìm được để truy cập vào dịch vụ xác thực trên server và lấy được flag.
+Sơ đồ mạng
+Client
+nmap / onesixtyone / snmpwalk / curl
+máy tấn công
+Quét cổng, khai thác SNMP, xác thực
+&nbsp;
+Server
+SNMP + HTTP Auth Server
+172.50.2.20
+3. Kiến thức bổ trợ
+Kiến thức nền tảng
+Process Discovery (T1057):
+ kỹ thuật kẻ tấn công sử dụng để liệt kê các tiến trình đang chạy trên hệ thống mục tiêu, nhằm thu thập thông tin phục vụ cho các bước tấn công tiếp theo, kể cả khi không có quyền truy cập trực tiếp vào hệ thống (ví dụ thông qua giao thức quản lý từ xa như SNMP).
+SNMP (Simple Network Management Protocol):
+ giao thức dùng để giám sát và quản lý thiết bị mạng từ xa, sử dụng 
+community string
+ làm cơ chế xác thực. Nếu community string bị đặt mặc định hoặc dễ đoán, kẻ tấn công có thể đọc được toàn bộ dữ liệu quản lý của thiết bị.
+MIB/OID:
+ dữ liệu SNMP được tổ chức theo cấu trúc cây (Management Information Base), mỗi nút được định danh bằng một OID (Object Identifier). Ví dụ OID 
+.1.3.6.1.2.1.25.4.2
+ tương ứng với bảng danh sách các tiến trình đang chạy trên hệ thống.
+Thành phần cần quan sát trong bài lab
+Thành phần
+Vai trò
+Cổng TCP/UDP mở trên server
+Xác định các dịch vụ đang chạy, trong đó có dịch vụ HTTP Auth Server và dịch vụ SNMP.
+SNMP community string
+Chuỗi xác thực của SNMP; nếu bị cấu hình yếu, có thể bị dò ra bằng kỹ thuật brute-force với wordlist công khai.
+Danh sách tiến trình (process list) qua SNMP
+Dữ liệu truy vấn được qua OID 
+.1.3.6.1.2.1.25.4.2
+, có thể chứa thông tin nhạy cảm như username/password nếu ứng dụng truyền tham số không an toàn.
+flag.txt
+Tập tin chứa flag, chỉ truy cập được sau khi xác thực thành công vào HTTP Auth Server.
+Bảng tùy chọn và cú pháp công cụ sử dụng trong bài
+Công cụ
+Tùy chọn / Cú pháp
+Mô tả tác dụng
+nmap
+nmap -sS -p- --min-rate &lt;n&gt; -n -Pn -oA &lt;output&gt; &lt;IP&gt;
+Quét toàn bộ (65535) cổng TCP dạng SYN scan, không phân giải DNS, không ping trước, lưu kết quả ra nhiều định dạng.
+nmap
+nmap -sV -sC -p&lt;ports&gt; -oA &lt;output&gt; &lt;IP&gt;
+Quét chi tiết dịch vụ và phiên bản, chạy kèm script mặc định trên các cổng đã xác định là mở.
+nmap
+nmap -sU --top-ports &lt;n&gt; --open -oA &lt;output&gt; &lt;IP&gt;
+Quét các cổng UDP phổ biến nhất, chỉ hiển thị cổng đang mở.
+onesixtyone
+onesixtyone -c &lt;wordlist&gt; -i &lt;hosts&gt; -o &lt;log&gt; -w &lt;ms&gt;
+Brute-force community string SNMP trên danh sách host, với danh sách từ điển và độ trễ giữa các gói tin tính bằng mili-giây.
+snmpwalk
+snmpwalk -v &lt;version&gt; -c &lt;community_string&gt; &lt;IP&gt; &lt;OID&gt;
+Truy vấn toàn bộ dữ liệu SNMP bắt đầu từ một OID gốc, sử dụng community string đã dò được.
+curl
+curl -v &lt;IP&gt;:&lt;port&gt;/&lt;path&gt; -u &lt;user&gt;:&lt;pass&gt;
+Gửi yêu cầu HTTP kèm thông tin xác thực Basic Auth.
+4. Các nhiệm vụ của bài thực hành
+Để tải bài thực hành, sinh viên thực hiện câu lệnh:
+imodule https://github.com/ptit2026/pen_lab_2026/raw/refs/heads/main/atk-mitre-t1057.tar
+Để khởi động bài thực hành, sinh viên dùng câu lệnh:
+labtainer atk-mitre-t1057
+(chú ý: sinh viên sử dụng mã sinh viên của mình để nhập thông tin email người thực hiện bài lab khi có yêu cầu, để sử dụng khi chấm điểm)
+Sau khi khởi động xong, một terminal ảo sẽ xuất hiện, đại diện cho máy tấn công: 
+client
+.
+Nhiệm vụ 1 - scan_network: Quét cổng và phát hiện dịch vụ trên server
+Sử dụng 
+nmap
+ để quét các cổng và dịch vụ đang chạy trên server mục tiêu.
+Bước 1:
+ Tạo thư mục để lưu kết quả quét:
+mkdir -p nmap
+Bước 2:
+ Quét toàn bộ cổng TCP:
+sudo nmap -sS -p- --min-rate 10000 -n -Pn -oA nmap/alltcp 172.50.2.20
+Bước 3:
+ Quét chi tiết dịch vụ trên các cổng TCP đã phát hiện được ở Bước 2:
+sudo nmap -sV -sC -p199,8443 -oA nmap/tcp-detail 172.50.2.20
+Bước 4:
+ Quét các cổng UDP phổ biến để xác định thêm các dịch vụ khác đang chạy:
+sudo nmap -sU --top-ports 1000 -n -Pn --min-rate 10000 --max-retries 1 --open -oA nmap/udp_top1000 172.50.2.20
+Kết quả rà quét cho thấy server đang chạy một dịch vụ HTTP (cổng 8443) và một dịch vụ SNMP.
+Điều kiện hoàn thành nhiệm vụ:
+ Đã quét và phát hiện được dịch vụ HTTP qua TCP, đồng thời quét và phát hiện được dịch vụ SNMP qua UDP
+Câu hỏi 1:
+Vì sao cần thực hiện cả quét TCP lẫn UDP khi rà soát một hệ thống, thay vì chỉ quét một trong hai loại giao thức?
+Trả lời:
+ _______________________________________
+Nhiệm vụ 2 - snmp_enum: Khai thác SNMP misconfig và trích xuất thông tin nhạy cảm
+Khai thác lỗ hổng cấu hình sai community string của SNMP bằng brute-force, sau đó truy vấn thông tin hệ thống để tìm thông tin nhạy cảm bị lộ lọt.
+Bước 1:
+ Tải wordlist công khai để làm input cho việc brute-force:
+wget https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/SNMP/snmp-onesixtyone.txt -O dict.txt
+Bước 2:
+ Thêm địa chỉ IP của server vào tập tin danh sách host:
+echo "172.50.2.20" &gt; hosts
+Bước 3:
+ Sử dụng 
+onesixtyone
+ để brute-force community string SNMP:
+onesixtyone -c dict.txt -i hosts -o my.log -w 100
+Lưu ý: quá trình quét có thể tốn khá nhiều thời gian.
+Bước 4:
+ Sau khi có được community string, dùng 
+snmpwalk
+ để rà quét thông tin hệ thống (giao diện mạng, username, uptime, phiên bản OS, tiến trình đang chạy,...):
+Gợi ý cú pháp:
+snmpwalk -v &lt;VERSION_SNMP&gt; -c &lt;COMM_STRING&gt; &lt;IP_SERVER&gt; .1
+Ví dụ: 
+snmpwalk -v1 -c &lt;comm_string&gt; 172.50.2.20 .1
+Bước 5:
+ Sử dụng OID truy vấn riêng danh sách tiến trình đang chạy để thu hẹp phạm vi tìm kiếm:
+Gợi ý cú pháp:
+snmpwalk -v1 -c &lt;comm_string&gt; 172.50.2.20 .1.3.6.1.2.1.25.4.2
+Bước 6:
+ Tìm kiếm thông tin nhạy cảm hữu ích từ danh sách tiến trình thu được, ví dụ tham số đăng nhập vô tình bị truyền vào dòng lệnh của một tiến trình:
+Gợi ý:
+ có thể lọc kết quả bằng lệnh 
+grep
+Điều kiện hoàn thành nhiệm vụ:
+ Đã brute-force thành công community string của SNMP, đồng thời trích xuất được thông tin đăng nhập (username, password) từ danh sách tiến trình
+Câu hỏi 2:
+Vì sao việc truyền username/password trực tiếp qua tham số dòng lệnh của một tiến trình lại được xem là không an toàn, ngay cả khi hệ thống không bị truy cập trực tiếp?
+Trả lời:
+ _______________________________________
+Nhiệm vụ 3 - get_flag: Truy cập dịch vụ xác thực và lấy flag
+Trên cổng 8443 đang chạy một dịch vụ HTTP Auth Server. Sử dụng thông tin đăng nhập đã tìm được ở Nhiệm vụ 2 để truy cập vào và đọc tập tin 
+flag.txt
+.
+Gợi ý cú pháp:
+curl -v 172.50.2.20:8443/flag.txt -u &lt;username&gt;:&lt;password&gt;
+Nếu xác thực thành công, nội dung trả về sẽ chứa flag của bài thực hành.
+Điều kiện hoàn thành nhiệm vụ:
+ Truy cập thành công vào HTTP Auth Server bằng thông tin đăng nhập đã tìm được, và nội dung phản hồi chứa chuỗi flag đúng định dạng
+Câu hỏi 3:
+Trình bày lại toàn bộ chuỗi khai thác từ bước quét cổng ban đầu đến khi lấy được flag. Bước nào trong chuỗi này là nguyên nhân gốc rễ dẫn đến việc lộ thông tin đăng nhập?
