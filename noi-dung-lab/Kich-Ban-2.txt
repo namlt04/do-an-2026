@@ -1,0 +1,851 @@
+================================================================================
+   KỊCH BẢN TỔNG QUAN CHI TIẾT — 10 BÀI LAB DEVSECOPS/CLOUD
+   Hệ thống CloudNova — SecLab PTIT
+   Phiên bản: 2.0  |  Ngày: 30/09/2026
+================================================================================
+
+MỤC LỤC
+────────
+  PHẦN A — TỔNG QUAN CHUNG
+    A.1  Mục tiêu dự án
+    A.2  Nguyên tắc thiết kế
+    A.3  Nền tảng Labtainer & ràng buộc
+  PHẦN B — KIẾN TRÚC HẠ TẦNG TỔNG THỂ
+    B.1  Sơ đồ mạng tổng quan 10 bài lab
+    B.2  Bảng tổng hợp máy/container
+    B.3  Bảng phần mềm & phiên bản
+  PHẦN C — CHI TIẾT TỪNG BÀI LAB
+    C.1  Bài 1: dso-iac-scan
+    C.2  Bài 2: dso-image-scan
+    C.3  Bài 3: dso-secrets-git
+    C.4  Bài 4: dso-supplychain-sca
+    C.5  Bài 5: cloud-s3-misconfig
+    C.6  Bài 6: dso-waf-crs
+    C.7  Bài 7: cloud-ssrf-imds
+    C.8  Bài 8: dso-cicd-jenkins
+    C.9  Bài 9: dso-docker-escape
+    C.10 Bài 10: cloud-k8s-rbac
+  PHẦN D — YÊU CẦU TÀI NGUYÊN & PHIÊN BẢN
+
+================================================================================
+PHẦN A — TỔNG QUAN CHUNG
+================================================================================
+
+A.1  MỤC TIÊU DỰ ÁN
+─────────────────────
+Thiết kế 10 bài lab thực hành cho nền tảng Labtainer, phục vụ môn học
+"Nhập môn DevOps" (SEC1412_CLC) tại Học viện Công nghệ BCVT (PTIT).
+
+- Trọng tâm: Bảo mật (security) ~60%, Thiết lập môi trường (DevOps/Cloud) ~40%
+- 10 bài lab ĐỘC LẬP kỹ thuật nhưng LIÊN KẾT theo cốt truyện kill-chain
+- Cốt truyện xuyên suốt: Chiến dịch đánh giá an ninh hệ thống CloudNova
+- Mỗi bài gồm cả phần tấn công (Red) và phòng thủ/hardening (Blue)
+
+A.2  NGUYÊN TẮC THIẾT KẾ
+──────────────────────────
+1. Độc lập kỹ thuật: mỗi bài tự chứa, chiến lợi phẩm được pre-seed
+2. Liên tục tường thuật: cùng hệ thống CloudNova, cảm giác chiến dịch liền mạch
+3. Sắp xếp theo độ khó tăng dần (1 sao → 9 sao)
+4. Ánh xạ tới MITRE ATT&CK, OWASP, CIS Benchmarks
+5. Chấm điểm tự động qua flag tham số hóa theo mã sinh viên
+
+A.3  NỀN TẢNG LABTAINER & RÀNG BUỘC
+──────────────────────────────────────
+- Nền tảng: Labtainer (https://nps.edu/web/c3o/labtainers)
+- Chạy trên: VM Linux (Ubuntu) chứa Docker Engine
+- Hoàn toàn OFFLINE — không có Internet, không có cloud thật
+- Mọi dịch vụ cloud đều mô phỏng bằng container Docker
+- Mạng ảo nội bộ cho mỗi lab (dải 172.x.x.x)
+- Chấm điểm: artifacts (bash_history, stdout, file output)
+- Base image: labtainer.base (Ubuntu 20.04 based)
+
+================================================================================
+PHẦN B — KIẾN TRÚC HẠ TẦNG TỔNG THỂ
+================================================================================
+
+B.1  SƠ ĐỒ MẠNG THỐNG NHẤT — TOÀN BỘ HẠ TẦNG CLOUDNOVA (10 BÀI LAB GỘP)
+────────────────────────────────────────────────────────────────────────────
+
+Ghi chú: Mỗi bài lab chạy ĐỘC LẬP trên Labtainer (không chạy đồng thời).
+Sơ đồ dưới đây GỘP toàn bộ 22 container vào MỘT bức tranh hệ thống
+CloudNova, thể hiện: (a) các vùng mạng, (b) vai trò từng container,
+(c) luồng khai thác kill-chain nối các bài, (d) dịch vụ & cổng.
+
+╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                              VM LABTAINER  (Ubuntu 20.04 + Docker Engine)                                     ║
+║                              RAM >= 4 GB  |  CPU >= 2 vCPU  |  OFFLINE                                       ║
+║                                                                                                               ║
+║  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓  ║
+║  ┃  INTERNET GIẢ ĐỊNH / BỀ MẶT NGOÀI  (nơi attacker/DevSecOps tiếp cận ban đầu)                           ┃  ║
+║  ┃                                                                                                          ┃  ║
+║  ┃    [attacker / devsecops / client]                                                                       ┃  ║
+║  ┃    172.25.0.10  (Bài 1–8, 10)  |  172.60.2.10  (Bài 9)                                                  ┃  ║
+║  ┃    Ubuntu 20.04  —  Máy sinh viên thao tác (terminal chính)                                              ┃  ║
+║  ┃    ┌─────────────────────────────────────────────────────────────────────────────────────────────────┐     ┃  ║
+║  ┃    │  Công cụ cài sẵn (tùy bài):                                                                   │     ┃  ║
+║  ┃    │  curl, jq, grep, git, base64, vim                              (chung tất cả bài)              │     ┃  ║
+║  ┃    │  tfsec, checkov, trivy, terraform                              (Bài 1)                         │     ┃  ║
+║  ┃    │  trivy, grype, syft, docker CLI, tar                           (Bài 2)                         │     ┃  ║
+║  ┃    │  gitleaks >= 8.18, trufflehog >= 3.70, git-filter-repo         (Bài 3)                         │     ┃  ║
+║  ┃    │  npm >= 9, retire.js >= 4, snyk (opt.), syft, grype            (Bài 4)                         │     ┃  ║
+║  ┃    │  aws-cli v2, mc (MinIO client)                                 (Bài 5, 7)                      │     ┃  ║
+║  ┃    │  nikto >= 2.5, ZAP (opt.)                                      (Bài 6)                         │     ┃  ║
+║  ┃    │  jenkins-cli.jar                                               (Bài 8)                         │     ┃  ║
+║  ┃    │  docker CLI >= 24, capsh, getcap, nsenter, mount, fdisk, lsblk (Bài 9)                         │     ┃  ║
+║  ┃    │  kubectl >= 1.28, kube-linter, kubesec (opt.)                  (Bài 10)                        │     ┃  ║
+║  ┃    └─────────────────────────────────────────────────────────────────────────────────────────────────┘     ┃  ║
+║  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛  ║
+║          │          │          │          │          │         │          │          │          │               ║
+║          │ Bài 1    │ Bài 2    │ Bài 3    │ Bài 4    │ Bài 5   │ Bài 6    │ Bài 7    │ Bài 8    │ Bài 9,10     ║
+║          │ tfsec    │ pull     │ git      │ HTTP     │ S3 API  │ HTTP     │ HTTP     │ HTTP     │ docker/      ║
+║          │ scan     │ image    │ clone    │ exploit  │ :9000   │ :80/:8080│ :8080    │ :8080    │ kubectl      ║
+║          ▼          ▼          ▼          ▼          ▼         ▼          ▼          ▼          ▼               ║
+║  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓  ║
+║  ┃  VÙNG DỊCH VỤ NỘI BỘ CLOUDNOVA  —  Mạng 172.25.0.0/24  (Bài 1–8, 10)  |  172.60.2.0/24  (Bài 9)      ┃  ║
+║  ┃                                                                                                          ┃  ║
+║  ┃  ╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗ ┃  ║
+║  ┃  ║  TẦNG SOURCE CODE & IaC                                                                            ║ ┃  ║
+║  ┃  ║                                                                                                     ║ ┃  ║
+║  ┃  ║  [Bài 1 — ~/iac-project/]              [Bài 3 — gitserver]           [Bài 2 — registry]            ║ ┃  ║
+║  ┃  ║  (local trên devsecops)                  172.25.0.20                  172.25.0.20                   ║ ┃  ║
+║  ┃  ║  Terraform code lỗi                      Gitea 1.21 (Alpine)         Docker Registry v2 (Alpine)   ║ ┃  ║
+║  ┃  ║  main.tf, network.tf,                    Repo CloudNova              Image CloudNova                ║ ┃  ║
+║  ┃  ║  storage.tf, iam.tf,                     lịch sử commit              (chứa secret trong layer)     ║ ┃  ║
+║  ┃  ║  variables.tf, logging.tf                chứa secret lộ              HTTP :3000 (Gitea UI)         ║ ┃  ║
+║  ┃  ║  gate.sh (CI mô phỏng)                  HTTP :3000 (Gitea)           HTTP :5000 (Registry API)     ║ ┃  ║
+║  ┃  ║                                                                                                     ║ ┃  ║
+║  ┃  ║  Luồng: [1]──lộ kiến trúc──►[2]──lộ API key──►[3]──lộ AWS key──►[5]                               ║ ┃  ║
+║  ┃  ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════╝ ┃  ║
+║  ┃                                          │                                                               ┃  ║
+║  ┃                                          ▼ (credential sprawl — cùng bộ khóa lộ ở nhiều tầng)            ┃  ║
+║  ┃  ╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗ ┃  ║
+║  ┃  ║  TẦNG ỨNG DỤNG & BUILD                                                                             ║ ┃  ║
+║  ┃  ║                                                                                                     ║ ┃  ║
+║  ┃  ║  [Bài 4 — appserver]               [Bài 8 — jenkins]              [Bài 8 — gitserver]              ║ ┃  ║
+║  ┃  ║  172.25.0.20                        172.25.0.20                    172.25.0.30                      ║ ┃  ║
+║  ┃  ║  Node.js 18 LTS (Debian 12)        Flask mock (Debian 12)         Gitea 1.21 + Registry            ║ ┃  ║
+║  ┃  ║  App CloudNova có CVE              HOẶC Jenkins LTS (JVM)         Repo CI + deploy keys            ║ ┃  ║
+║  ┃  ║  (prototype pollution /            Script Console (RCE)            HTTP :3000                       ║ ┃  ║
+║  ┃  ║   deserialization)                 Credential Store                                                 ║ ┃  ║
+║  ┃  ║  node_modules cài sẵn             HTTP :8080                                                       ║ ┃  ║
+║  ┃  ║  HTTP :8080 (hoặc :3000)                                                                           ║ ┃  ║
+║  ┃  ║                                                                                                     ║ ┃  ║
+║  ┃  ║  Luồng: [3]──mã nguồn──►[4]──shell trên app──►[8]──credential deploy──►[9]                        ║ ┃  ║
+║  ┃  ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════╝ ┃  ║
+║  ┃                                          │                                                               ┃  ║
+║  ┃                                          ▼                                                               ┃  ║
+║  ┃  ╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗ ┃  ║
+║  ┃  ║  TẦNG WEB PERIMETER (WAF + STOREFRONT)                                                             ║ ┃  ║
+║  ┃  ║                                                                                                     ║ ┃  ║
+║  ┃  ║  [Bài 6 — waf]                   [Bài 6,7 — webapp]                                                ║ ┃  ║
+║  ┃  ║  172.25.0.20                      172.25.0.30 (Bài 6) / 172.25.0.20 (Bài 7)                        ║ ┃  ║
+║  ┃  ║  nginx 1.24 (Debian 12)           Python 3.11 + Flask (Debian 12)                                  ║ ┃  ║
+║  ┃  ║  + ModSecurity v3 >= 3.0.12       Storefront CloudNova                                              ║ ┃  ║
+║  ┃  ║  + OWASP CRS >= 4.0              SQLi, XSS, Path Traversal (Bài 6)                                 ║ ┃  ║
+║  ┃  ║  + modsec-nginx connector         "imgproxy-portal" / SSRF (Bài 7)                                  ║ ┃  ║
+║  ┃  ║  Audit log: /var/log/modsec_*     fetch?url= (điểm nhập SSRF)                                      ║ ┃  ║
+║  ┃  ║  Cổng :80 (reverse proxy)         Cổng :8080 (backend)                                              ║ ┃  ║
+║  ┃  ║                                                                                                     ║ ┃  ║
+║  ┃  ║  Luồng:  client──►[6] waf (bảo vệ)──►webapp ──►[7] webapp (SSRF)──►imds──►credential──►storage    ║ ┃  ║
+║  ┃  ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════╝ ┃  ║
+║  ┃                                          │                                                               ┃  ║
+║  ┃                                          ▼                                                               ┃  ║
+║  ┃  ╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗ ┃  ║
+║  ┃  ║  TẦNG CLOUD SERVICES (MÔ PHỎNG)                                                                    ║ ┃  ║
+║  ┃  ║                                                                                                     ║ ┃  ║
+║  ┃  ║  [Bài 5,7 — storage]               [Bài 7 — imds]                                                  ║ ┃  ║
+║  ┃  ║  172.25.0.20 (Bài 5)               169.254.169.254 (alias)                                          ║ ┃  ║
+║  ┃  ║  172.25.0.30 (Bài 7)               Alpine 3.18                                                      ║ ┃  ║
+║  ┃  ║  MinIO Server (Debian 12)           Python http.server custom                                        ║ ┃  ║
+║  ┃  ║  S3-compatible                      /latest/meta-data/                                               ║ ┃  ║
+║  ┃  ║  Cổng :9000 (S3 API)               /latest/meta-data/iam/                                           ║ ┃  ║
+║  ┃  ║  Cổng :9001 (Console)                security-credentials/                                           ║ ┃  ║
+║  ┃  ║  Buckets:                           AccessKeyId / SecretKey / Token                                  ║ ┃  ║
+║  ┃  ║   • public-assets (ẩn danh)         IMDSv1 (mặc định) → IMDSv2                                      ║ ┃  ║
+║  ┃  ║   • internal-backup (credential)    Cổng :80 (HTTP link-local)                                       ║ ┃  ║
+║  ┃  ║   • finance-reports (private)                                                                       ║ ┃  ║
+║  ┃  ║   • fin-reports (Bài 7, flag)                                                                       ║ ┃  ║
+║  ┃  ║                                                                                                     ║ ┃  ║
+║  ┃  ║  Luồng: [5]──S3 misconfig──►exfil backup──►lộ thêm key──►bucket private                            ║ ┃  ║
+║  ┃  ║          [7]──SSRF──►imds──►credential──►storage──►flag                                             ║ ┃  ║
+║  ┃  ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════╝ ┃  ║
+║  ┃                                          │                                                               ┃  ║
+║  ┃                                          ▼                                                               ┃  ║
+║  ┃  ╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗ ┃  ║
+║  ┃  ║  TẦNG CONTAINER & HOST  (Mạng 172.60.2.0/24)                                                       ║ ┃  ║
+║  ┃  ║                                                                                                     ║ ┃  ║
+║  ┃  ║  [Bài 9 — app]                         [Bài 9 — host-sim]                                          ║ ┃  ║
+║  ┃  ║  172.60.2.10                            172.60.2.5                                                   ║ ┃  ║
+║  ┃  ║  Ubuntu 20.04                           Alpine (docker:24-dind)                                      ║ ┃  ║
+║  ┃  ║  Container bị chiếm (shell SV)          Mô phỏng MÁY HOST                                           ║ ┃  ║
+║  ┃  ║                                         Docker Engine (dockerd)                                      ║ ┃  ║
+║  ┃  ║  Cấu hình YẾU cố ý:                    /var/run/docker.sock                                         ║ ┃  ║
+║  ┃  ║   • --privileged                        /root/flag.txt  ← MỤC TIÊU                                  ║ ┃  ║
+║  ┃  ║   • mount docker.sock ◄── socket ──►    /root/.hostmarker (canary)                                   ║ ┃  ║
+║  ┃  ║   • CAP_SYS_ADMIN                                                                                   ║ ┃  ║
+║  ┃  ║                                                                                                     ║ ┃  ║
+║  ┃  ║  Đường escape A: docker.sock ──► tạo container mới mount / ──► chroot ──► đọc flag                  ║ ┃  ║
+║  ┃  ║  Đường escape B: mount /dev/sda1 ──► /mnt/host ──► đọc flag                                         ║ ┃  ║
+║  ┃  ║  Đường escape C: nsenter --target 1 ──► shell host ──► đọc flag                                     ║ ┃  ║
+║  ┃  ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════╝ ┃  ║
+║  ┃                                          │                                                               ┃  ║
+║  ┃                                          ▼ (host = node Kubernetes)                                      ┃  ║
+║  ┃  ╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗ ┃  ║
+║  ┃  ║  TẦNG ORCHESTRATION — KUBERNETES  (Mạng 172.25.0.0/24)                    ★ ĐỈNH KILL-CHAIN ★      ║ ┃  ║
+║  ┃  ║                                                                                                     ║ ┃  ║
+║  ┃  ║  [Bài 10 — k8s-node]                                                                               ║ ┃  ║
+║  ┃  ║  172.25.0.20                                                                                        ║ ┃  ║
+║  ┃  ║  Ubuntu 22.04 + k3s v1.28 (single-node: control-plane + worker)                                     ║ ┃  ║
+║  ┃  ║  --disable traefik,servicelb,metrics-server  |  SQLite (thay etcd)                                   ║ ┃  ║
+║  ┃  ║  ┌──────────────────────────────────────────────────────────────────────────────────────────────┐    ║ ┃  ║
+║  ┃  ║  │  API Server :6443                                                                            │    ║ ┃  ║
+║  ┃  ║  │                                                                                              │    ║ ┃  ║
+║  ┃  ║  │  namespace: app                                                                              │    ║ ┃  ║
+║  ┃  ║  │  ┌─────────────────────────────────────────────────────────────────────────────────────────┐ │    ║ ┃  ║
+║  ┃  ║  │  │  pod: web-app                                                                           │ │    ║ ┃  ║
+║  ┃  ║  │  │  ServiceAccount: web-sa  ← RBAC QUÁ RỘNG (list secrets, create pods)                    │ │    ║ ┃  ║
+║  ┃  ║  │  │  /var/run/secrets/kubernetes.io/serviceaccount/token                                     │ │    ║ ┃  ║
+║  ┃  ║  │  ├─────────────────────────────────────────────────────────────────────────────────────────┤ │    ║ ┃  ║
+║  ┃  ║  │  │  Secret: db-credentials  (base64: username + password)                                   │ │    ║ ┃  ║
+║  ┃  ║  │  │  ConfigMap: app-config   (LẪN secret plaintext — anti-pattern)                           │ │    ║ ┃  ║
+║  ┃  ║  │  └─────────────────────────────────────────────────────────────────────────────────────────┘ │    ║ ┃  ║
+║  ┃  ║  │                                                                                              │    ║ ┃  ║
+║  ┃  ║  │  NODE FILESYSTEM:  /opt/host-secrets/flag.txt  ← MỤC TIÊU CUỐI CÙNG                         │    ║ ┃  ║
+║  ┃  ║  │  (chỉ đọc được qua pod hostPath/privileged escape)                                           │    ║ ┃  ║
+║  ┃  ║  └──────────────────────────────────────────────────────────────────────────────────────────────┘    ║ ┃  ║
+║  ┃  ║                                                                                                     ║ ┃  ║
+║  ┃  ║  Luồng: SA token ──► RBAC quá rộng ──► đọc secret ──► tạo pod hostPath ──► đọc flag NODE           ║ ┃  ║
+║  ┃  ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════╝ ┃  ║
+║  ┃                                                                                                          ┃  ║
+║  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛  ║
+║                                                                                                               ║
+║  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓  ║
+║  ┃  LUỒNG KILL-CHAIN TỔNG THỂ (từ ngoài vào trong, từ nông đến sâu)                                       ┃  ║
+║  ┃                                                                                                          ┃  ║
+║  ┃   [1] IaC lộ ──► [2] Image ──► [3] Git secret ──► [4] App CVE ──► [5] S3 cloud                         ┃  ║
+║  ┃   tfsec/checkov   docker/trivy   gitleaks/trufflehog  SCA+exploit    aws-cli+MinIO                      ┃  ║
+║  ┃   lộ kiến trúc    lộ API key     lộ AWS key           chiếm shell    exfil dữ liệu                     ┃  ║
+║  ┃       │               │              │                    │              │                                ┃  ║
+║  ┃       └───────── cùng bộ credential cloud (mô-típ "credential sprawl") ─┘                                ┃  ║
+║  ┃                                                                   │                                      ┃  ║
+║  ┃   [6] WAF bảo vệ ──► [7] SSRF→IMDS ──► [8] Jenkins ──► [9] Docker escape ──► [10] K8s RBAC             ┃  ║
+║  ┃   ModSec+CRS          cắp role cloud     RCE pipeline    thoát ra host         chiếm toàn cụm            ┃  ║
+║  ┃   chặn SQLi/XSS       Capital One 2019   trộm cred       docker.sock          SA token→pod escape       ┃  ║
+║  ┃                                                           privileged            hostPath→flag NODE        ┃  ║
+║  ┃                                                                                                          ┃  ║
+║  ┃   ═══════════════════════════════════════════════════════════════════════════                              ┃  ║
+║  ┃   CƠ BẢN (★)                    TRUNG BÌNH (★★★★)              NÂNG CAO–ĐỈNH (★★★★★★★★★)               ┃  ║
+║  ┃   Bài 1, 2                       Bài 3, 4, 5, 6                Bài 7, 8, 9, 10                           ┃  ║
+║  ┃   ═══════════════════════════════════════════════════════════════════════════                              ┃  ║
+║  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛  ║
+║                                                                                                               ║
+║  TỔNG HỢP: 22 container  |  6 vùng mạng/tầng  |  10 bài lab  |  12 flag  |  40 nhiệm vụ  |  40 câu hỏi     ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+
+B.2  BẢNG TỔNG HỢP MÁY/CONTAINER — TẤT CẢ 10 BÀI LAB
+─────────────────────────────────────────────────────────
+
+Tổng cộng: 22 container trên 10 bài lab (mỗi bài chạy riêng lẻ, không chạy đồng thời)
+
+┌─────┬─────────────────────┬──────────────┬──────────────────────────────┬───────────────────────────────────────────┐
+│ Bài │ Tên container       │ IP           │ Hệ điều hành / Base image    │ Vai trò                                   │
+├─────┼─────────────────────┼──────────────┼──────────────────────────────┼───────────────────────────────────────────┤
+│  1  │ devsecops           │ 172.25.0.10  │ Ubuntu 20.04 (labtainer)     │ Bàn làm việc kỹ sư; quét IaC             │
+├─────┼─────────────────────┼──────────────┼──────────────────────────────┼───────────────────────────────────────────┤
+│  2  │ devsecops           │ 172.25.0.10  │ Ubuntu 20.04 (labtainer)     │ Workstation phân tích image               │
+│     │ registry            │ 172.25.0.20  │ Alpine 3.18 (registry:2)     │ Docker Registry v2 nội bộ                 │
+├─────┼─────────────────────┼──────────────┼──────────────────────────────┼───────────────────────────────────────────┤
+│  3  │ attacker            │ 172.25.0.10  │ Ubuntu 20.04 (labtainer)     │ Máy tấn công: git, gitleaks, trufflehog   │
+│     │ gitserver           │ 172.25.0.20  │ Alpine/Debian (Gitea 1.21)   │ Git server nội bộ chứa repo lỗ hổng       │
+├─────┼─────────────────────┼──────────────┼──────────────────────────────┼───────────────────────────────────────────┤
+│  4  │ devsecops           │ 172.25.0.10  │ Ubuntu 20.04 (labtainer)     │ Workstation: npm audit, retire.js, snyk   │
+│     │ appserver           │ 172.25.0.20  │ Debian 12 (Node.js 18 LTS)   │ Ứng dụng Node.js có CVE trong dependencies│
+├─────┼─────────────────────┼──────────────┼──────────────────────────────┼───────────────────────────────────────────┤
+│  5  │ attacker            │ 172.25.0.10  │ Ubuntu 20.04 (labtainer)     │ Máy tấn công: aws-cli, curl, jq           │
+│     │ storage             │ 172.25.0.20  │ Debian 12 (MinIO latest)     │ Object storage S3-compatible (MinIO)       │
+├─────┼─────────────────────┼──────────────┼──────────────────────────────┼───────────────────────────────────────────┤
+│  6  │ client              │ 172.25.0.10  │ Ubuntu 20.04 (labtainer)     │ Attacker/DAST: curl, nikto, (ZAP opt.)    │
+│     │ waf                 │ 172.25.0.20  │ Debian 12 (nginx 1.24)       │ Reverse proxy + ModSecurity v3 + CRS 4.x  │
+│     │ webapp              │ 172.25.0.30  │ Debian 12 (Python 3.11)      │ Web app lỗ hổng (Flask): SQLi/XSS/trav.   │
+├─────┼─────────────────────┼──────────────┼──────────────────────────────┼───────────────────────────────────────────┤
+│  7  │ client              │ 172.25.0.10  │ Ubuntu 20.04 (labtainer)     │ Attacker: curl, aws-cli, jq               │
+│     │ webapp              │ 172.25.0.20  │ Debian 12 (Python 3.11)      │ App "imgproxy-portal" dính SSRF           │
+│     │ imds                │ 169.254.169. │ Alpine 3.18 (Python httpd)   │ IMDS giả: phục vụ metadata + credential   │
+│     │                     │ 254 (alias)  │                              │                                           │
+│     │ storage             │ 172.25.0.30  │ Debian 12 (MinIO latest)     │ Object storage S3-compatible (MinIO)       │
+├─────┼─────────────────────┼──────────────┼──────────────────────────────┼───────────────────────────────────────────┤
+│  8  │ attacker            │ 172.25.0.10  │ Ubuntu 20.04 (labtainer)     │ Máy tấn công: curl, jq, git               │
+│     │ jenkins             │ 172.25.0.20  │ Debian 12 (Python 3.11)      │ Jenkins mock (Flask) - endpoint lỗ hổng   │
+│     │ gitserver           │ 172.25.0.30  │ Alpine/Debian (Gitea 1.21)   │ Git server + Docker registry phụ           │
+├─────┼─────────────────────┼──────────────┼──────────────────────────────┼───────────────────────────────────────────┤
+│  9  │ app                 │ 172.60.2.10  │ Ubuntu 20.04 (labtainer)     │ Container mục tiêu - shell SV (cấu hình  │
+│     │                     │              │                              │ yếu: docker.sock + privileged)             │
+│     │ host-sim            │ 172.60.2.5   │ Alpine (docker:24-dind)      │ Mô phỏng máy host - Docker-in-Docker       │
+│     │                     │              │                              │ Chứa /root/flag.txt                        │
+├─────┼─────────────────────┼──────────────┼──────────────────────────────┼───────────────────────────────────────────┤
+│ 10  │ attacker            │ 172.25.0.10  │ Ubuntu 20.04 (labtainer)     │ Shell "trong pod bị chiếm": kubectl        │
+│     │ k8s-node            │ 172.25.0.20  │ Ubuntu 22.04 (k3s v1.28)    │ K3s single-node: API server + worker       │
+│     │                     │              │                              │ Chứa /opt/host-secrets/flag.txt            │
+└─────┴─────────────────────┴──────────────┴──────────────────────────────┴───────────────────────────────────────────┘
+
+
+B.3  BẢNG PHẦN MỀM & PHIÊN BẢN
+─────────────────────────────────
+
+┌──────────────────────────────────┬─────────────────────┬────────────┬──────────────────────────────────────────────┐
+│ Phần mềm / Hệ thống             │ Phiên bản           │ Dùng ở bài │ Ghi chú                                      │
+├──────────────────────────────────┼─────────────────────┼────────────┼──────────────────────────────────────────────┤
+│ Ubuntu (base image Labtainer)    │ 20.04 LTS           │ Tất cả     │ Base cho container sinh viên thao tác         │
+├──────────────────────────────────┼─────────────────────┼────────────┼──────────────────────────────────────────────┤
+│ Terraform CLI                    │ >= 1.5.x            │ Bài 1      │ Binary tĩnh; chỉ dùng validate/plan         │
+│ tfsec                            │ >= 1.28.x           │ Bài 1      │ Binary Go tĩnh, offline hoàn toàn            │
+│ checkov                          │ >= 3.0.x            │ Bài 1      │ Python; cài via pip, đóng gói sẵn            │
+│ Trivy                            │ >= 0.50.x           │ Bài 1,2    │ Binary; ĐÃ đóng gói sẵn DB rule vào image   │
+├──────────────────────────────────┼─────────────────────┼────────────┼──────────────────────────────────────────────┤
+│ Docker Registry                  │ v2 (registry:2)     │ Bài 2      │ Registry nội bộ chứa image CloudNova         │
+│ Grype                            │ >= 0.74.x           │ Bài 2      │ SCA cho image; binary tĩnh                   │
+│ Syft                             │ >= 1.0.x            │ Bài 2,4    │ Tạo SBOM; binary tĩnh                        │
+├──────────────────────────────────┼─────────────────────┼────────────┼──────────────────────────────────────────────┤
+│ Git                              │ >= 2.34             │ Bài 3,8,9  │ Có sẵn trong Ubuntu base                     │
+│ Gitea                            │ 1.21.x              │ Bài 3,8    │ Git server tự host, nhẹ; trang web + API     │
+│ Gitleaks                         │ >= 8.18.x           │ Bài 3      │ Binary Go tĩnh, chạy offline                 │
+│ TruffleHog                       │ >= 3.70.x           │ Bài 3      │ Binary Go tĩnh                               │
+│ git-filter-repo                  │ >= 2.38             │ Bài 3      │ Python script, cài sẵn                       │
+├──────────────────────────────────┼─────────────────────┼────────────┼──────────────────────────────────────────────┤
+│ Node.js                          │ 18 LTS              │ Bài 4      │ Runtime cho ứng dụng có CVE                  │
+│ npm                              │ >= 9.x              │ Bài 4      │ Package manager; dùng npm audit              │
+│ retire.js                        │ >= 4.x              │ Bài 4      │ SCA cho JS; cài sẵn via npm global           │
+│ Snyk CLI (offline mode)          │ >= 1.x              │ Bài 4      │ Tùy chọn; cần đóng gói sẵn DB               │
+├──────────────────────────────────┼─────────────────────┼────────────┼──────────────────────────────────────────────┤
+│ MinIO Server                     │ latest (2024+)      │ Bài 5,7    │ Object storage S3-compatible                 │
+│ MinIO Client (mc)                │ latest              │ Bài 5      │ CLI thao tác MinIO                           │
+│ AWS CLI v2                       │ >= 2.15.x           │ Bài 5,7    │ Tương tác S3-compatible; bundle offline       │
+├──────────────────────────────────┼─────────────────────┼────────────┼──────────────────────────────────────────────┤
+│ nginx                            │ 1.24.x / 1.26.x     │ Bài 6      │ Reverse proxy cho WAF                        │
+│ ModSecurity v3 (libmodsecurity)  │ >= 3.0.12           │ Bài 6      │ WAF engine; biên dịch sẵn trong image        │
+│ ModSecurity-nginx connector      │ >= 1.0.3            │ Bài 6      │ Module connector; build cùng nginx           │
+│ OWASP Core Rule Set (CRS)        │ >= 4.0.x            │ Bài 6      │ Bộ luật WAF; giải nén sẵn vào image          │
+│ nikto                            │ >= 2.5.0            │ Bài 6      │ DAST scanner (Perl); nhẹ                     │
+│ OWASP ZAP (tùy chọn)            │ >= 2.14             │ Bài 6      │ DAST nặng (JVM); chỉ dùng nếu RAM đủ        │
+├──────────────────────────────────┼─────────────────────┼────────────┼──────────────────────────────────────────────┤
+│ Python 3 + Flask                 │ 3.11 / Flask 3.x    │ Bài 6,7,8  │ Backend cho webapp lỗ hổng & Jenkins mock    │
+│ IMDS mock server (Python httpd)  │ custom              │ Bài 7      │ HTTP server giả /latest/meta-data/...        │
+├──────────────────────────────────┼─────────────────────┼────────────┼──────────────────────────────────────────────┤
+│ Docker CLI                       │ >= 24.x             │ Bài 9      │ Client CLI để nói chuyện qua socket          │
+│ Docker Engine (DinD)             │ docker:24-dind      │ Bài 9      │ Docker-in-Docker mô phỏng host               │
+│ libcap2-bin (capsh/getcap)       │ >= 2.44             │ Bài 9      │ Liệt kê/giải mã capabilities                │
+│ util-linux (nsenter/mount/lsblk) │ >= 2.37             │ Bài 9      │ Công cụ escape: nsenter, mount               │
+│ deepce (tùy chọn)               │ latest              │ Bài 9      │ Script trinh sát container escape            │
+├──────────────────────────────────┼─────────────────────┼────────────┼──────────────────────────────────────────────┤
+│ k3s                              │ v1.28.x / v1.29.x   │ Bài 10     │ Lightweight Kubernetes; single-node           │
+│ kubectl                          │ >= 1.28             │ Bài 10     │ CLI quản lý K8s                              │
+│ kube-linter                      │ >= 0.6.x            │ Bài 10     │ Audit tĩnh manifest K8s                      │
+│ kubesec                          │ >= 2.14             │ Bài 10     │ Chấm điểm rủi ro manifest                   │
+│ kube-bench                       │ >= 0.7.x            │ Bài 10     │ Đối chiếu CIS Kubernetes Benchmark           │
+├──────────────────────────────────┼─────────────────────┼────────────┼──────────────────────────────────────────────┤
+│ Công cụ chung (có sẵn tất cả)   │                     │ Tất cả     │                                              │
+│   curl                           │ >= 7.68             │            │ HTTP client                                  │
+│   jq                             │ >= 1.6              │            │ JSON parser                                  │
+│   grep / sed / awk               │ GNU coreutils       │            │ Text processing                              │
+│   base64                         │ GNU coreutils       │            │ Mã hóa/giải mã                               │
+│   vim / nano                     │ -                   │            │ Text editor                                  │
+└──────────────────────────────────┴─────────────────────┴────────────┴──────────────────────────────────────────────┘
+
+
+================================================================================
+PHẦN C — CHI TIẾT TỪNG BÀI LAB
+================================================================================
+
+──────────────────────────────────────────────────────────────────────
+C.1  BÀI 1 — dso-iac-scan  |  Bảo mật Infrastructure as Code
+──────────────────────────────────────────────────────────────────────
+
+Độ khó:      ★ (Cơ bản)
+Số container: 1
+Mạng:        172.25.0.0/24
+Kill-chain:  Trinh sát — mã hạ tầng lộ
+
+Sơ đồ mạng:
+┌─────────────────────────────────────────────────────────────┐
+│  Mạng ảo Labtainer 172.25.0.0/24  (không ra Internet)      │
+│                                                             │
+│  [devsecops]  172.25.0.10                                   │
+│  Ubuntu 20.04 | ~/iac-project/ (mã Terraform lỗi)          │
+│  Công cụ: tfsec, checkov, trivy config, terraform, git     │
+│  Script CI: ~/gate.sh → tiết lộ flag khi 0 HIGH/CRITICAL   │
+│                                                             │
+│  Kiến trúc mà Terraform MÔ TẢ (không tồn tại thật):        │
+│  Internet ──► [SG] ──► EC2 ──► S3 bucket                   │
+│                          └── IAM role/policy                │
+└─────────────────────────────────────────────────────────────┘
+
+Containers:
+  ┌───────────────┬──────────────┬──────────────┬─────────────────────────────┐
+  │ Tên           │ IP           │ OS           │ Phần mềm                    │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ devsecops     │ 172.25.0.10  │ Ubuntu 20.04 │ terraform >= 1.5            │
+  │               │              │              │ tfsec >= 1.28               │
+  │               │              │              │ checkov >= 3.0 (Python)     │
+  │               │              │              │ trivy >= 0.50               │
+  │               │              │              │ git, grep, jq               │
+  └───────────────┴──────────────┴──────────────┴─────────────────────────────┘
+
+Nhiệm vụ: 4 (baseline_scan, fix_network_storage, fix_secret_iam, pass_gate)
+Flag: 1 (khi quality gate đạt 0 HIGH/CRITICAL)
+Khả thi: RẤT CAO — 1 container, phân tích tĩnh thuần túy
+
+
+──────────────────────────────────────────────────────────────────────
+C.2  BÀI 2 — dso-image-scan  |  Bảo mật Image Container
+──────────────────────────────────────────────────────────────────────
+
+Độ khó:      ★★ (Cơ bản+)
+Số container: 2
+Mạng:        172.25.0.0/24
+Kill-chain:  Thu thập — image nội bộ lộ API key
+
+Sơ đồ mạng:
+┌────────────────────────────────────────────────────────────────────┐
+│  Mạng ảo Labtainer 172.25.0.0/24                                 │
+│                                                                    │
+│  [devsecops] 172.25.0.10  ◄──pull/scan──►  [registry] 172.25.0.20│
+│  Ubuntu 20.04                                Alpine (registry:2) │
+│  trivy, grype, syft,                         Docker Registry v2   │
+│  docker CLI, jq, tar                         Image CloudNova      │
+└────────────────────────────────────────────────────────────────────┘
+
+Containers:
+  ┌───────────────┬──────────────┬──────────────┬─────────────────────────────┐
+  │ Tên           │ IP           │ OS           │ Phần mềm                    │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ devsecops     │ 172.25.0.10  │ Ubuntu 20.04 │ trivy, grype, syft          │
+  │               │              │              │ docker CLI, jq, tar         │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ registry      │ 172.25.0.20  │ Alpine 3.18  │ Docker Registry v2          │
+  │               │              │              │ Image dàn dựng sẵn          │
+  └───────────────┴──────────────┴──────────────┴─────────────────────────────┘
+
+Nhiệm vụ: 4 (scan_image, analyze_layers, exploit_leaked_secret, harden_image)
+Flag: 1 (qua khai thác API key lộ trong layer)
+Khả thi: CAO
+
+
+──────────────────────────────────────────────────────────────────────
+C.3  BÀI 3 — dso-secrets-git  |  Bí mật trong lịch sử Git
+──────────────────────────────────────────────────────────────────────
+
+Độ khó:      ★★★ (Trung bình)
+Số container: 2
+Mạng:        172.25.0.0/24
+Kill-chain:  Thu thập — mã nguồn lộ credential
+
+Sơ đồ mạng:
+┌────────────────────────────────────────────────────────────────────┐
+│  Mạng ảo Labtainer 172.25.0.0/24                                 │
+│                                                                    │
+│  [attacker] 172.25.0.10  ◄──git clone──►  [gitserver] 172.25.0.20│
+│  Ubuntu 20.04                              Gitea 1.21 (Alpine)    │
+│  git, gitleaks, trufflehog                 Repo CloudNova         │
+│  git-filter-repo                           (lịch sử commit lỗi)  │
+└────────────────────────────────────────────────────────────────────┘
+
+Containers:
+  ┌───────────────┬──────────────┬──────────────┬─────────────────────────────┐
+  │ Tên           │ IP           │ OS           │ Phần mềm                    │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ attacker      │ 172.25.0.10  │ Ubuntu 20.04 │ git, gitleaks >= 8.18       │
+  │               │              │              │ trufflehog >= 3.70          │
+  │               │              │              │ git-filter-repo >= 2.38     │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ gitserver     │ 172.25.0.20  │ Alpine/Debian│ Gitea 1.21                  │
+  │               │              │              │ Repo dàn dựng sẵn           │
+  └───────────────┴──────────────┴──────────────┴─────────────────────────────┘
+
+Nhiệm vụ: 4 (clone_scan, deep_history, exploit_credential, harden_purge)
+Flag: 1 (dùng credential lộ truy cập dịch vụ đích)
+Khả thi: CAO
+
+
+──────────────────────────────────────────────────────────────────────
+C.4  BÀI 4 — dso-supplychain-sca  |  SCA & SBOM (Chuỗi cung ứng)
+──────────────────────────────────────────────────────────────────────
+
+Độ khó:      ★★★★ (Trung bình)
+Số container: 1-2
+Mạng:        172.25.0.0/24
+Kill-chain:  Chiếm chỗ đứng — khai thác CVE phụ thuộc
+
+Sơ đồ mạng:
+┌────────────────────────────────────────────────────────────────────┐
+│  Mạng ảo Labtainer 172.25.0.0/24                                 │
+│                                                                    │
+│  [devsecops] 172.25.0.10  ◄──HTTP──►  [appserver] 172.25.0.20   │
+│  Ubuntu 20.04                          Node.js 18 LTS (Debian)   │
+│  npm audit, retire.js, snyk            App có CVE (prototype     │
+│  syft, grype, jq                       pollution / deserialization)│
+└────────────────────────────────────────────────────────────────────┘
+
+Containers:
+  ┌───────────────┬──────────────┬──────────────┬─────────────────────────────┐
+  │ Tên           │ IP           │ OS           │ Phần mềm                    │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ devsecops     │ 172.25.0.10  │ Ubuntu 20.04 │ npm >= 9.x, retire.js >= 4  │
+  │               │              │              │ syft, grype, snyk (opt.)    │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ appserver     │ 172.25.0.20  │ Debian 12    │ Node.js 18 LTS, npm         │
+  │  (tùy chọn)  │              │              │ node_modules cài sẵn offline │
+  └───────────────┴──────────────┴──────────────┴─────────────────────────────┘
+
+Nhiệm vụ: 4 (audit_deps, generate_sbom, exploit_cve, fix_deps)
+Flag: 1 (khai thác CVE thành công)
+Khả thi: TRUNG BÌNH–CAO (cần chốt CVE tái lập offline)
+Hệ sinh thái: Node.js (npm) ✅ ĐÃ CHỐT
+
+
+──────────────────────────────────────────────────────────────────────
+C.5  BÀI 5 — cloud-s3-misconfig  |  Object Storage cấu hình sai
+──────────────────────────────────────────────────────────────────────
+
+Độ khó:      ★★★★ (Trung bình)
+Số container: 2
+Mạng:        172.25.0.0/24
+Kill-chain:  Rò rỉ dữ liệu cloud
+
+Sơ đồ mạng:
+┌────────────────────────────────────────────────────────────────────┐
+│  Mạng ảo Labtainer 172.25.0.0/24                                 │
+│                                                                    │
+│  [attacker] 172.25.0.10  ◄──S3 API 9000──►  [storage] 172.25.0.20│
+│  Ubuntu 20.04                                 MinIO Server        │
+│  aws-cli v2, curl, jq, mc                     Buckets:            │
+│                                                 public-assets     │
+│                                                 internal-backup   │
+│                                                 finance-reports   │
+└────────────────────────────────────────────────────────────────────┘
+
+Containers:
+  ┌───────────────┬──────────────┬──────────────┬─────────────────────────────┐
+  │ Tên           │ IP           │ OS           │ Phần mềm                    │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ attacker      │ 172.25.0.10  │ Ubuntu 20.04 │ aws-cli v2, curl, jq, mc   │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ storage       │ 172.25.0.20  │ Debian 12    │ MinIO Server (latest)       │
+  │               │              │              │ Cổng: 9000 (S3 API)         │
+  │               │              │              │       9001 (Console)        │
+  └───────────────┴──────────────┴──────────────┴─────────────────────────────┘
+
+Nhiệm vụ: 4 (discover_public, exfil_backup, access_private, harden_bucket)
+Flag: 2 (bucket public + bucket private)
+Khả thi: CAO
+
+
+──────────────────────────────────────────────────────────────────────
+C.6  BÀI 6 — dso-waf-crs  |  WAF Runtime (ModSecurity + CRS)
+──────────────────────────────────────────────────────────────────────
+
+Độ khó:      ★★★★★ (Trung bình khá)
+Số container: 3
+Mạng:        172.25.0.0/24
+Kill-chain:  Vận hành — bảo vệ app
+
+Sơ đồ mạng:
+┌────────────────────────────────────────────────────────────────────┐
+│  Mạng ảo Labtainer 172.25.0.0/24                                 │
+│                                                                    │
+│  [client]  ──HTTP:80──►  [waf]  ──HTTP:8080──►  [webapp]          │
+│  .10                     .20                     .30               │
+│  curl, nikto             nginx 1.24              Flask (Python)    │
+│  (ZAP tùy chọn)         + ModSecurity v3         SQLi, XSS,       │
+│                          + OWASP CRS 4.x         Path Traversal   │
+│                          audit log               flag1.txt         │
+│                                                                    │
+│  Luồng CHƯA có WAF: client ──────────────────► webapp:8080       │
+│  Luồng CÓ WAF:     client ──► waf:80 ────────► webapp:8080      │
+└────────────────────────────────────────────────────────────────────┘
+
+Containers:
+  ┌───────────────┬──────────────┬──────────────┬─────────────────────────────┐
+  │ Tên           │ IP           │ OS           │ Phần mềm                    │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ client        │ 172.25.0.10  │ Ubuntu 20.04 │ curl, nikto >= 2.5          │
+  │               │              │              │ ZAP >= 2.14 (tùy chọn)     │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ waf           │ 172.25.0.20  │ Debian 12    │ nginx 1.24                  │
+  │               │              │              │ libmodsecurity3 >= 3.0.12   │
+  │               │              │              │ modsecurity-nginx >= 1.0.3  │
+  │               │              │              │ OWASP CRS >= 4.0            │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ webapp        │ 172.25.0.30  │ Debian 12    │ Python 3.11, Flask 3.x      │
+  │               │              │              │ App lỗ hổng cố ý            │
+  └───────────────┴──────────────┴──────────────┴─────────────────────────────┘
+
+Nhiệm vụ: 4 (exploit_direct, deploy_waf, dast_compare, tune_falsepositive)
+Flag: 3 (khai thác trực tiếp, WAF chặn, khử false positive)
+Khả thi: TRUNG BÌNH (ModSecurity cần build sẵn, ZAP nặng)
+
+
+──────────────────────────────────────────────────────────────────────
+C.7  BÀI 7 — cloud-ssrf-imds  |  SSRF → Cloud Metadata
+──────────────────────────────────────────────────────────────────────
+
+Độ khó:      ★★★★★★ (Nâng cao)
+Số container: 4
+Mạng:        172.25.0.0/24
+Kill-chain:  Leo thang vào cloud (Capital One 2019)
+
+Sơ đồ mạng:
+┌────────────────────────────────────────────────────────────────────┐
+│  Mạng ảo Labtainer 172.25.0.0/24                                 │
+│                                                                    │
+│  [client] .10                                                      │
+│    │ (1) HTTP "fetch URL"                                          │
+│    ▼                                                               │
+│  [webapp] .20 (:8080) ──(2) SSRF──► [imds] 169.254.169.254        │
+│  "imgproxy-portal"                   IMDS giả (Python httpd)      │
+│  Flask + SSRF cố ý                  /latest/meta-data/...         │
+│    │                                credential tạm thời            │
+│    │ (4) credential                                                │
+│    ▼                                                               │
+│  [storage] .30 (:9000)                                             │
+│  MinIO (S3-compatible)                                             │
+│  Bucket: fin-reports → flag.txt                                    │
+│                                                                    │
+│  GHI CHÚ: client KHÔNG truy cập trực tiếp imds/storage            │
+│           (theo kịch bản — chỉ qua webapp)                         │
+└────────────────────────────────────────────────────────────────────┘
+
+Containers:
+  ┌───────────────┬──────────────┬──────────────┬─────────────────────────────┐
+  │ Tên           │ IP           │ OS           │ Phần mềm                    │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ client        │ 172.25.0.10  │ Ubuntu 20.04 │ curl, aws-cli v2, jq        │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ webapp        │ 172.25.0.20  │ Debian 12    │ Python 3.11, Flask          │
+  │               │              │              │ App dính SSRF cố ý          │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ imds          │ 169.254.169. │ Alpine 3.18  │ Python http.server custom   │
+  │               │ 254 (alias)  │              │ /latest/meta-data/...       │
+  │               │              │              │ IMDSv1 (mặc định) + IMDSv2  │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ storage       │ 172.25.0.30  │ Debian 12    │ MinIO Server (latest)       │
+  │               │              │              │ Bucket: fin-reports         │
+  └───────────────┴──────────────┴──────────────┴─────────────────────────────┘
+
+Nhiệm vụ: 4 (discover_ssrf, steal_credentials, access_storage_get_flag, harden_ssrf_imds)
+Flag: 1 (qua SSRF → IMDS → credential → S3 → flag)
+Khả thi: TRUNG BÌNH–CAO
+
+
+──────────────────────────────────────────────────────────────────────
+C.8  BÀI 8 — dso-cicd-jenkins  |  Bảo mật CI/CD (Jenkins)
+──────────────────────────────────────────────────────────────────────
+
+Độ khó:      ★★★★★★★ (Nâng cao)
+Số container: 3
+Mạng:        172.25.0.0/24
+Kill-chain:  Chiếm pipeline
+
+Sơ đồ mạng:
+┌────────────────────────────────────────────────────────────────────┐
+│  Mạng ảo Labtainer 172.25.0.0/24                                 │
+│                                                                    │
+│  [attacker] .10 ──HTTP:8080──► [jenkins] .20 ──HTTP──► [git] .30 │
+│  curl, jq, git                 Flask mock (mặc định)   Gitea 1.21│
+│  jenkins-cli.jar               HOẶC Jenkins LTS thật   Repo CI   │
+│                                 Script Console           + Registry│
+│                                 Credential Store                   │
+│                                 Build trigger                      │
+└────────────────────────────────────────────────────────────────────┘
+
+Containers:
+  ┌───────────────┬──────────────┬──────────────┬─────────────────────────────┐
+  │ Tên           │ IP           │ OS           │ Phần mềm                    │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ attacker      │ 172.25.0.10  │ Ubuntu 20.04 │ curl, jq, git               │
+  │               │              │              │ jenkins-cli.jar             │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ jenkins       │ 172.25.0.20  │ Debian 12    │ Phương án A (mặc định):     │
+  │               │              │              │   Python 3.11 + Flask mock  │
+  │               │              │              │ Phương án B (tùy chọn):     │
+  │               │              │              │   Jenkins LTS 2.426+ (JVM)  │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ gitserver     │ 172.25.0.30  │ Alpine/Debian│ Gitea 1.21                  │
+  │               │              │              │ Docker Registry (tùy chọn)  │
+  └───────────────┴──────────────┴──────────────┴─────────────────────────────┘
+
+Nhiệm vụ: 4 (recon_jenkins, rce_script_console, steal_credentials, harden_jenkins)
+Flag: 1 (RCE qua Script Console)
+Khả thi: TRUNG BÌNH
+Phương án mặc định: Mock Flask ✅ ĐÃ CHỐT
+
+
+──────────────────────────────────────────────────────────────────────
+C.9  BÀI 9 — dso-docker-escape  |  Thoát container chiếm host
+──────────────────────────────────────────────────────────────────────
+
+Độ khó:      ★★★★★★★★ (Nâng cao)
+Số container: 2
+Mạng:        172.60.2.0/24
+Kill-chain:  Thoát ra host
+
+Sơ đồ mạng:
+┌────────────────────────────────────────────────────────────────────┐
+│  Mạng ảo Labtainer 172.60.2.0/24                                 │
+│                                                                    │
+│  [app]  172.60.2.10                   [host-sim]  172.60.2.5      │
+│  Ubuntu 20.04                          Alpine (docker:24-dind)    │
+│  (shell SV — attacker)                 (mô phỏng host)           │
+│                                                                    │
+│  Cấu hình YẾU cố ý:                   Docker daemon (dockerd)    │
+│   • /var/run/docker.sock ──mount──►    /var/run/docker.sock       │
+│   • --privileged                       /root/flag.txt (mục tiêu)  │
+│   • CAP_SYS_ADMIN                     /root/.hostmarker (canary) │
+│                                                                    │
+│  Công cụ: docker CLI, mount,                                      │
+│  nsenter, capsh, getcap,                                           │
+│  fdisk, lsblk, deepce (opt.)                                      │
+│                                                                    │
+│  Luồng escape:                                                     │
+│  Đường A: app ──docker.sock──► host-sim daemon ──► container mới  │
+│           mount / host → chroot → đọc flag                         │
+│  Đường B: app ──mount /dev/sda1──► /mnt/host → đọc flag           │
+│  Đường C: app ──nsenter --target 1──► shell trên host             │
+└────────────────────────────────────────────────────────────────────┘
+
+Containers:
+  ┌───────────────┬──────────────┬──────────────┬─────────────────────────────┐
+  │ Tên           │ IP           │ OS           │ Phần mềm                    │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ app           │ 172.60.2.10  │ Ubuntu 20.04 │ docker CLI >= 24            │
+  │               │              │              │ libcap2-bin (capsh/getcap)  │
+  │               │              │              │ util-linux (nsenter/mount)  │
+  │               │              │              │ deepce.sh (tùy chọn)       │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ host-sim      │ 172.60.2.5   │ Alpine       │ docker:24-dind              │
+  │               │              │ (DinD image) │ Docker Engine (dockerd)     │
+  │               │              │              │ /root/flag.txt              │
+  └───────────────┴──────────────┴──────────────┴─────────────────────────────┘
+
+Nhiệm vụ: 5 (recon_container, escape_via_socket, escape_via_privileged,
+              get_flag, harden_container)
+Flag: 1 (PTIT{...} trên host-sim)
+Khả thi: TRUNG BÌNH–THẤP (nested DinD cần kiểm thử)
+Đường chính: docker.sock (ổn định) ✅
+
+
+──────────────────────────────────────────────────────────────────────
+C.10  BÀI 10 — cloud-k8s-rbac  |  Bảo mật Kubernetes (RBAC)
+──────────────────────────────────────────────────────────────────────
+
+Độ khó:      ★★★★★★★★★ (Chuyên sâu — đỉnh)
+Số container: 2
+Mạng:        172.25.0.0/24
+Kill-chain:  Chiếm toàn cụm
+
+Sơ đồ mạng:
+┌────────────────────────────────────────────────────────────────────┐
+│  Mạng ảo Labtainer 172.25.0.0/24                                 │
+│                                                                    │
+│  [attacker] 172.25.0.10                                            │
+│  Ubuntu 20.04                                                      │
+│  kubectl, base64, jq, curl                                         │
+│  (mô phỏng shell trong pod web-app bị chiếm)                      │
+│    │                                                               │
+│    │  kubectl / curl --token=<SA token>                            │
+│    ▼                                                               │
+│  [k8s-node] 172.25.0.20                                            │
+│  Ubuntu 22.04 + k3s v1.28 (single-node: control-plane + worker)   │
+│    ├─ API server :6443                                             │
+│    ├─ namespace app:                                               │
+│    │   ├─ pod web-app (SA: web-sa ← RBAC quá rộng)                │
+│    │   ├─ ConfigMap app-config (LẪN secret plaintext)              │
+│    │   └─ Secret db-credentials                                    │
+│    └─ FILESYSTEM NODE: /opt/host-secrets/flag.txt (mục tiêu)      │
+│                                                                    │
+│  Luồng khai thác:                                                  │
+│  đọc SA token → liệt kê RBAC (list secrets / create pods)         │
+│  → đọc Secret + ConfigMap lộ secret                                │
+│  → tạo pod hostPath/privileged → đọc flag trên node               │
+└────────────────────────────────────────────────────────────────────┘
+
+Containers:
+  ┌───────────────┬──────────────┬──────────────┬─────────────────────────────┐
+  │ Tên           │ IP           │ OS           │ Phần mềm                    │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ attacker      │ 172.25.0.10  │ Ubuntu 20.04 │ kubectl >= 1.28             │
+  │               │              │              │ base64, jq, curl            │
+  │               │              │              │ kube-linter, kubesec (opt.) │
+  ├───────────────┼──────────────┼──────────────┼─────────────────────────────┤
+  │ k8s-node      │ 172.25.0.20  │ Ubuntu 22.04 │ k3s v1.28 (single-node)    │
+  │               │              │              │ --disable traefik,servicelb │
+  │               │              │              │ --disable metrics-server    │
+  │               │              │              │ SQLite (thay etcd)          │
+  │               │              │              │ busybox/alpine (cached)     │
+  │               │              │              │ kube-bench >= 0.7 (opt.)    │
+  └───────────────┴──────────────┴──────────────┴─────────────────────────────┘
+
+Nhiệm vụ: 4 (recon_rbac, loot_secrets, escape_node, harden_cluster)
+Flag: 1 (trên filesystem node)
+Khả thi: THẤP–TRUNG BÌNH (k3s nặng RAM)
+Phương án mặc định: k3s thật ✅ ĐÃ CHỐT
+Phương án dự phòng: Audit tĩnh manifest + API mock
+Yêu cầu tối thiểu: 2 vCPU, 2–3 GB RAM
+
+
+================================================================================
+PHẦN D — YÊU CẦU TÀI NGUYÊN & TỔNG HỢP PHIÊN BẢN
+================================================================================
+
+D.1  YÊU CẦU TÀI NGUYÊN VM LABTAINER
+──────────────────────────────────────
+
+┌────────────────────────────────┬────────────┬───────────┬──────────────────────┐
+│ Nhóm bài                       │ RAM tối    │ CPU tối   │ Ghi chú              │
+│                                │ thiểu      │ thiểu     │                      │
+├────────────────────────────────┼────────────┼───────────┼──────────────────────┤
+│ Bài 1, 4                       │ 1 GB       │ 1 vCPU    │ 1 container, nhẹ     │
+│ Bài 2, 3, 5                    │ 2 GB       │ 1 vCPU    │ 2 container nhẹ      │
+│ Bài 6, 7, 8                    │ 2–3 GB     │ 2 vCPU    │ 3-4 container        │
+│ Bài 9                           │ 3–4 GB     │ 2 vCPU    │ DinD cần RAM         │
+│ Bài 10                          │ 3–4 GB     │ 2 vCPU    │ k3s cần RAM + CPU    │
+├────────────────────────────────┼────────────┼───────────┼──────────────────────┤
+│ KHUYẾN NGHỊ CHUNG VM           │ >= 4 GB    │ 2 vCPU    │ Chạy được mọi bài    │
+└────────────────────────────────┴────────────┴───────────┴──────────────────────┘
+
+D.2  THỐNG KÊ NHANH
+─────────────────────
+
+- Tổng số bài lab:          10
+- Tổng số container:        22 (không chạy đồng thời)
+- Container/bài ít nhất:     1 (Bài 1, Bài 4)
+- Container/bài nhiều nhất:  4 (Bài 7)
+- Bài nhẹ nhất:             Bài 1 (phân tích tĩnh, 1 container)
+- Bài nặng nhất:            Bài 10 (k3s cluster)
+- Hệ sinh thái lập trình:   Node.js (Bài 4), Python/Flask (Bài 6,7,8)
+- Cloud mock:               MinIO (Bài 5,7), IMDS mock (Bài 7)
+- Orchestration:            k3s/Kubernetes (Bài 10)
+- WAF:                      ModSecurity v3 + OWASP CRS (Bài 6)
+- CI/CD:                    Jenkins mock (Flask) / Jenkins LTS thật (Bài 8)
+
+D.3  ÁNH XẠ KHUNG THAM CHIẾU TỔNG HỢP
+─────────────────────────────────────────
+
+┌──────┬───────────────────────────────────┬────────────────────────────────────┐
+│ Bài  │ MITRE ATT&CK                      │ OWASP / CIS                        │
+├──────┼───────────────────────────────────┼────────────────────────────────────┤
+│  1   │ T1190, T1552, T1078, T1562.008    │ OWASP IaC, CIS AWS 1-5             │
+│  2   │ T1525, T1552, T1204.003           │ CIS Docker 4.x/5.x                │
+│  3   │ T1552.001                          │ OWASP Secrets Management           │
+│  4   │ T1195.001, T1195.002              │ OWASP A06:2021 (Vulnerable Comp.)  │
+│  5   │ T1530                              │ CIS AWS 2.1.x (S3)                │
+│  6   │ A03 Injection, A05 Misconfig       │ OWASP CRS, DevSecOps Guideline     │
+│  7   │ T1552.005 (IMDS)                  │ OWASP A10:2021 (SSRF)              │
+│  8   │ T1072, T1059.004, T1552.001       │ CIS Jenkins Benchmark              │
+│  9   │ T1611 (Escape to Host)            │ CIS Docker 5.3/5.4/5.31           │
+│ 10   │ T1552.001, T1610, T1611, T1613    │ OWASP K8s Top 10, CIS K8s         │
+└──────┴───────────────────────────────────┴────────────────────────────────────┘
+
+================================================================================
+KẾT THÚC TÀI LIỆU
+================================================================================
