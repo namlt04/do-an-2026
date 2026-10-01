@@ -1,0 +1,5 @@
+cloud-s3-misconfig: Khai thac bucket object storage (MinIO, tuong thich S3) bi cau
+hinh sai cho phep truy cap an danh. Sinh vien liet ke/tai backup tu bucket cong
+khai, tim credential bi lo trong file cau hinh, dung credential do xac thuc vao
+bucket rieng tu de lay flag, roi dong vai DevSecOps engineer khac phuc: go public
+policy, ap dung least privilege, bat versioning. Muc do: Trung binh.

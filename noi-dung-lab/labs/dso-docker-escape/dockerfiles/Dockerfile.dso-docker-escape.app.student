@@ -1,0 +1,94 @@
+#
+# Labtainer Dockerfile - dso-docker-escape : app
+#
+# "app" la container sinh vien co shell - dong vai container bi chiem, cau hinh YEU
+# co chu dich: /var/run/docker.sock duoc mot socat service (system unit
+# docker-sock-forward.service, xem _system/etc/systemd/system/) forward toi dockerd
+# THAT SU dang chay tren container host-sim (172.35.0.5:2375, xem Dockerfile cua
+# host-sim). Vi vay lenh `docker -H unix:///var/run/docker.sock ...` tren app hoat
+# dong dung nhu de bai mo ta, ma khong can ban than app chay privileged.
+#
+# The labtainer.base image includes the following packages:
+#    build-essential  expect  file  gcc-multilib  gdb  iputils-ping  less  man  manpages-dev
+#    net-tools  openssh-client  python  sudo  tcl8.6  vim  zip  hexedit  rsyslog
+#
+# The labtainer.network image adds the following packages:
+#   openssl openssh-server openvpn wget tcpdump  update-inetd  xinetd
+#
+ARG registry
+FROM $registry/labtainer.network
+#FROM $registry/labtainer.base2
+#FROM $registry/labtainer.centos
+#FROM $registry/labtainer.lamp
+#
+#  lab is the fully qualified image name, e.g., mylab.some_container.student
+#  labdir is the name of the lab, e.g., mylab
+#  imagedir is the name of the container
+#  user_name is the USER from the start.config, if other than ubuntu,
+#            then that user must be added in this dockerfile
+#            before the USER command
+#
+ARG lab
+ARG labdir
+ARG imagedir
+ARG user_name
+ARG password
+ARG apt_source
+ARG version
+LABEL version=$version
+ENV APT_SOURCE $apt_source
+RUN /usr/bin/apt-source.sh
+#
+#  ==== Cong cu trinh sat + khai thac (Nhiem vu 1-3) + docker CLI (Nhiem vu 2) ====
+#  Cai khi build (VM co internet); runtime hoan toan OFFLINE.
+#
+#  - docker.io          : cung cap lenh `docker` (client CLI) de noi chuyen qua
+#                          docker.sock/TCP toi dockerd cua host-sim. Goi nay cung cai
+#                          kem mot dockerd cuc bo tren app ma ta KHONG dung toi (xem
+#                          2 dong `ln -sf /dev/null ...` ben duoi) de nhuong duong dan
+#                          /var/run/docker.sock cho socat forward. Dung goi co san tu
+#                          apt mirror da cau hinh (khong can them repo ngoai -> giam
+#                          rui ro build offline).
+#  - libcap2-bin         : capsh, getcap (Nhiem vu 1 - doc CapEff/capability).
+#  - util-linux           : nsenter, mount, lsblk, fdisk, findmnt (Nhiem vu 1 & 3).
+#  - socat                : tao /var/run/docker.sock va forward toi host-sim:2375
+#                           (xem systemd unit docker-sock-forward.service).
+#  - grep, ca-certificates, iproute2 : ho tro trinh sat/ket noi mang co ban.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        docker.io libcap2-bin util-linux socat grep ca-certificates iproute2 \
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -sf /dev/null /etc/systemd/system/docker.service \
+    && ln -sf /dev/null /etc/systemd/system/docker.socket
+#
+#
+# Install the system files found in the _system directory
+#   ( _system/etc/systemd/system/docker-sock-forward.service : socat unix->tcp forward )
+#
+ADD $labdir/$imagedir/sys_tar/sys.tar /
+ADD $labdir/sys_$lab.tar.gz /
+#
+RUN useradd -ms /bin/bash $user_name
+RUN echo "$user_name:$password" | chpasswd
+RUN adduser $user_name sudo
+# replace above with below for centos/fedora
+#RUN usermod $user_name -a -G wheel
+
+
+#
+#  **** Perform all root operations, e.g.,           ****
+#  **** "apt-get install" prior to the USER command. ****
+#
+USER $user_name
+ENV HOME /home/$user_name
+#
+# Install files in the user home directory
+#
+ADD $labdir/$imagedir/home_tar/home.tar $HOME
+# remove after docker fixes problem with empty tars
+RUN rm -f $HOME/home.tar
+ADD $labdir/$lab.tar.gz $HOME
+#
+#  The first thing that executes on the container.
+#
+USER root
+CMD ["/bin/bash", "-c", "exec /sbin/init --log-target=journal 3>&1"]

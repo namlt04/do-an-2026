@@ -1,0 +1,5 @@
+dso-secrets-git: Phat hien, khai thac va khac phuc secret bi lo trong lich su Git.
+Sinh vien dao lich su commit de tim AWS key gia / DB password / API token da bi
+"xoa" o HEAD nhung con trong history, dung credential do de truy cap dich vu HTTP
+API (app) va MinIO object store (storage) lay flag, roi thuc hien remediation
+(rotate secret, .gitignore, pre-commit hook quet secret). Muc do: Trung binh.

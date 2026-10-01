@@ -1,0 +1,9 @@
+dso-docker-escape: Thoat container Docker bi cau hinh sai de chiem quyen "host"
+(MITRE ATT&CK T1611 - Escape to Host). Sinh vien dong vai pentester co shell trong
+container `app`, trinh sat de phat hien Docker socket (/var/run/docker.sock) bi lo,
+dung socket do de dieu khien Docker daemon that su chay tren container mo phong
+host (`host-sim`, docker-in-docker), tao container moi mount toan bo rootfs cua
+"host" va doc flag tai /root/flag.txt. Sau do doi vai DevSecOps engineer: viet lai
+cau hinh `docker run` an toan (bo privileged, bo mount docker.sock, cap-drop=ALL,
+non-root, seccomp) va doi chieu CIS Docker Benchmark. Bai chay offline, khong can
+mang luc lam bai. Muc do: Nang cao.

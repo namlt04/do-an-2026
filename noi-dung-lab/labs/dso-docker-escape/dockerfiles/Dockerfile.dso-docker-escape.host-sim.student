@@ -1,0 +1,103 @@
+#
+# Labtainer Dockerfile - dso-docker-escape : host-sim
+#
+# "host-sim" MO PHONG mot may host dang chay Docker Engine that (docker-in-docker /
+# dind). KHONG dung image upstream `docker:dind` (Alpine, khong co apt/systemd) de
+# GIU NGUYEN toan bo build-glue cua Labtainer (ADD sys.tar, useradd, systemd CMD...).
+# Thay vao do: cai dockerd THAT tu goi apt `docker.io` (cung apt mirror da cau hinh
+# cho ca bo lab -> khong phu thuoc repo ngoai) roi tu chay no bang mot systemd unit
+# rieng (dockerd-hostsim.service, xem _system/etc/systemd/system/). Container nay GIU
+# che do privileged mac dinh cua Labtainer vi dockerd/dind can no (xem BUILD-NOTES.md).
+#
+# The labtainer.base image includes the following packages:
+#    build-essential  expect  file  gcc-multilib  gdb  iputils-ping  less  man  manpages-dev
+#    net-tools  openssh-client  python  sudo  tcl8.6  vim  zip  hexedit  rsyslog
+#
+# The labtainer.network image adds the following packages:
+#   openssl openssh-server openvpn wget tcpdump  update-inetd  xinetd
+#
+ARG registry
+FROM $registry/labtainer.network
+#FROM $registry/labtainer.base2
+#FROM $registry/labtainer.centos
+#FROM $registry/labtainer.lamp
+#
+#  lab is the fully qualified image name, e.g., mylab.some_container.student
+#  labdir is the name of the lab, e.g., mylab
+#  imagedir is the name of the container
+#  user_name is the USER from the start.config, if other than ubuntu,
+#            then that user must be added in this dockerfile
+#            before the USER command
+#
+ARG lab
+ARG labdir
+ARG imagedir
+ARG user_name
+ARG password
+ARG apt_source
+ARG version
+LABEL version=$version
+ENV APT_SOURCE $apt_source
+RUN /usr/bin/apt-source.sh
+#
+#  ==== Docker Engine that (dind) mo phong host + anh "escimg" offline ====
+#  Cai khi build (VM co internet); runtime hoan toan OFFLINE (khong pull anh nao).
+#
+#  - docker.io       : dockerd + containerd + runc that su (mo phong Docker Engine
+#                       cua "host"). Se duoc bat bang systemd unit rieng
+#                       dockerd-hostsim.service (khong dung docker.service mac dinh
+#                       cua goi, xem 2 dong `ln -sf /dev/null ...` ben duoi de tranh
+#                       2 tien trinh tranh nhau /var/run/docker.sock).
+#  - iptables         : dockerd can binary nay de khoi tao (du fixlocal.sh se bat
+#                        dockerd voi --iptables=false de giam phu thuoc kernel module
+#                        khi chay long nested-privileged, xem BUILD-NOTES.md).
+#  - busybox-static    : binary tinh (khong phu thuoc thu vien ngoai) dung de dung
+#                        san anh Docker toi gian "escimg" (FROM scratch) MA KHONG CAN
+#                        pull tu Internet luc runtime. Anh nay chi can co /bin/sh va
+#                        /bin/chroot de sinh vien chay dung cu phap de bai:
+#                        `docker run -v /:/host escimg chroot /host sh`.
+#  - ca-certificates  : ho tro cac lenh mang thong thuong (khong bat buoc cho exploit).
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        docker.io iptables busybox-static ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /opt/escimg-build \
+    && cp /bin/busybox /opt/escimg-build/busybox \
+    && chmod +x /opt/escimg-build/busybox \
+    && ln -sf /dev/null /etc/systemd/system/docker.service \
+    && ln -sf /dev/null /etc/systemd/system/docker.socket
+#
+#
+# Install the system files found in the _system directory
+#   ( _system/etc/systemd/system/dockerd-hostsim.service : unit chay dockerd that
+#     _system/opt/escimg-build/Dockerfile                : anh "escimg" (FROM scratch)
+#     _system/root/flag.txt                              : flag (HASH_REPLACE)
+#     _system/root/.hostmarker                            : canary (HASH_REPLACE) )
+#
+ADD $labdir/$imagedir/sys_tar/sys.tar /
+ADD $labdir/sys_$lab.tar.gz /
+#
+RUN useradd -ms /bin/bash $user_name
+RUN echo "$user_name:$password" | chpasswd
+RUN adduser $user_name sudo
+# replace above with below for centos/fedora
+#RUN usermod $user_name -a -G wheel
+
+
+#
+#  **** Perform all root operations, e.g.,           ****
+#  **** "apt-get install" prior to the USER command. ****
+#
+USER $user_name
+ENV HOME /home/$user_name
+#
+# Install files in the user home directory
+#
+ADD $labdir/$imagedir/home_tar/home.tar $HOME
+# remove after docker fixes problem with empty tars
+RUN rm -f $HOME/home.tar
+ADD $labdir/$lab.tar.gz $HOME
+#
+#  The first thing that executes on the container.
+#
+USER root
+CMD ["/bin/bash", "-c", "exec /sbin/init --log-target=journal 3>&1"]

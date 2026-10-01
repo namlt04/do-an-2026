@@ -1,0 +1,6 @@
+Tai lieu huong dan: file://LAB_DOCS/cloud-s3-misconfig-guide.md
+
+Mo bang cach chuot phai -> chon "Open Link".
+
+Ghi chu: endpoint object storage (MinIO) cua bai la http://172.33.0.30:9000.
+Toan bo lenh thuc hien tren terminal cua may `client`.

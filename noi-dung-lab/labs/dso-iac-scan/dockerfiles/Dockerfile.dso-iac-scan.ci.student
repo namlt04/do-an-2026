@@ -1,0 +1,79 @@
+#
+# Labtainer Dockerfile - dso-iac-scan : ci (quality gate service, giu flag)
+#
+# The labtainer.base image includes the following packages:
+#    build-essential  expect  file  gcc-multilib  gdb  iputils-ping  less  man  manpages-dev
+#    net-tools  openssh-client  python  sudo  tcl8.6  vim  zip  hexedit  rsyslog
+#
+# The labtainer.network image adds the following packages:
+#   openssl openssh-server openvpn wget tcpdump  update-inetd  xinetd
+#
+ARG registry
+FROM $registry/labtainer.network
+#FROM $registry/labtainer.base2
+#FROM $registry/labtainer.centos
+#FROM $registry/labtainer.lamp
+#
+#  lab is the fully qualified image name, e.g., mylab.some_container.student
+#  labdir is the name of the lab, e.g., mylab
+#  imagedir is the name of the container
+#  user_name is the USER from the start.config, if other than ubuntu,
+#            then that user must be added in this dockerfile
+#            before the USER command
+#
+ARG lab
+ARG labdir
+ARG imagedir
+ARG user_name
+ARG password
+ARG apt_source
+ARG version
+LABEL version=$version
+ENV APT_SOURCE $apt_source
+RUN /usr/bin/apt-source.sh
+#
+#  ==== DICH VU QUALITY GATE (giu flag, tu quet tfsec) ====
+#  Cai khi build; runtime OFFLINE.
+#
+# 1) Python3 + Flask cho HTTP service
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        curl ca-certificates python3 python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+RUN pip3 install --no-cache-dir flask==3.0.3 || pip3 install --no-cache-dir flask || true
+
+# 2) tfsec - ci TU quet bo terraform ma sinh vien gui len (offline, embed rule)
+RUN curl -fsSL -o /usr/local/bin/tfsec \
+        https://github.com/aquasecurity/tfsec/releases/download/v1.28.13/tfsec-linux-amd64 \
+    && chmod +x /usr/local/bin/tfsec
+#
+# Install the system files found in the _system directory
+#   ( _system/opt/gate/gate_server.py, flag.env, va systemd unit iacgate.service )
+#
+ADD $labdir/$imagedir/sys_tar/sys.tar /
+ADD $labdir/sys_$lab.tar.gz /
+#
+RUN useradd -ms /bin/bash $user_name
+RUN echo "$user_name:$password" | chpasswd
+RUN adduser $user_name sudo
+# replace above with below for centos/fedora
+#RUN usermod $user_name -a -G wheel
+
+
+#
+#  **** Perform all root operations, e.g.,           ****
+#  **** "apt-get install" prior to the USER command. ****
+#
+USER $user_name
+ENV HOME /home/$user_name
+#
+# Install files in the user home directory
+#
+ADD $labdir/$imagedir/home_tar/home.tar $HOME
+# remove after docker fixes problem with empty tars
+RUN rm -f $HOME/home.tar
+ADD $labdir/$lab.tar.gz $HOME
+#
+#  The first thing that executes on the container.
+#
+USER root
+CMD ["/bin/bash", "-c", "exec /sbin/init --log-target=journal 3>&1"]

@@ -1,0 +1,14 @@
+[Unit]
+Description=dso-iac-scan CI quality gate service (tfsec gate, giu flag)
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/gate/gate_server.py
+WorkingDirectory=/opt/gate
+Restart=on-failure
+RestartSec=2
+User=root
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,14 @@
+cloud-ssrf-imds - ghi chu nhanh cho may client
+
+Dia chi trong mang lab (LAB_NET 172.34.0.0/24), dung duoc ca ten DNS lan IP:
+  web      (172.34.0.20)  - ung dung imgproxy-portal, cong 8080
+  imds     (172.34.0.40)  - IMDS gia (mo phong 169.254.169.254), cong 80
+  storage  (172.34.0.30)  - object storage MinIO, cong 9000
+
+Ban KHONG co shell tren web/imds/storage - moi thao tac phai thuc hien tu
+day (client) bang curl/jq/aws.
+
+Xem huong dan chi tiet trong tai lieu lab (docs). Ket qua ghi vao:
+  ~/creds.txt        - JSON credential tam thoi lay duoc qua SSRF (Nhiem vu 2)
+  ~/loot.txt         - CHI chua flag cuoi cung lay tu storage (Nhiem vu 3)
+  ~/remediation.txt  - phan tra loi hardening (Nhiem vu 4)

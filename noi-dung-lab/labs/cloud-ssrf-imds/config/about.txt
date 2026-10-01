@@ -1,0 +1,6 @@
+cloud-ssrf-imds: Khai thac SSRF trong chuc nang "xem truoc anh theo URL" cua
+ung dung web de ep server doc Instance Metadata Service (IMDS) gia, danh cap
+credential tam thoi cua IAM role, roi dung credential do truy cap cloud
+object storage (MinIO) lay flag. Tai hien su co Capital One 2019. Ket thuc
+bang hardening: allowlist chong SSRF, bat IMDSv2 (token + hop limit), va
+de xuat least privilege. Muc do: Nang cao.

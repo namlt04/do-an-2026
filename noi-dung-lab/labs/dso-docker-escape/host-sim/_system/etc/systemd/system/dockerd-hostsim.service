@@ -1,0 +1,31 @@
+[Unit]
+Description=Docker Engine that mo phong may host (dso-docker-escape / host-sim)
+Documentation=none
+After=network.target
+
+[Service]
+Type=simple
+ExecStartPre=-/bin/mkdir -p /var/lib/docker
+# --storage-driver=vfs : tuong thich cao nhat khi chay dind long trong container da
+#   privileged cua Labtainer (tranh loi overlay-tren-overlay tren mot so kernel VM).
+# --iptables=false      : tranh phu thuoc kernel module iptables/NAT co the khong co
+#   san/khong duoc phep thao tac trong moi truong nested-privileged (xem BUILD-NOTES.md).
+# -H unix:// + -H tcp:// : mo CA HAI, giong dung mo ta trong de bai (docker.sock ma
+#   sinh vien thay tren app that ra la socat forward toi cong TCP nay).
+ExecStart=/usr/bin/dockerd \
+    --host=unix:///var/run/docker.sock \
+    --host=tcp://0.0.0.0:2375 \
+    --storage-driver=vfs \
+    --iptables=false \
+    --data-root=/var/lib/docker \
+    --pidfile=/var/run/docker.pid
+Restart=on-failure
+RestartSec=2
+TimeoutStartSec=30
+LimitNOFILE=1048576
+LimitNPROC=infinity
+LimitCORE=infinity
+TasksMax=infinity
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,18 @@
+[Unit]
+Description=Forward /var/run/docker.sock toi dockerd cua host-sim (dso-docker-escape)
+Documentation=none
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStartPre=-/bin/rm -f /var/run/docker.sock
+# CO CHU DICH: mode=666 (socket cho phep moi user doc/ghi) mo phong dung sai lam cau
+# hinh "Docker socket bi lo" ma bai lab day sinh vien nhan dien va khai thac.
+ExecStart=/usr/bin/socat UNIX-LISTEN:/var/run/docker.sock,fork,reuseaddr,mode=666 TCP:172.35.0.5:2375
+Restart=always
+RestartSec=2
+StartLimitIntervalSec=0
+
+[Install]
+WantedBy=multi-user.target

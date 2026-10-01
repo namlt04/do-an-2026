@@ -1,0 +1,5 @@
+secrets
+credentials
+git
+devsecops
+scanning

@@ -1,0 +1,5 @@
+Bao mat Infrastructure as Code (shift-left). Sinh vien dong vai DevSecOps engineer:
+quet tinh bo ma Terraform bang tfsec/checkov/trivy, phan loai rui ro, sua cac misconfig
+kinh dien (Security Group mo 0.0.0.0/0, S3 public/khong ma hoa, secret hardcode, IAM
+Action:*/Resource:*, thieu logging), va vuot quality gate CI (0 HIGH/CRITICAL) de lay flag.
+Bai chay hoan toan offline trong container co lap.
