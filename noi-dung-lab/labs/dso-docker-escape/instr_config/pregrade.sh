@@ -51,6 +51,14 @@ fi
 outdir="$homedir/$destdir/.local/result"
 mkdir -p "$outdir" 2>/dev/null
 
+# Placeholder cho file feeding boolean (host_evidence.txt -> escape_via_socket;
+# flag_result.txt -> get_flag/lab_complete) de checkwork khong vo ("unknown token")
+# khi SV cham luc CHUA giai. Gia tri khong khop parameter.* nen van cham N dung.
+if [[ "$destdir" == *app* ]]; then
+  [ -s "$homedir/$destdir/host_evidence.txt" ] || echo "__MISSING__" > "$homedir/$destdir/host_evidence.txt"
+  [ -s "$homedir/$destdir/flag_result.txt" ]  || echo "__MISSING__" > "$homedir/$destdir/flag_result.txt"
+fi
+
 # ---- Nhiem vu 1: recon_container ----
 # "OK" neu ~/recon.txt chua >=1 trong 3 dau hieu cau hinh sai
 recon_ok="NO"

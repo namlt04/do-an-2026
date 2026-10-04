@@ -29,6 +29,15 @@ cd "$homedir/$destdir" || exit 0
 outdir="$homedir/$destdir/.local/result"
 mkdir -p "$outdir"
 
+# Placeholder cac co .ok feeding boolean (CONTAINS YES) -> boolean khong vo
+# ("unknown token") khi SV cham luc CHUA giai. Logic ben duoi se ghi de "YES"
+# khi dieu kien that su dat; neu khong, giu "NO" -> cham N dung.
+case "$destdir" in
+  *web*)    for k in discover_ssrf steal_via_ssrf harden_blocks_ssrf; do [ -f "$outdir/$k.ok" ] || echo NO > "$outdir/$k.ok"; done ;;
+  *imds*)   [ -f "$outdir/imdsv2_enforced.ok" ] || echo NO > "$outdir/imdsv2_enforced.ok" ;;
+  *client*) for k in loot_accesskey remediation_ok; do [ -f "$outdir/$k.ok" ] || echo NO > "$outdir/$k.ok"; done ;;
+esac
+
 # -----------------------------------------------------------------------
 # Container web: suy luan tu fetch.log (nhat ky /fetch cua imgproxy-portal)
 # -----------------------------------------------------------------------

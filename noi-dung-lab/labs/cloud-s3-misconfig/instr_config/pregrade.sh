@@ -46,6 +46,12 @@ fi
 # dong khac voi gia tri parameter (khong co newline cuoi).
 # ---------------------------------------------------------------------------
 if [ "$destdir" = "client" ]; then
+  # Placeholder cho file feeding boolean exfiltrate_backup (creds_*_key.txt) de
+  # checkwork khong vo ("unknown token") khi SV cham luc CHUA giai. Gia tri
+  # placeholder khong khop parameter.leak_* nen van cham N dung.
+  for pf in creds_access_key.txt creds_secret_key.txt; do
+    [ -s "$pf" ] || printf '__MISSING__\n' > "$pf"
+  done
   for f in loot.txt creds_access_key.txt creds_secret_key.txt \
            recon_list_status.txt recon_policy_status.txt \
            harden_anon_status.txt harden_versioning_status.txt; do

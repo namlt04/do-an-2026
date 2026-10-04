@@ -38,6 +38,17 @@ mkdir -p "$OUTDIR"
 SUMMARY="$OUTDIR/pregrade_summary.txt"
 : > "$SUMMARY"
 
+# Placeholder cho cac file feeding boolean (loot_*, rotate_verify.log,
+# precommit_test.log, repo/.gitignore) de checkwork khong vo ("unknown token")
+# khi SV cham luc CHUA giai. Gia tri placeholder khong khop parameter.* va
+# khong chua chuoi CONTAINS muc tieu -> van cham N dung.
+if [[ "$destdir" == *dev* ]]; then
+  for rf in loot_storage.txt loot_api.txt loot_rotate.txt rotate_verify.log precommit_test.log; do
+    [ -s "$rf" ] || echo "__MISSING__" > "$rf"
+  done
+  [ -f repo/.gitignore ] || { mkdir -p repo 2>/dev/null; echo "__MISSING__" > repo/.gitignore; }
+fi
+
 # ---- Gia tri credential GOC (PHAI KHOP dev/_bin/fixlocal.sh, app/app.py, storage) ----
 LEAK_AWS_ACCESS_KEY_ID="AKIAZ7Q2X8VNK4RPDLW3"
 LEAK_AWS_SECRET_ACCESS_KEY="wWw0kQfZ9pL3xR7bN2sV6yH1tG4mD8cU5aJ0eKqP"
