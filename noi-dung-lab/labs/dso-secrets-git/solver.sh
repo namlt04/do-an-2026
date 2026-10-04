@@ -1,20 +1,4 @@
 #!/bin/bash
-#
-# solver.sh — dso-secrets-git (LOI GIAI MAU, KHONG phat cho sinh vien)
-# ----------------------------------------------------------------------------
-# Chay BEN TRONG container `dev` (mo terminal cua lab roi dan lenh, hoac:
-#   docker exec -it -u ubuntu <ten_container_dev> bash -lc '/path/to/solver.sh'
-# sau khi copy file nay vao container, vi du:
-#   docker cp solver.sh <ten_container_dev>:/home/ubuntu/solver.sh
-#   docker exec -u ubuntu <ten_container_dev> bash /home/ubuntu/solver.sh
-# )
-#
-# Muc dich: tu dong hoa TRON VEN chuoi khai thac + remediation cua ca 4 nhiem
-# vu, tao du moi artifact ma instr_config/results.config + goals.config doi
-# chieu, de kiem tra "giai dung => PASS het" truoc khi giao lab (LAB-BUILD-
-# RULES.md #0 / #7). Khong dung du lieu tinh (hardcode) cho cac gia tri
-# credential/flag — moi thu deu duoc DAO / GOI DICH VU THAT giong sinh vien.
-# ----------------------------------------------------------------------------
 set -u
 
 REPO="$HOME/repo"
@@ -25,9 +9,7 @@ note() { echo; echo "===== $* ====="; }
 ok()   { echo "  [OK] $*"; }
 bad()  { echo "  [FAIL] $*"; FAIL=1; }
 
-# =============================================================================
 note "Nhiem vu 1 - recon_history"
-# =============================================================================
 if [ ! -d "$REPO/.git" ]; then
   bad "Khong tim thay $REPO — lab chua dung repo (fixlocal.sh chua chay?)."
   exit 1
@@ -46,16 +28,13 @@ else
   bad "Khong xac dinh duoc commit them/xoa $SENSITIVE_PATH"
 fi
 
-# Xac nhan HEAD sach
 if git -C "$REPO" show "HEAD:$SENSITIVE_PATH" >/dev/null 2>&1; then
   bad "HEAD van con $SENSITIVE_PATH — repo mau khong dung ky vong"
 else
   ok "HEAD hien tai khong con $SENSITIVE_PATH (dung ky vong)"
 fi
 
-# =============================================================================
 note "Nhiem vu 2 - scan_secrets"
-# =============================================================================
 if command -v gitleaks >/dev/null 2>&1; then
   gitleaks detect --source "$REPO" -v --report-path="$HOME/gitleaks.json" >/tmp/gitleaks_run.log 2>&1
   N=$(grep -c '"RuleID"' "$HOME/gitleaks.json" 2>/dev/null || echo 0)
@@ -90,9 +69,7 @@ else
   bad "Bo qua trich xuat credential vi khong co ADD_COMMIT"
 fi
 
-# =============================================================================
 note "Nhiem vu 3 - exploit_get_flag"
-# =============================================================================
 if [ -n "${AWS_ACCESS_KEY_ID:-}" ] && [ -n "${AWS_SECRET_ACCESS_KEY:-}" ]; then
   mc alias set leak "http://storage:9000" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" >/dev/null 2>&1
   if mc cat leak/corp-backups/flags/flag.txt > "$HOME/loot_storage.txt" 2>/tmp/mc_cat.log; then
@@ -117,9 +94,7 @@ else
   bad "Bo qua huong B (API) vi thieu API_TOKEN"
 fi
 
-# =============================================================================
 note "Nhiem vu 4 - remediation_harden"
-# =============================================================================
 if [ -x "$HOME/rotate_secrets.sh" ]; then
   "$HOME/rotate_secrets.sh"
   if [ -f "$HOME/loot_rotate.txt" ]; then
@@ -182,9 +157,7 @@ fi
 git -C "$REPO" reset -q HEAD test_leak.txt 2>/dev/null
 rm -f "$REPO/test_leak.txt"
 
-# =============================================================================
 note "Tom tat"
-# =============================================================================
 if [ "$FAIL" -eq 0 ]; then
   echo "TAT CA BUOC CHINH DA CHAY THANH CONG. Kiem tra lai bang checkwork/gradelab."
   exit 0

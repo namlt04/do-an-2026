@@ -1,18 +1,4 @@
 #!/bin/bash
-#
-#  fixlocal.sh (app) - dso-docker-escape
-#
-#  Chay SAU khi parameterization da hoan tat. $1 = mat khau user, $2 = uid.
-#  WAIT_FOR host-sim (khai bao trong start.config) dam bao host-sim da bat xong
-#  dockerd truoc khi script nay chay.
-#
-#  Nhiem vu:
-#   1) Vo hieu hoa dockerd CUC BO cua app (goi docker.io cai kem no nhung ta khong
-#      dung) de nhuong duong dan /var/run/docker.sock cho socat forward.
-#   2) Bat docker-sock-forward.service: tao /var/run/docker.sock va forward toi
-#      dockerd THAT dang chay tren host-sim (172.35.0.5:2375). Day chinh la cau hinh
-#      SAI co chu dich ma sinh vien se phat hien va khai thac o Nhiem vu 1 & 2.
-#
 set -u
 PW="$1"
 
@@ -27,8 +13,6 @@ echo "$PW" | sudo -S systemctl daemon-reload
 echo "$PW" | sudo -S systemctl enable docker-sock-forward.service >/tmp/docker-sock-forward.enable.log 2>&1
 echo "$PW" | sudo -S systemctl restart docker-sock-forward.service
 
-# Kiem tra ket noi (khong bat buoc thanh cong ngay; service co Restart=always nen se
-# tu thu lai neu host-sim chua san sang kip).
 ok=0
 for i in $(seq 1 15); do
     if docker -H unix:///var/run/docker.sock version >/dev/null 2>&1; then

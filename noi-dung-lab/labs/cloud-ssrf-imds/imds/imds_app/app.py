@@ -1,22 +1,4 @@
 #!/usr/bin/env python3
-"""
-imds-mock - gia lap Instance Metadata Service (IMDS) cho bai lab
-cloud-ssrf-imds (SecLab PTIT / Do an DevSecOps 2026).
-
-Trong cloud that, IMDS chi nghe tren dia chi link-local 169.254.169.254 va
-CHI truy cap duoc TU BEN TRONG chinh may ao gan IAM role do - khong mot may
-nao khac (ke ca may khac trong cung VPC) co the goi toi IMDS cua mot instance
-khac. Lab nay mo phong dung tinh chat do: cac duong dan /latest/... CHI chap
-nhan request co nguon la container 'web' (dong vai "chinh instance gan
-role") hoac tu chinh no (127.0.0.1, dung cho /admin/imdsv2-demo). Sinh vien
-(client) khong the goi truc tiep - phai di qua loi SSRF cua webapp (dung
-vai tro webapp de "muon" vi tri mang cua no), dung nhu ban chat that cua
-su co Capital One 2019.
-
-Cac endpoint /admin/* la cong cu quan tri/demo CUA BAI LAB (khong ton tai
-tren AWS that) de sinh vien co the bat IMDSv2 va xem minh hoa quy trinh hop
-le MA KHONG can shell tren container nay (TERMINALS -1).
-"""
 import json
 import os
 import secrets
@@ -25,25 +7,18 @@ import time
 from flask import Flask, Response, jsonify, request
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
-# Hardcode (khong dung os.path.expanduser) vi tien trinh nay co the duoc khoi
-# dong qua sudo (de bind cong 80), luc do "~" se tro ve /root chu khong phai
-# /home/ubuntu - se lam vo hieu duong dan log ma results.config tham chieu.
 HOME_DIR = "/home/ubuntu"
 CREDS_PATH = os.path.join(APP_DIR, "creds_template.json")
 LOG_PATH = os.path.join(HOME_DIR, "imds_access.log")
 
 ROLE_NAME = "web-imgproxy-role"
 
-# Nguon duoc phep goi cac duong dan /latest/* (mo phong "chi trong pham vi
-# instance"): IP cua container 'web' va localhost (dung cho /admin/imdsv2-demo
-# tu goi chinh no).
 ALLOWED_SOURCES = {"172.34.0.20", "127.0.0.1"}
 
 app = Flask(__name__)
 
 STATE = {
     "imdsv2_required": False,
-    # token -> expiry epoch seconds
     "tokens": {},
 }
 
@@ -71,7 +46,6 @@ def load_creds():
 
 
 def client_ip():
-    # Container nay khong nam sau reverse proxy trong lab -> dung remote_addr truc tiep.
     return request.remote_addr
 
 
@@ -93,8 +67,6 @@ def check_token_header():
 
 
 def metadata_guard(path):
-    """Kiem tra nguon + (neu bat IMDSv2) token hop le cho 1 request toi
-    /latest/*. Tra ve (Response|None, status). None nghia la duoc phep di tiep."""
     ts = now_ts()
     if not check_source_allowed():
         log_access(
@@ -152,9 +124,6 @@ def admin_status():
 
 @app.route("/admin/enable-imdsv2", methods=["POST"])
 def admin_enable_imdsv2():
-    """Bat IMDSv2: moi request GET toi /latest/* tu day ve sau BAT BUOC phai
-    kem token hop le lay tu PUT /latest/api/token (mo phong hop_limit=1 +
-    yeu cau token cua IMDSv2 that)."""
     STATE["imdsv2_required"] = True
     return jsonify(ok=True, imdsv2_required=True,
                     message="Da bat IMDSv2: GET /latest/* tu day can header X-aws-ec2-metadata-token.")
@@ -162,17 +131,10 @@ def admin_enable_imdsv2():
 
 @app.route("/admin/imdsv2-demo")
 def admin_imdsv2_demo():
-    """Minh hoa quy trinh IMDSv2 HOP LE (PUT lay token -> GET kem token) thuc
-    hien tu 'chinh instance' (goi loopback), dung DU LIEU METADATA VO HAI
-    (khong phai credential) de khong tao them duong lo credential ngoai
-    chuoi SSRF that."""
     ttl = 21600
     token = secrets.token_hex(16)
     STATE["tokens"][token] = time.time() + ttl
     ts = now_ts()
-    # Ghi nhan that vao imds_access.log (khong chi mo phong trong JSON tra
-    # ve): day la bang chung "co it nhat 1 lan luong token hop le hoat dong
-    # dung" ma instr_config/pregrade.sh doi chieu cho goal harden_ssrf_imds.
     log_access(
         {
             "ts": ts,

@@ -1,24 +1,5 @@
-#
-# Labtainer Dockerfile - cloud-ssrf-imds : imds (gia lap Instance Metadata Service)
-#
-# Flask app mo phong IMDS (cong 80): /latest/meta-data/... , /latest/api/token
-# (IMDSv2). Chi chap nhan request /latest/* tu dia chi IP cua container 'web'
-# (xem imds_app/app.py) -> sinh vien khong the bo qua SSRF de doc thang IMDS.
-# TERMINALS -1 -> sinh vien KHONG co shell tren container nay.
-#
 ARG registry
 FROM $registry/labtainer.network2
-#FROM $registry/labtainer.base2
-#FROM $registry/labtainer.centos
-#FROM $registry/labtainer.lamp
-#
-#  lab is the fully qualified image name, e.g., mylab.some_container.student
-#  labdir is the name of the lab, e.g., mylab
-#  imagedir is the name of the container
-#  user_name is the USER from the start.config, if other than ubuntu,
-#            then that user must be added in this dockerfile
-#            before the USER command
-#
 ARG lab
 ARG labdir
 ARG imagedir
@@ -29,44 +10,20 @@ ARG version
 LABEL version=$version
 ENV APT_SOURCE $apt_source
 RUN /usr/bin/apt-source.sh
-#
-#  put package installation here, e.g.,
-#     RUN apt-get update && apt-get install -y --no-install-recommends somepackage
-#
-#  ---- Flask (IMDS gia) ----
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python3 python3-pip ca-certificates iproute2 && \
     pip3 install --no-cache-dir flask==3.0.3 && \
     rm -rf /var/lib/apt/lists/* /root/.cache/pip
-#
-#
-# Install the system files found in the _system directory
-#
 ADD $labdir/$imagedir/sys_tar/sys.tar /
 ADD $labdir/sys_$lab.tar.gz /
-#
 RUN useradd -ms /bin/bash $user_name
 RUN echo "$user_name:$password" | chpasswd
 RUN adduser $user_name sudo
-# replace above with below for centos/fedora
-#RUN usermod $user_name -a -G wheel
 
-
-#
-#  **** Perform all root operations, e.g.,           ****
-#  **** "apt-get install" prior to the USER command. ****
-#
 USER $user_name
 ENV HOME /home/$user_name
-#
-# Install files in the user home directory
-#
 ADD $labdir/$imagedir/home_tar/home.tar $HOME
-# remove after docker fixes problem with empty tars
 RUN rm -f $HOME/home.tar
 ADD $labdir/$lab.tar.gz $HOME
-#
-#  The first thing that executes on the container.
-#
 USER root
 CMD ["/bin/bash", "-c", "exec /sbin/init --log-target=journal 3>&1"]

@@ -1,22 +1,4 @@
 #!/bin/bash
-: <<'END'
-pregrade.sh — dso-secrets-git
-
-Chay TRUOC khi cham diem (phia instructor/GRADE host), nhan:
-  $1 = homedir  (thu muc goc noi framework thu thap artifact cua sinh vien)
-  $2 = destdir  (thu muc con ung voi container GRADE_CONTAINER = dev)
-
-Muc dich: doi chieu BANG CHUNG THAT thay vi chi tin loi sinh vien tu khai
-(LAB-BUILD-RULES.md #4.4): kiem tra git history that, dem finding trong
-gitleaks.json, so sanh credential trich xuat voi hang so noi bo (KHONG ship
-cho sinh vien), kiem tra hook thuc thi... roi ghi tom tat vao
-.local/result/pregrade_summary.txt de instr_config/results.config va
-goals.config tham chieu.
-
-Cac gia tri credential "goc" duoi day CHI dung o day (phia cham diem) de doi
-chieu — day la file instructor-side, KHONG nam trong tar phat cho sinh vien.
-PHAI khop dev/_bin/fixlocal.sh, app/app.py, storage/_bin/fixlocal.sh.
-END
 
 set -u
 
@@ -38,10 +20,6 @@ mkdir -p "$OUTDIR"
 SUMMARY="$OUTDIR/pregrade_summary.txt"
 : > "$SUMMARY"
 
-# Placeholder cho cac file feeding boolean (loot_*, rotate_verify.log,
-# precommit_test.log, repo/.gitignore) de checkwork khong vo ("unknown token")
-# khi SV cham luc CHUA giai. Gia tri placeholder khong khop parameter.* va
-# khong chua chuoi CONTAINS muc tieu -> van cham N dung.
 if [[ "$destdir" == *dev* ]]; then
   for rf in loot_storage.txt loot_api.txt loot_rotate.txt rotate_verify.log precommit_test.log; do
     [ -s "$rf" ] || echo "__MISSING__" > "$rf"
@@ -49,23 +27,16 @@ if [[ "$destdir" == *dev* ]]; then
   [ -f repo/.gitignore ] || { mkdir -p repo 2>/dev/null; echo "__MISSING__" > repo/.gitignore; }
 fi
 
-# ---- Gia tri credential GOC (PHAI KHOP dev/_bin/fixlocal.sh, app/app.py, storage) ----
 LEAK_AWS_ACCESS_KEY_ID="AKIAZ7Q2X8VNK4RPDLW3"
 LEAK_AWS_SECRET_ACCESS_KEY="wWw0kQfZ9pL3xR7bN2sV6yH1tG4mD8cU5aJ0eKqP"
 LEAK_DB_PASSWORD="S3cr3t-DB-Pw-2024!"
 LEAK_API_TOKEN="app_tok_5f4e3d2c1b0a9988776655443322110f"
 SENSITIVE_PATH="deploy/credentials.yaml"
 
-# =============================================================================
-# 1) RECON — doi chieu ADD_COMMIT / REMOVE_COMMIT sinh vien ghi trong
-#    ~/recon_answers.txt voi git log THAT cua ~/repo (khong chi tin loi khai).
-# =============================================================================
 RECON=FAIL
 if [ -f recon_answers.txt ] && [ -d repo/.git ]; then
   ADD_COMMIT=$(sed -n 's/^ADD_COMMIT=//p' recon_answers.txt | tr -d ' \t\r\n')
   REMOVE_COMMIT=$(sed -n 's/^REMOVE_COMMIT=//p' recon_answers.txt | tr -d ' \t\r\n')
-  # Grader container KHONG co git -> xac minh 2 commit hash la THAT bang cach
-  # grep trong metadata cua repo/.git da thu (logs/refs/objects), va phai khac nhau.
   if [ -n "$ADD_COMMIT" ] && [ -n "$REMOVE_COMMIT" ] && [ "$ADD_COMMIT" != "$REMOVE_COMMIT" ] \
      && grep -rqF "$ADD_COMMIT" repo/.git 2>/dev/null \
      && grep -rqF "$REMOVE_COMMIT" repo/.git 2>/dev/null; then
@@ -74,25 +45,16 @@ if [ -f recon_answers.txt ] && [ -d repo/.git ]; then
 fi
 echo "RECON=$RECON" >> "$SUMMARY"
 
-# =============================================================================
-# 2) GITLEAKS — bao cao ton tai va co >=3 finding (dem so RuleID trong JSON).
-# =============================================================================
 GITLEAKS=FAIL
 if [ -f gitleaks.json ]; then
   N=$(grep -c '"RuleID"' gitleaks.json 2>/dev/null)
   N=${N:-0}
-  # gitleaks gom theo RuleID; bo secret cam san sinh ra >=2 RuleID khac nhau
-  # (vd aws-access-token + generic-api-key) -> nguong >=2.
   if [ "$N" -ge 2 ]; then
     GITLEAKS=OK
   fi
 fi
 echo "GITLEAKS=$GITLEAKS" >> "$SUMMARY"
 
-# =============================================================================
-# 3) CREDS — sinh vien trich xuat dung ca 4 gia tri credential vao
-#    ~/secrets_found.txt (so sanh CHINH XAC voi hang so noi bo o tren).
-# =============================================================================
 CREDS=FAIL
 if [ -f secrets_found.txt ]; then
   A=$(sed -n 's/^AWS_ACCESS_KEY_ID=//p' secrets_found.txt | tr -d '\r\n')
@@ -106,12 +68,8 @@ if [ -f secrets_found.txt ]; then
 fi
 echo "CREDS=$CREDS" >> "$SUMMARY"
 
-# =============================================================================
-# 4) HOOK — pre-commit hook ton tai, co quyen thuc thi, va thuc su goi gitleaks.
-# =============================================================================
 HOOK=FAIL
 HOOKFILE="repo/.git/hooks/pre-commit"
-# Artifact collection khong giu bit +x -> chi kiem tra ton tai + goi gitleaks.
 if [ -f "$HOOKFILE" ] && grep -q "gitleaks" "$HOOKFILE" 2>/dev/null; then
   HOOK=OK
 fi
@@ -119,10 +77,6 @@ echo "HOOK=$HOOK" >> "$SUMMARY"
 
 echo "[pregrade] dso-secrets-git: RECON=$RECON GITLEAKS=$GITLEAKS CREDS=$CREDS HOOK=$HOOK"
 
-#
-# Giu lai hanh vi mac dinh cua template (xu ly firefox places.sqlite neu co,
-# vo hai neu khong dung).
-#
 is_sqlite=$(which sqlite3 2>/dev/null)
 if [ -n "$is_sqlite" ]; then
   here=$(pwd)

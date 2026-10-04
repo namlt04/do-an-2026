@@ -1,32 +1,4 @@
 #!/bin/bash
-#
-# rotate_secrets.sh — dso-secrets-git
-# ----------------------------------------------------------------------------
-# Script MO PHONG quy trinh "rotate" (xoay vong) mot credential vua bi phat
-# hien la da lo trong Git history, do lab cung cap cho sinh vien (Nhiem vu 4,
-# Buoc 1).
-#
-# Cach hoat dong:
-#   1. Tu dao lai credential GOC tung bi lo (AWS key gia, DB password, API
-#      token) truc tiep tu lich su ~/repo — giong het cach mot ky su bao mat
-#      that su lam viec: dung Git de xac dinh CHINH XAC gia tri da bi xam
-#      pham truoc khi rotate. Script nay KHONG chua san gia tri secret duoi
-#      dang van ban ro trong chinh no — neu ban doc duoc script nay ma van
-#      chua chay Nhiem vu 1-3 thi ban se KHONG thay gia tri secret o day.
-#   2. Goi API quan tri "/admin/rotate" tren dich vu app (172.32.0.20:8080)
-#      kem theo cac gia tri vua dao duoc, coi day la "bang chung" da phat
-#      hien dung su co ro ri. Neu dung, app se:
-#        - Sinh DB password / API token MOI, vo hieu hoa gia tri CU tren
-#          chinh no.
-#        - Yeu cau storage (MinIO) VO HIEU HOA AWS key gia da lo (khong con
-#          dang nhap duoc bang cap key cu).
-#        - Tra ve mot "rotate proof" (flag thu 3, rieng cho tung sinh vien).
-#   3. Luu rotate proof do vao ~/loot_rotate.txt — dung de doi chieu khi cham
-#      diem Nhiem vu 4.
-#
-# Sau khi chay xong, HAY tu kiem chung credential CU khong con dung duoc nua
-# (xem huong dan trong tai lieu bai lab, muc Nhiem vu 4 - Buoc 1).
-# ----------------------------------------------------------------------------
 set -u
 
 REPO="$HOME/repo"
@@ -41,7 +13,6 @@ fi
 
 echo "[rotate_secrets] Dang tu dao credential goc tu lich su Git tai $REPO ..."
 
-# Tim commit DAU TIEN da THEM file cau hinh nhay cam (con trong history du HEAD da xoa)
 ADD_COMMIT="$(git -C "$REPO" log --all --diff-filter=A --format='%H' -- "$SENSITIVE_PATH" | tail -n1)"
 
 if [ -z "$ADD_COMMIT" ]; then

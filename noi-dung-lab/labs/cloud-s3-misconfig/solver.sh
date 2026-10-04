@@ -1,19 +1,4 @@
 #!/bin/bash
-#
-# solver.sh - cloud-s3-misconfig (LOI GIAI MAU - KHONG phat cho sinh vien)
-#
-# Muc dich: tu dong thuc hien TOAN BO chuoi khai thac + hardening mo ta trong
-# docs/cloud-s3-misconfig-guide.md, de kiem tra instr_config/goals.config PASS
-# het khi giai dung (va, chay tren mot may "chua lam gi", se FAIL het).
-#
-# Chay BEN TRONG container `client` cua bai lab (vd qua terminal cua labtainer,
-# hoac `docker exec -it <ten_container_client> bash -lc "bash ~/solver.sh"`
-# sau khi container da khoi dong va storage da seed xong MinIO).
-#
-# Script nay CHI dung de nguoi xay lab tu kiem tra (rebuild -> chay solver.sh ->
-# stoplab -> checkwork phai PASS toan bo). KHONG dua file nay vao goi phat hanh
-# cho sinh vien.
-#
 set -euo pipefail
 
 ENDPOINT="http://172.33.0.30:9000"
@@ -25,9 +10,6 @@ aws --endpoint-url "$ENDPOINT" s3 ls s3://public-assets --recursive --no-sign-re
   | tee /tmp/list.out
 ( grep -q 'backup/app-backup' /tmp/list.out && echo -n LISTED || echo -n NOLIST ) > ~/recon_list_status.txt
 
-# MinIO that KHONG cho doc bucket-policy AN DANH (aws s3api get-bucket-policy ->
-# AccessDenied). Day chi la buoc phu; bang chung misconfig THAT = liet ke an danh
-# thanh cong o tren. Do do lam buoc nay KHOAN DUNG (khong abort du set -e).
 if aws --endpoint-url "$ENDPOINT" s3api get-bucket-policy --bucket public-assets \
      --no-sign-request 2>/dev/null | jq -r '.Policy' > /tmp/policy.json 2>/dev/null; then
   ( grep -q '"Principal"' /tmp/policy.json && grep -qi 'GetObject' /tmp/policy.json \
@@ -79,7 +61,6 @@ aws --endpoint-url "$ENDPOINT" s3api delete-bucket-policy --bucket public-assets
 aws --endpoint-url "$ENDPOINT" s3api put-bucket-versioning \
   --bucket secure-data --versioning-configuration Status=Enabled
 
-# 4a. xac minh anonymous list PHAI that bai
 unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
 set +e
 aws --endpoint-url "$ENDPOINT" s3 ls s3://public-assets --no-sign-request > /tmp/anon.out 2>&1
@@ -88,7 +69,6 @@ set -e
 cat /tmp/anon.out || true
 echo "harden_anon_status = $(cat ~/harden_anon_status.txt)"
 
-# 4b. xac minh versioning secure-data = Enabled
 export AWS_ACCESS_KEY_ID
 export AWS_SECRET_ACCESS_KEY
 AWS_ACCESS_KEY_ID="$(grep '^AWS_ACCESS_KEY_ID=' ~/hardening-admin.env | cut -d= -f2)"

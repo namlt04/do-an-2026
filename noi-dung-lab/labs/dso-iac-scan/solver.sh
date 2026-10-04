@@ -1,22 +1,4 @@
 #!/bin/bash
-#
-# solver.sh -- LOI GIAI MAU cho bai dso-iac-scan. KHONG phat cho sinh vien.
-#
-# Muc dich: chay TRONG container `devsecops` (sau khi `labtainer dso-iac-scan`
-# / `rebuild dso-iac-scan` da khoi dong lab) de tu dong thuc hien TRON CHUOI
-# tu baseline scan -> remediation -> vuot quality gate -> lay flag. Dung de
-# TU KIEM TRA rang toan bo goal (baseline_scan, fix_network_storage,
-# fix_secret_iam, pass_gate) co the dat PASS khi bai duoc giai dung, truoc
-# khi giao cho sinh vien.
-#
-# Cach chay (tu may build/test, VD sau khi rebuild lab va container dang
-# chay):
-#   docker exec -it <ten_container_devsecops> bash -c 'bash ~/solver.sh'
-# hoac dan noi dung file nay vao 1 terminal cua lab (copy/paste), hoac copy
-# file vao ~/solver.sh trong container roi chay `bash ~/solver.sh`.
-#
-# Sau khi chay xong: dung `checkwork`/gradelab de xac nhan goals PASS.
-#
 set -u
 
 PROJ="$HOME/iac-project"
@@ -46,10 +28,6 @@ grep -o '"severity":"[A-Z]*"' "$HOME/baseline.json" | sort | uniq -c
 echo
 echo "=== [2/6] Sua network.tf (Nhiem vu 2 - siet Security Group) ==="
 cat > network.tf <<'EOF'
-# network.tf
-# Security Group cho ung dung web.
-# DA KHAC PHUC: khong con ingress nao mo ra 0.0.0.0/0 tren cong quan tri/DB.
-# Chi cho phep dai quan tri noi bo (10.0.0.0/16) truy cap SSH/MySQL.
 
 resource "aws_security_group" "web" {
   name        = "ptit-web-sg"
@@ -88,10 +66,6 @@ EOF
 
 echo "=== [3/6] Sua storage.tf + logging.tf (Nhiem vu 2 + 4 - S3, logging) ==="
 cat > storage.tf <<'EOF'
-# storage.tf
-# S3 bucket luu du lieu ung dung.
-# DA KHAC PHUC: chan public access, bat ma hoa at-rest, bat versioning,
-# bat access logging (tro toi bucket log trong logging.tf).
 
 resource "aws_s3_bucket" "data" {
   bucket = "ptit-devsecops-app-data"
@@ -110,8 +84,6 @@ resource "aws_s3_bucket_public_access_block" "data" {
   restrict_public_buckets = true
 }
 
-# Mã hóa at-rest bằng SSE-S3 (AES256). Yêu cầu CMK (KMS) là hardening nâng cao
-# ngoài phạm vi bài cơ bản -> chấp nhận rủi ro có chủ đích, ghi chú rõ:
 #tfsec:ignore:aws-s3-encryption-customer-key
 resource "aws_s3_bucket_server_side_encryption_configuration" "data" {
   bucket = aws_s3_bucket.data.id
@@ -139,10 +111,7 @@ resource "aws_s3_bucket_logging" "data" {
 EOF
 
 cat > logging.tf <<'EOF'
-# logging.tf
-# DA KHAC PHUC (Nhiem vu 4): bat VPC flow log va S3 access log.
 
-# Bucket rieng de chua access log cua bucket du lieu (cung duoc hardening).
 resource "aws_s3_bucket" "logs" {
   bucket = "ptit-devsecops-app-logs"
 
@@ -171,7 +140,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "logs" {
   }
 }
 
-# VPC Flow Log -> CloudWatch Logs
 resource "aws_cloudwatch_log_group" "vpc" {
   name              = "/ptit/vpc/flowlogs"
   retention_in_days = 30
@@ -192,8 +160,6 @@ resource "aws_iam_role" "flowlog" {
   })
 }
 
-# CloudWatch Logs yêu cầu resource "<log-group-arn>:*" để tạo/ghi log stream;
-# đây là wildcard BẮT BUỘC cho dịch vụ flow-log -> chấp nhận có chủ đích:
 #tfsec:ignore:aws-iam-no-policy-wildcards
 resource "aws_iam_role_policy" "flowlog" {
   name = "ptit-vpc-flowlog-policy"
@@ -227,10 +193,6 @@ EOF
 echo
 echo "=== [4/6] Sua variables.tf + iam.tf (Nhiem vu 3 - secret + IAM) ==="
 cat > variables.tf <<'EOF'
-# variables.tf
-# DA KHAC PHUC (Nhiem vu 3): loai bo secret hardcode khoi default; danh dau
-# bien nhay cam bang sensitive = true. Gia tri that duoc truyen luc chay qua
-# TF_VAR_db_password / TF_VAR_aws_secret_key hoac file *.tfvars khong commit.
 
 variable "region" {
   type    = string
@@ -245,20 +207,15 @@ variable "app_bucket_name" {
 variable "db_password" {
   type      = string
   sensitive = true
-  # KHONG dat default la mat khau that.
 }
 
 variable "aws_secret_key" {
   type      = string
   sensitive = true
-  # KHONG dat default la secret key that.
 }
 EOF
 
 cat > iam.tf <<'EOF'
-# iam.tf
-# DA KHAC PHUC (Nhiem vu 3): policy ap dung least-privilege, chi cho phep
-# doc/ghi dung bucket du lieu cua ung dung thay vi Action:*/Resource:*.
 
 resource "aws_iam_role" "app" {
   name = "ptit-app-role"
@@ -295,9 +252,6 @@ EOF
 echo
 echo "=== [5/6] Sua compute.tf (loi phu: IMDSv2 + ma hoa EBS) ==="
 cat > compute.tf <<'EOF'
-# compute.tf
-# EC2 instance chay ung dung web.
-# DA KHAC PHUC: ep IMDSv2 (http_tokens = required) va bat ma hoa EBS.
 
 resource "aws_instance" "web" {
   ami           = "ami-0abcdef1234567890"

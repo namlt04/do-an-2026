@@ -1,33 +1,4 @@
 #!/usr/bin/env python3
-"""
-dso-secrets-git : app — HTTP API muc tieu (cong 8080)
-------------------------------------------------------------------------------
-GET  /flag
-    Yeu cau xac thuc bang MOT trong hai cach:
-      - Header "Authorization: Bearer <API_TOKEN>", HOAC
-      - HTTP Basic Auth voi <DB_USER>:<DB_PASSWORD>
-    Neu credential dung voi trang thai HIEN TAI (chua rotate hoac da rotate
-    deu duoc, mien la dung), tra ve flag rieng cho tung sinh vien (da duoc
-    framework Labtainer thay the qua co che HASH_REPLACE truoc khi container
-    nay khoi dong dich vu).
-
-POST /admin/rotate
-    Nhan JSON {aws_access_key_id, aws_secret_access_key, db_password,
-    api_token}. Day la buoc "chung minh da phat hien dung su co ro ri" truoc
-    khi duoc phep rotate — cac gia tri gui len phai khop CHINH XAC voi bo
-    credential GOC tung bi lo trong lich su Git tren may dev. Neu dung:
-      - Sinh DB password / API token MOI, ghi de trang thai hien tai (gia tri
-        CU tren chinh dich vu nay het hieu luc ngay lap tuc).
-      - Goi sang storage (MinIO) de VO HIEU HOA AWS access key gia (thong qua
-        tai khoan admin NOI BO cua rieng app, khong lien quan gi den Git
-        history hay may dev).
-      - Tra ve "rotate proof" — flag thu ba, rieng cho tung sinh vien.
-
-Sinh vien KHONG co shell tren container nay (TERMINALS -1 trong start.config)
-nen khong the doc truc tiep source file nay hay cac file flag_*.txt; chi co
-the lay du lieu qua dung 2 endpoint noi tren, va chi khi xac thuc thanh cong.
-------------------------------------------------------------------------------
-"""
 import json
 import os
 import secrets
@@ -44,17 +15,12 @@ STATE_FILE = STATE_DIR / "creds_state.json"
 FLAG_API_FILE = HOME / "flag_api.txt"
 FLAG_ROTATE_FILE = HOME / "flag_rotate.txt"
 
-# ---- Gia tri "goc" tung bi lo trong lich su Git tren may dev ----------------
-# PHAI KHOP CHINH XAC voi dev/_bin/fixlocal.sh va storage/_bin/fixlocal.sh.
 LEAKED_DB_USER = "appuser"
 LEAKED_DB_PASSWORD = "S3cr3t-DB-Pw-2024!"
 LEAKED_API_TOKEN = "app_tok_5f4e3d2c1b0a9988776655443322110f"
 LEAKED_AWS_ACCESS_KEY_ID = "AKIAZ7Q2X8VNK4RPDLW3"
 LEAKED_AWS_SECRET_ACCESS_KEY = "wWw0kQfZ9pL3xR7bN2sV6yH1tG4mD8cU5aJ0eKqP"
 
-# ---- Tai khoan admin NOI BO de dieu phoi MinIO -----------------------------
-# KHONG bao gio nhung vao Git history hay bat ky noi nao sinh vien co the doc
-# duoc (dev khong co shell tren app/storage). Dung de rotate AWS key gia.
 MINIO_ROOT_USER = "miniolabadmin"
 MINIO_ROOT_PASSWORD = "Lab-Adm1n-R00t-2024-DoNotShare"
 MINIO_ENDPOINT = os.environ.get("STORAGE_ENDPOINT", "http://storage:9000")
@@ -151,7 +117,6 @@ def admin_rotate():
 
 
 def _disable_leaked_minio_key():
-    """Vo hieu hoa AWS key gia tren MinIO (storage) bang tai khoan admin noi bo."""
     try:
         subprocess.run(
             ["mc", "alias", "set", MC_ADMIN_ALIAS, MINIO_ENDPOINT,
@@ -167,7 +132,7 @@ def _disable_leaked_minio_key():
                 "mc admin user disable rc=%s stderr=%s",
                 result.returncode, result.stderr.decode(errors="replace"),
             )
-    except Exception as exc:  # best-effort: khong duoc lam sap API vi loi phia MinIO
+    except Exception as exc:
         app.logger.warning("khong the vo hieu hoa key tren storage: %s", exc)
 
 

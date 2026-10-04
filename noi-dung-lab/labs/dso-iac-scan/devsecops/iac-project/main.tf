@@ -1,7 +1,3 @@
-# main.tf
-# Provider + VPC. Bo ma nay mo ta ha tang cho mot ung dung web se len AWS.
-# Bai lab la PHAN TICH TINH: chi validate/scan cuc bo, KHONG terraform apply len cloud that.
-
 terraform {
   required_version = ">= 1.5.0"
   required_providers {
@@ -14,8 +10,6 @@ terraform {
 
 provider "aws" {
   region = "ap-southeast-1"
-  # Che do mo ta - khong can credential that vi chi validate/scan.
-  # (Cac tham so duoi giup provider khong co gang goi API khi validate.)
   skip_credentials_validation = true
   skip_requesting_account_id  = true
   skip_metadata_api_check     = true

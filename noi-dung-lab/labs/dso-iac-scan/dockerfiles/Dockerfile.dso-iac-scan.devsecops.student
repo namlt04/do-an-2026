@@ -1,26 +1,5 @@
-#
-# Labtainer Dockerfile - dso-iac-scan : devsecops (ban lam viec cua ky su)
-#
-# The labtainer.base image includes the following packages:
-#    build-essential  expect  file  gcc-multilib  gdb  iputils-ping  less  man  manpages-dev
-#    net-tools  openssh-client  python  sudo  tcl8.6  vim  zip  hexedit  rsyslog
-#
-# The labtainer.network image adds the following packages:
-#   openssl openssh-server openvpn wget tcpdump  update-inetd  xinetd
-#
 ARG registry
 FROM $registry/labtainer.network
-#FROM $registry/labtainer.base2
-#FROM $registry/labtainer.centos
-#FROM $registry/labtainer.lamp
-#
-#  lab is the fully qualified image name, e.g., mylab.some_container.student
-#  labdir is the name of the lab, e.g., mylab
-#  imagedir is the name of the container
-#  user_name is the USER from the start.config, if other than ubuntu,
-#            then that user must be added in this dockerfile
-#            before the USER command
-#
 ARG lab
 ARG labdir
 ARG imagedir
@@ -31,86 +10,54 @@ ARG version
 LABEL version=$version
 ENV APT_SOURCE $apt_source
 RUN /usr/bin/apt-source.sh
-#
-#  ==== CAI DAT BO CONG CU IaC (chay khi build, VM co internet; runtime OFFLINE) ====
-#  Tat ca binary/DB duoc dong goi vao image de khong can mang khi chay.
-#
-# 1) Goi he thong ho tro
 RUN apt-get update && apt-get install -y --no-install-recommends \
         curl ca-certificates git jq unzip python3 python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-# 2) tfsec (binary Go tinh, embed rule, chay hoan toan offline)
 RUN curl -fsSL -o /usr/local/bin/tfsec \
         https://github.com/aquasecurity/tfsec/releases/download/v1.28.13/tfsec-linux-amd64 \
     && chmod +x /usr/local/bin/tfsec
 
-# 3) trivy (binary) - dung cho `trivy config`; dong goi san checks de offline
 RUN curl -fsSL -o /tmp/trivy.tar.gz \
         https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_Linux-64bit.tar.gz \
     && tar -xzf /tmp/trivy.tar.gz -C /usr/local/bin trivy \
     && chmod +x /usr/local/bin/trivy && rm -f /tmp/trivy.tar.gz
 
-# 4) terraform (binary) - chi dung init -backend=false / validate / fmt
 RUN curl -fsSL -o /tmp/tf.zip \
         https://releases.hashicorp.com/terraform/1.9.8/terraform_1.9.8_linux_amd64.zip \
     && unzip -o /tmp/tf.zip -d /usr/local/bin && chmod +x /usr/local/bin/terraform \
     && rm -f /tmp/tf.zip
 
-# 5) Terraform provider mirror OFFLINE (de `terraform init/validate` khong can mang).
-#    Tai san provider aws pin dung phien ban ma iac-project yeu cau.
 RUN mkdir -p /tmp/mreq \
     && printf 'terraform {\n  required_providers {\n    aws = {\n      source  = "hashicorp/aws"\n      version = "5.72.0"\n    }\n  }\n}\n' > /tmp/mreq/main.tf \
     && cd /tmp/mreq \
     && terraform providers mirror -platform=linux_amd64 /opt/tf-mirror \
     && rm -rf /tmp/mreq
-# CLI config tro Terraform vao mirror cuc bo (khong goi registry.terraform.io)
 RUN mkdir -p /etc/terraform \
     && printf 'provider_installation {\n  filesystem_mirror {\n    path    = "/opt/tf-mirror"\n    include = ["registry.terraform.io/*/*"]\n  }\n  direct {\n    exclude = ["registry.terraform.io/*/*"]\n  }\n}\n' > /etc/terraform/cli.tfrc
 ENV TF_CLI_CONFIG_FILE=/etc/terraform/cli.tfrc
 
-# 6) checkov (pip, pin version). Nang ve dung luong - xem BUILD-NOTES neu can luoc bo.
 RUN pip3 install --no-cache-dir checkov==3.2.257 || pip3 install --no-cache-dir checkov==3.2.0 || true
 
-# 7) Pre-cache trivy checks/policy de `trivy config` chay offline
 ENV TRIVY_CACHE_DIR=/opt/trivy-cache
 RUN mkdir -p /opt/trivy-cache /tmp/tvchk \
     && printf 'resource "aws_s3_bucket" "x" {\n  bucket = "warm-cache"\n}\n' > /tmp/tvchk/main.tf \
     && (trivy --cache-dir /opt/trivy-cache config /tmp/tvchk || true) \
     && rm -rf /tmp/tvchk \
     && chmod -R a+rX /opt/trivy-cache
-# Runtime: khong tu tai them checks/DB
 ENV TRIVY_SKIP_CHECK_UPDATE=true
 ENV TRIVY_SKIP_DB_UPDATE=true
 ENV TRIVY_SKIP_JAVA_DB_UPDATE=true
-#
-# Install the system files found in the _system directory
-#
 ADD $labdir/$imagedir/sys_tar/sys.tar /
 ADD $labdir/sys_$lab.tar.gz /
-#
 RUN useradd -ms /bin/bash $user_name
 RUN echo "$user_name:$password" | chpasswd
 RUN adduser $user_name sudo
-# replace above with below for centos/fedora
-#RUN usermod $user_name -a -G wheel
 
-
-#
-#  **** Perform all root operations, e.g.,           ****
-#  **** "apt-get install" prior to the USER command. ****
-#
 USER $user_name
 ENV HOME /home/$user_name
-#
-# Install files in the user home directory
-#
 ADD $labdir/$imagedir/home_tar/home.tar $HOME
-# remove after docker fixes problem with empty tars
 RUN rm -f $HOME/home.tar
 ADD $labdir/$lab.tar.gz $HOME
-#
-#  The first thing that executes on the container.
-#
 USER root
 CMD ["/bin/bash", "-c", "exec /sbin/init --log-target=journal 3>&1"]

@@ -1,17 +1,4 @@
 #!/usr/bin/env python3
-"""
-imgproxy-portal - ung dung web mo phong chuc nang "xem truoc anh theo URL"
-cua mot cong ty tai chinh gia dinh. Duoc CO Y dinh loi SSRF (Server-Side
-Request Forgery) o endpoint /fetch khi cau hinh ssrf_protection=false (mac
-dinh luc khoi dong lab).
-
-Day la MA NGUON CUA BAI LAB cloud-ssrf-imds (SecLab PTIT / Do an DevSecOps
-2026), dung de tai hien chuoi su co Capital One 2019 (SSRF -> IMDS ->
-credential tam thoi -> object storage). KHONG dung lam tham khao cho ma
-nguon san xuat thuc te - endpoint /admin/* o day KHONG co xac thuc, chi
-phuc vu muc dich "cong tac hardening" ma sinh vien goi truc tiep qua curl
-(container nay khong cap terminal/shell cho sinh vien - TERMINALS -1).
-"""
 import ipaddress
 import json
 import os
@@ -24,16 +11,10 @@ import yaml
 from flask import Flask, Response, jsonify, request
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
-# Hardcode (khong dung os.path.expanduser) de tranh sai lech neu tien trinh
-# duoc khoi dong duoi ngu canh khac ubuntu (vd qua sudo).
 HOME_DIR = "/home/ubuntu"
 CONFIG_PATH = os.path.join(APP_DIR, "config.yaml")
 LOG_PATH = os.path.join(HOME_DIR, "fetch.log")
 
-# Cac "bi danh" cua dich vu IMDS gia trong lab nay. Dia chi that cua IMDS
-# tren cloud la link-local 169.254.169.254; trong moi truong Labtainer,
-# duong dan CHAC CHAN hoat dong la ten DNS noi bo "imds" (172.34.0.40, xem
-# BUILD-NOTES.md). Ca hai deu duoc coi la "dich noi bo/nhay cam" khi ghi log.
 IMDS_HOSTNAMES = {"imds", "169.254.169.254", "172.34.0.40"}
 IMDS_IPS = {"169.254.169.254", "172.34.0.40"}
 LOOPBACK_HOSTNAMES = {"127.0.0.1", "localhost", "::1"}
@@ -52,9 +33,6 @@ def save_config(cfg):
 
 
 def log_fetch(entry):
-    """Ghi 1 dong JSON (thu tu truong CO DINH) vao fetch.log. day la bang
-    chung chinh de cham diem discover_ssrf / steal_credentials / hardening -
-    sinh vien khong co shell tren container web nen khong the sua file nay."""
     ordered = {
         "ts": entry.get("ts"),
         "url": entry.get("url"),
@@ -70,8 +48,6 @@ def log_fetch(entry):
 
 
 def resolve_host(hostname):
-    """Tra ve danh sach IP (string) ma hostname phan giai toi. Neu hostname
-    da la mot literal IP thi tra ve chinh no (khong qua DNS/hosts)."""
     try:
         ipaddress.ip_address(hostname)
         return [hostname]
@@ -85,8 +61,6 @@ def resolve_host(hostname):
 
 
 def is_internal_target(hostname, resolved_ips):
-    """True neu dich la loopback cua webapp, la IMDS gia (duoi bat ky bi
-    danh nao), hoac roi vao dai IP rieng/link-local noi chung."""
     host_l = (hostname or "").lower()
     if host_l in LOOPBACK_HOSTNAMES or host_l in IMDS_HOSTNAMES:
         return True
@@ -149,10 +123,6 @@ def admin_status():
 
 @app.route("/admin/harden", methods=["POST"])
 def admin_harden():
-    """Ap dung ban va chong SSRF: bat allowlist host + chan cac dai IP noi
-    bo/link-local (bao gom IMDS gia). Mo phong thao tac push cau hinh qua
-    kenh quan tri/CI-CD (khong can SSH vao webapp de sua file va restart
-    thu cong, vi container nay khong cap shell cho sinh vien)."""
     cfg = load_config()
     cfg["ssrf_protection"] = True
     cfg.setdefault("allow_hosts", ["images.trusted.example"])
@@ -228,7 +198,6 @@ def fetch():
             )
             return Response("blocked host (ssrf_protection): %s" % reason, status=403)
 
-    # --- hanh vi cot loi (co y dinh loi): server tai ho URL, khong kiem tra dich ---
     try:
         upstream = requests.get(target, timeout=5)
         body = upstream.text
