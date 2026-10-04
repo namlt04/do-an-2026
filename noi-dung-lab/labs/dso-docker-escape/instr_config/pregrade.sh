@@ -81,9 +81,12 @@ harden_ok="NO"
 hr="$homedir/$destdir/hardened_run.sh"
 hm="$homedir/$destdir/hardening_map.txt"
 if [ -f "$hr" ] && [ -f "$hm" ] && [ -s "$hm" ]; then
-    if ! grep -q -- "--privileged" "$hr" \
-       && ! grep -q "docker.sock" "$hr" \
-       && grep -q -- "--cap-drop=ALL" "$hr"; then
+    # Bo qua dong comment ('#') de tranh false-positive khi SV ghi chu thich
+    # kieu "KHONG --privileged, KHONG docker.sock" trong hardened_run.sh.
+    hr_eff=$(grep -vE '^[[:space:]]*#' "$hr")
+    if ! printf '%s' "$hr_eff" | grep -q -- "--privileged" \
+       && ! printf '%s' "$hr_eff" | grep -q "docker.sock" \
+       && printf '%s' "$hr_eff" | grep -q -- "--cap-drop=ALL"; then
         harden_ok="OK"
     fi
 fi
