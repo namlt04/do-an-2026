@@ -41,7 +41,10 @@ echo "AccessKeyId=$AK"
 echo "== [3/4] access_storage_get_flag: dung credential danh cap de lay flag =="
 export AWS_ACCESS_KEY_ID="$AK"
 export AWS_SECRET_ACCESS_KEY="$SK"
-export AWS_SESSION_TOKEN="$TK"
+# MinIO (mo phong cloud) chap nhan access/secret key nhu credential thuong va
+# KHONG co STS de validate session token -> KHONG gui token (neu gui se bi
+# InvalidTokenId). Token $TK van la bang chung da danh cap duoc credential tam.
+unset AWS_SESSION_TOKEN
 export AWS_DEFAULT_REGION=us-east-1
 
 aws --endpoint-url "http://$STORAGE:9000" s3 ls

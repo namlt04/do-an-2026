@@ -3,6 +3,23 @@
 > File resume: đọc để tiếp tục nhanh. Cập nhật lần cuối: 2026-09-28.
 > Rule: [LAB-BUILD-RULES.md](LAB-BUILD-RULES.md). Kết nối VM: memory `lab-vm-connection`.
 
+## CẬP NHẬT 2026-10-04: build/test thật
+- ✅ **cloud-s3-misconfig** — PASS 5/5 goal (MinIO thật) + docx + commit.
+- ✅ **dso-iac-scan** — PASS 4/4 goal + docx + commit.
+- ✅ **dso-secrets-git** — PASS toàn bộ goal (MinIO thật + Flask network2) + docx + commit.
+- 🔄 **cloud-ssrf-imds** — đã fix (network2, flag bare, results REGEX/CONTAINS, minio inject), đang build/test.
+- ⏳ **dso-docker-escape** — đã fix (flag bare, results REGEX), chờ build dind.
+
+### Bài học grading Labtainer (ÁP DỤNG MỌI BÀI) — đã kiểm chứng:
+1. **results.config grammar**: `name = container:file : <tokenidx> : <LINE_TYPE> : <match>`. Dùng **`REGEX : .+`** để lấy token1 dòng bất kỳ. **KHÔNG dùng `LINE`** (bug `lineno` undefined trong ResultParser). Boolean "file chứa chuỗi": `container:file : CONTAINS : <str>`. KHÔNG có field `content`.
+2. **goals.config**: literal so sánh phải `answer=<val>` (vd `string_equal : r : answer=OK`); so parameter: `string_equal : r : parameter.X`.
+3. **Flag/cred phải BARE** (= đúng giá trị HASH_REPLACE, KHÔNG bọc `FLAG{}`/`AKIA`/`PTIT{}`) để khớp `parameter.*`.
+4. **Tên network RIÊNG từng bài** (S3_NET/IAC_NET/SECGIT_NET/SSRF_NET/ESCAPE_NET) — dùng chung `LAB_NET` gây "Invalid address ... network's subnet" khi chuyển bài.
+5. **ADD-HOST**: cú pháp `ADD-HOST host:ip` (KHÔNG `-- NET`, gây lỗi "image lab_net"). Thêm full-mesh để app dùng tên host.
+6. **Grader container KHÔNG có `git`**; artifact **không giữ bit +x**; `.git` CÓ được thu (grep hash commit được). Tránh phụ thuộc git/exec-perm trong pregrade.
+7. **MinIO**: build-from-source (`_shared/bin/{minio,mc}`) inject qua `<container>/sys_tar/sys.tar`; bỏ `dl.min.io`; base `network2` cho Flask/aws-cli.
+8. **Quy trình/bài**: deploy (tar/scp) → inject binary → `rebuild <lab>` (Xvfb, DISPLAY=:99) → `docker cp solver.sh` + chạy → `checkwork` → đọc grades: `docker exec <lab>-igrader ... python3 instructor.py` rồi `cat /home/instructor/<lab>.grades.txt`.
+
 ## Trạng thái tổng quan
 - ✅ **AUTHOR xong 5/5 bài** (file nguồn trong `labs/<lab>/`): dso-iac-scan, dso-secrets-git, cloud-s3-misconfig, cloud-ssrf-imds, dso-docker-escape. Mỗi bài có config, dockerfiles, service, grading (results/goals/pregrade), `docs/<lab>-guide.md`, `solver.sh`, `BUILD-NOTES.md`.
 - 🔄 **BUILD/TEST**: đang làm, tuần tự. Chưa bài nào PASS đủ (build+solver+chấm).

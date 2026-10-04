@@ -38,10 +38,6 @@ RUN /usr/bin/apt-source.sh
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates wget && \
     rm -rf /var/lib/apt/lists/*
-RUN wget -qO /usr/local/bin/minio https://dl.min.io/server/minio/release/linux-amd64/minio && \
-    chmod +x /usr/local/bin/minio
-RUN wget -qO /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc && \
-    chmod +x /usr/local/bin/mc
 #
 #
 # Install the system files found in the _system directory

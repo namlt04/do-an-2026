@@ -5,7 +5,7 @@
 # Tai va cai dat luc BUILD (VM co internet) -> dong goi vao image -> runtime OFFLINE.
 #
 ARG registry
-FROM $registry/labtainer.network
+FROM $registry/labtainer.network2
 #FROM $registry/labtainer.base2
 #FROM $registry/labtainer.centos
 #FROM $registry/labtainer.lamp

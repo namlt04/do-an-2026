@@ -7,7 +7,7 @@
 # TERMINALS -1 -> sinh vien KHONG co shell tren container nay.
 #
 ARG registry
-FROM $registry/labtainer.network
+FROM $registry/labtainer.network2
 #FROM $registry/labtainer.base2
 #FROM $registry/labtainer.centos
 #FROM $registry/labtainer.lamp
