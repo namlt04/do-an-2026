@@ -194,3 +194,7 @@ ngoài phạm vi bản build hiện tại).
 - `host-sim`: base `labtainer.network` + `docker.io` (bắt buộc, cần dockerd thật) +
   `busybox-static` (vài trăm KB) — không cần preload image nặng nào khác nhờ cơ chế
   `escimg` build cục bộ.
+
+## Cập nhật test thật (2026-10-04)
+- **PASS 6/6 goal** với đường khai thác qua **TCP `tcp://172.60.2.5:2375`** (dockerd host-sim lắng nghe TCP — chính là lỗi "Docker daemon API lộ không TLS", CIS Docker 2.x; cũng nguy hiểm tương đương mount docker.sock).
+- Lưu ý kỹ thuật: forward `/var/run/docker.sock` bằng `socat UNIX-LISTEN...TCP` chỉ hoạt động cho các API đơn giản (version/ps/images); **`docker run` bị mất output stream** qua socat (lỗi HTTP hijack kinh điển). Vì vậy đường khai thác tin cậy (solver + chấm) dùng `docker -H tcp://<host-sim>:2375`. `solver.sh` tự thử docker.sock trước rồi fallback sang TCP.
