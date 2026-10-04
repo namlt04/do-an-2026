@@ -53,12 +53,12 @@ RECON=FAIL
 if [ -f recon_answers.txt ] && [ -d repo/.git ]; then
   ADD_COMMIT=$(sed -n 's/^ADD_COMMIT=//p' recon_answers.txt | tr -d ' \t\r\n')
   REMOVE_COMMIT=$(sed -n 's/^REMOVE_COMMIT=//p' recon_answers.txt | tr -d ' \t\r\n')
-  if [ -n "$ADD_COMMIT" ] && [ -n "$REMOVE_COMMIT" ]; then
-    ADDED=$(git -C repo show --stat "$ADD_COMMIT" 2>/dev/null | grep -c "$SENSITIVE_PATH")
-    REMOVED=$(git -C repo show --stat "$REMOVE_COMMIT" 2>/dev/null | grep -c "$SENSITIVE_PATH")
-    if [ "${ADDED:-0}" -ge 1 ] && [ "${REMOVED:-0}" -ge 1 ] && [ "$ADD_COMMIT" != "$REMOVE_COMMIT" ]; then
-      RECON=OK
-    fi
+  # Grader container KHONG co git -> xac minh 2 commit hash la THAT bang cach
+  # grep trong metadata cua repo/.git da thu (logs/refs/objects), va phai khac nhau.
+  if [ -n "$ADD_COMMIT" ] && [ -n "$REMOVE_COMMIT" ] && [ "$ADD_COMMIT" != "$REMOVE_COMMIT" ] \
+     && grep -rqF "$ADD_COMMIT" repo/.git 2>/dev/null \
+     && grep -rqF "$REMOVE_COMMIT" repo/.git 2>/dev/null; then
+    RECON=OK
   fi
 fi
 echo "RECON=$RECON" >> "$SUMMARY"
@@ -70,7 +70,9 @@ GITLEAKS=FAIL
 if [ -f gitleaks.json ]; then
   N=$(grep -c '"RuleID"' gitleaks.json 2>/dev/null)
   N=${N:-0}
-  if [ "$N" -ge 3 ]; then
+  # gitleaks gom theo RuleID; bo secret cam san sinh ra >=2 RuleID khac nhau
+  # (vd aws-access-token + generic-api-key) -> nguong >=2.
+  if [ "$N" -ge 2 ]; then
     GITLEAKS=OK
   fi
 fi
@@ -98,7 +100,8 @@ echo "CREDS=$CREDS" >> "$SUMMARY"
 # =============================================================================
 HOOK=FAIL
 HOOKFILE="repo/.git/hooks/pre-commit"
-if [ -f "$HOOKFILE" ] && [ -x "$HOOKFILE" ] && grep -q "gitleaks" "$HOOKFILE" 2>/dev/null; then
+# Artifact collection khong giu bit +x -> chi kiem tra ton tai + goi gitleaks.
+if [ -f "$HOOKFILE" ] && grep -q "gitleaks" "$HOOKFILE" 2>/dev/null; then
   HOOK=OK
 fi
 echo "HOOK=$HOOK" >> "$SUMMARY"
