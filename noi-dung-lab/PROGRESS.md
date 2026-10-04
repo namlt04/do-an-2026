@@ -3,12 +3,13 @@
 > File resume: đọc để tiếp tục nhanh. Cập nhật lần cuối: 2026-09-28.
 > Rule: [LAB-BUILD-RULES.md](LAB-BUILD-RULES.md). Kết nối VM: memory `lab-vm-connection`.
 
-## CẬP NHẬT 2026-10-04: build/test thật
-- ✅ **cloud-s3-misconfig** — PASS 5/5 goal (MinIO thật) + docx + commit.
-- ✅ **dso-iac-scan** — PASS 4/4 goal + docx + commit.
-- ✅ **dso-secrets-git** — PASS toàn bộ goal (MinIO thật + Flask network2) + docx + commit.
-- 🔄 **cloud-ssrf-imds** — đã fix (network2, flag bare, results REGEX/CONTAINS, minio inject), đang build/test.
-- ⏳ **dso-docker-escape** — đã fix (flag bare, results REGEX), chờ build dind.
+## ✅ HOÀN THÀNH 5/5 (2026-10-04): build + solver + checkwork PASS, có .docx, đã push
+- ✅ **cloud-s3-misconfig** — PASS 5/5 goal (MinIO thật).
+- ✅ **dso-iac-scan** — PASS 4/4 goal (tfsec gate + CI service giữ flag).
+- ✅ **dso-secrets-git** — PASS 9/9 goal (MinIO thật + Flask network2).
+- ✅ **cloud-ssrf-imds** — PASS 4/4 goal (SSRF→IMDS→MinIO; unset session token).
+- ✅ **dso-docker-escape** — PASS 6/6 goal (dind host-sim; khai thác qua Docker daemon TCP 2375).
+Mỗi bài: flag per-student (HASH_REPLACE) chống bypass; `docs/<lab>.docx` (pandoc). Repo đã push origin/master.
 
 ### Bài học grading Labtainer (ÁP DỤNG MỌI BÀI) — đã kiểm chứng:
 1. **results.config grammar**: `name = container:file : <tokenidx> : <LINE_TYPE> : <match>`. Dùng **`REGEX : .+`** để lấy token1 dòng bất kỳ. **KHÔNG dùng `LINE`** (bug `lineno` undefined trong ResultParser). Boolean "file chứa chuỗi": `container:file : CONTAINS : <str>`. KHÔNG có field `content`.
