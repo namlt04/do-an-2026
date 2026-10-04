@@ -43,6 +43,11 @@ fi
 RESULT_DIR="$PWD/.local/result"
 mkdir -p "$RESULT_DIR"
 
+# Bao dam flag.txt luon ton tai (placeholder) de goal boolean pass_gate khong vo
+# ("unknown token _flag_ok") khi sinh vien cham khi CHUA lay duoc flag. gate.sh se
+# ghi de bang flag that khi vuot cong. Gia tri placeholder khong khop parameter.iacflag.
+if [ ! -s "$PWD/flag.txt" ]; then printf 'NOTYET\n' > "$PWD/flag.txt"; fi
+
 echo "[dso-iac-scan] pregrade start: $(date)" > "$dbg"
 
 NETWORK_TF="$PROJ/network.tf"
