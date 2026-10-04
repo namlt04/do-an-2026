@@ -56,7 +56,8 @@ IAM_TF="$PROJ/iam.tf"
 net_ok=1
 if [ -f "$NETWORK_TF" ]; then
     # Khong duoc con bat ky cidr_blocks nao mo ra toan Internet trong SG.
-    if grep -Eq '0\.0\.0\.0/0' "$NETWORK_TF"; then
+    # (Bo qua dong comment '#' de tranh false-positive khi SV ghi chu thich.)
+    if grep -vE '^[[:space:]]*#' "$NETWORK_TF" | grep -Eq '0\.0\.0\.0/0'; then
         net_ok=0
         echo "[network] con 0.0.0.0/0 trong network.tf" >> "$dbg"
     fi

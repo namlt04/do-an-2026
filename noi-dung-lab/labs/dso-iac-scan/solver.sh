@@ -110,6 +110,9 @@ resource "aws_s3_bucket_public_access_block" "data" {
   restrict_public_buckets = true
 }
 
+# Mã hóa at-rest bằng SSE-S3 (AES256). Yêu cầu CMK (KMS) là hardening nâng cao
+# ngoài phạm vi bài cơ bản -> chấp nhận rủi ro có chủ đích, ghi chú rõ:
+#tfsec:ignore:aws-s3-encryption-customer-key
 resource "aws_s3_bucket_server_side_encryption_configuration" "data" {
   bucket = aws_s3_bucket.data.id
 
@@ -157,6 +160,7 @@ resource "aws_s3_bucket_public_access_block" "logs" {
   restrict_public_buckets = true
 }
 
+#tfsec:ignore:aws-s3-encryption-customer-key
 resource "aws_s3_bucket_server_side_encryption_configuration" "logs" {
   bucket = aws_s3_bucket.logs.id
 
@@ -188,6 +192,9 @@ resource "aws_iam_role" "flowlog" {
   })
 }
 
+# CloudWatch Logs yêu cầu resource "<log-group-arn>:*" để tạo/ghi log stream;
+# đây là wildcard BẮT BUỘC cho dịch vụ flow-log -> chấp nhận có chủ đích:
+#tfsec:ignore:aws-iam-no-policy-wildcards
 resource "aws_iam_role_policy" "flowlog" {
   name = "ptit-vpc-flowlog-policy"
   role = aws_iam_role.flowlog.id
