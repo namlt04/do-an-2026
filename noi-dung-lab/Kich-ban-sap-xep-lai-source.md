@@ -10,6 +10,28 @@ từ ngoài vào trong, độ khó tăng dần; mỗi bài sinh viên vừa khai
 hổng (mũ đỏ) vừa vá lỗi (mũ xanh -- DevSecOps). Các bài độc lập, có thể
 thực hiện theo thứ tự bất kỳ.
 
+**MỤC TIÊU CHUNG**
+
+Sau khi hoàn thành toàn bộ, người học có khả năng:
+
+- Diễn giải được các vấn đề cơ bản và các kỹ thuật/công nghệ cốt lõi của
+  DevOps (điện toán đám mây, container, CI/CD, phát triển an toàn ---
+  DevSecOps).
+- Áp dụng các công cụ và kỹ thuật DevOps để phát triển, vận hành hệ
+  thống một cách an toàn, hiệu quả và tin cậy.
+- Đánh giá và lựa chọn được giải pháp bảo mật phù hợp cho từng giai đoạn
+  của vòng đời DevOps (phát hiện lỗ hổng, khắc phục, kiểm soát truy cập,
+  tuân thủ).
+- Rèn tư duy "shift-left": đưa kiểm tra an toàn vào sớm trong quy trình
+  phát triển và triển khai, thay vì xử lý sau khi hệ thống đã vận hành.
+
+Mỗi bài theo mô hình "hai mũ": người học vừa đóng vai tấn công (khai
+thác lỗ hổng thật) để hiểu rủi ro, vừa đóng vai kỹ sư DevSecOps (vá lỗi,
+hardening) để khắc phục triệt để. Các bài độc lập, chạy offline trên
+Labtainer, có thể thực hiện theo thứ tự bất kỳ.
+
+\newpage
+
 **1. dso-iac-scan --- Bảo mật hạ tầng dạng mã, IaC (Cơ bản)**
 
 Bối cảnh: Một lập trình viên của công ty vô tình đẩy toàn bộ mã hạ tầng
@@ -29,9 +51,7 @@ bucket lưu trữ công khai hoặc không mã hóa) → (3) Loại bỏ secret
 hardcode và siết quyền IAM (Action: / Resource:) → (4) Bật logging, quét
 lại toàn diện và vượt cổng chất lượng để nhận flag.
 
-**Ánh xạ đề cương:** Chương 3 (3.2 Cloud Computing, 3.3 VMs vs
-Containers) + Chương 6 (6.1 What to protect, 6.2 Vulnerability Discovery
---- shift-left). CLO1, CLO2.
+**Ánh xạ đề cương:** Chương chính: Chương 3 --- Container và điện toán đám mây (3.2. Điện toán đám mây; 3.3. Máy ảo và container). Chương liên quan: Chương 6 (6.2. Phát hiện và vá lỗ hổng --- shift-left).
 
 **2. dso-image-scan --- Bảo mật image container (Cơ bản)**
 
@@ -52,8 +72,7 @@ multi-stage build, .dockerignore, base image tối giản và ghim phiên bản,
 chạy bằng người dùng không phải root, quét đối chiếu để chứng minh đã
 sạch.
 
-**Ánh xạ đề cương:** Chương 3 (3.1 Docker Basics, 3.3 VMs vs
-Containers). CLO2.
+**Ánh xạ đề cương:** Chương chính: Chương 3 --- Container và điện toán đám mây (3.1. Kiến thức cơ bản về Docker; 3.3. Máy ảo và container).
 
 **3. dso-secrets-git --- Quản lý bí mật trong Git (Trung bình)**
 
@@ -74,8 +93,7 @@ dịch vụ mục tiêu và lấy flag → (4) Khắc phục: xoay vòng (rotate
 chuyển sang biến môi trường hoặc secret manager, thêm .gitignore và
 pre-commit hook quét secret, dọn secret khỏi lịch sử.
 
-**Ánh xạ đề cương:** Chương 6 (6.1 What to protect, 6.2 Vulnerability
-Discovery) + Chương 2 (2.2 Security Best Practices). CLO1, CLO2.
+**Ánh xạ đề cương:** Chương chính: Chương 6 --- Phát triển an toàn (6.1. Mục tiêu bảo vệ; 6.2. Phát hiện và vá lỗ hổng). Chương liên quan: Chương 2 (2.2. Thực tiễn đảm bảo an toàn).
 
 **4. dso-supplychain-sca --- Bảo mật chuỗi cung ứng phần mềm, SCA và
 SBOM (Trung bình)**
@@ -97,8 +115,7 @@ thác CVE trên máy chủ ứng dụng để lấy flag → (4) Khắc phục: 
 ghim phiên bản đã vá trong lockfile, dựng cổng quét tự động chặn khi còn
 lỗ hổng nghiêm trọng.
 
-**Ánh xạ đề cương:** Chương 6 (6.2 Vulnerability Discovery & Patching) +
-Chương 2 (2.3 Vulnerability Management). CLO2.
+**Ánh xạ đề cương:** Chương chính: Chương 6 --- Phát triển an toàn (6.2. Phát hiện và vá lỗ hổng). Chương liên quan: Chương 2 (2.3. Quản lý lỗ hổng).
 
 **5. cloud-s3-misconfig --- Lưu trữ đối tượng cấu hình sai (Trung
 bình)**
@@ -120,8 +137,7 @@ credential truy cập bucket riêng tư để lấy flag → (4) Khắc phục: 
 policy công khai, áp nguyên tắc tối thiểu quyền, bật versioning và
 logging, xoay vòng credential.
 
-**Ánh xạ đề cương:** Chương 3 (3.2 Cloud Computing) + Chương 2 (2.2
-Security Best Practices, 2.4 Compliance & Governance). CLO1, CLO2.
+**Ánh xạ đề cương:** Chương chính: Chương 3 --- Container và điện toán đám mây (3.2. Điện toán đám mây). Chương liên quan: Chương 2 (2.2. Thực tiễn đảm bảo an toàn; 2.4. Tuân thủ và quản trị).
 
 **6. dso-waf-crs --- Bảo vệ ứng dụng runtime bằng WAF (Trung bình khá)**
 
@@ -143,8 +159,7 @@ chế độ chặn, gửi lại payload cũ để xác nhận bị chặn (mã 4
 ngoại lệ để khử cảnh báo sai cho chức năng hợp lệ mà vẫn chặn được tấn
 công, lấy Flag 3.
 
-**Ánh xạ đề cương:** Chương 6 (6.4 DevSecOps, 6.3 Authentication &
-Authorization) + Chương 4 (4.5 Monitoring & Logging). CLO2.
+**Ánh xạ đề cương:** Chương chính: Chương 6 --- Phát triển an toàn (6.4. DevSecOps; 6.3. Xác thực và ủy quyền). Chương liên quan: Chương 4 (4.5. Giám sát và ghi nhật ký).
 
 **7. cloud-ssrf-imds --- SSRF tới dịch vụ metadata cloud (Nâng cao)**
 
@@ -163,8 +178,7 @@ cập dịch vụ lưu trữ đối tượng để lấy flag → (4) Khắc ph�
 phép danh sách trắng và chặn dải địa chỉ link-local, bật IMDSv2 (yêu cầu
 token và giới hạn hop), áp quyền tối thiểu cho role.
 
-**Ánh xạ đề cương:** Chương 3 (3.2 Cloud Computing) + Chương 6 (6.2
-Vulnerability Discovery, 6.1 What to protect). CLO1, CLO2.
+**Ánh xạ đề cương:** Chương chính: Chương 3 --- Container và điện toán đám mây (3.2. Điện toán đám mây). Chương liên quan: Chương 6 (6.2. Phát hiện và vá lỗ hổng; 6.1. Mục tiêu bảo vệ).
 
 **8. dso-cicd-jenkins --- Bảo mật dây chuyền CI/CD (Nâng cao)**
 
@@ -185,9 +199,7 @@ credential đánh cắp sang Docker Registry để lấy flag mục tiêu → (5
 phục: bật xác thực và phân quyền theo ma trận, tắt hoặc giới hạn Script
 Console, dùng Credentials Plugin, che credential trong log.
 
-**Ánh xạ đề cương:** Chương 4 (4.1 CI, 4.2 CI Setup, 4.3 Automated Builds
-& Testing, 4.4 Deployment Pipeline) + Chương 6 (6.4 DevSecOps). CLO1,
-CLO2.
+**Ánh xạ đề cương:** Chương chính: Chương 4 --- Tích hợp và triển khai liên tục (4.1. Tích hợp liên tục (CI); 4.2. Thiết lập và cấu hình CI; 4.3. Phát triển và kiểm thử tự động; 4.4. Quy trình triển khai). Chương liên quan: Chương 6 (6.4. DevSecOps).
 
 **9. dso-docker-escape --- Thoát container chiếm quyền host (Nâng cao)**
 
@@ -207,9 +219,7 @@ lệnh chạy container an toàn (loại bỏ toàn bộ capability không cần
 socket và privileged, bật user namespace, áp seccomp) và giải thích vì
 sao mỗi đường thoát bị chặn.
 
-**Ánh xạ đề cương:** Chương 3 (3.1 Docker Basics, 3.3 VMs vs Containers)
-+ Chương 2 (2.1 Security Principles, 2.2 Security Best Practices). CLO1,
-CLO2.
+**Ánh xạ đề cương:** Chương chính: Chương 3 --- Container và điện toán đám mây (3.1. Kiến thức cơ bản về Docker; 3.3. Máy ảo và container). Chương liên quan: Chương 2 (2.1. Nguyên tắc; 2.2. Thực tiễn đảm bảo an toàn).
 
 **10. cloud-k8s-rbac --- Bảo mật Kubernetes, RBAC và pod escape (Chuyên
 sâu)**
@@ -230,6 +240,4 @@ Quy trình: (1) Đọc ServiceAccount token và liệt kê quyền RBAC quá r�
 chuẩn Pod Security mức restricted, thêm NetworkPolicy; chạy lại chuỗi
 tấn công để chứng minh đã bị chặn.
 
-**Ánh xạ đề cương:** Chương 3 (3.1 Docker/Containers) + Chương 5 (5.3
-Microservice Architecture) + Chương 6 (6.3 Authentication &
-Authorization, 6.4 DevSecOps). CLO2.
+**Ánh xạ đề cương:** Chương chính: Chương 3 --- Container và điện toán đám mây (3.1. Kiến thức cơ bản về Docker/container). Chương liên quan: Chương 5 (5.3. Kiến trúc vi dịch vụ); Chương 6 (6.3. Xác thực và ủy quyền; 6.4. DevSecOps).
