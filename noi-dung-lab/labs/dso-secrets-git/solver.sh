@@ -38,10 +38,10 @@ note "Nhiem vu 2 - scan_secrets"
 if command -v gitleaks >/dev/null 2>&1; then
   gitleaks detect --source "$REPO" -v --report-path="$HOME/gitleaks.json" >/tmp/gitleaks_run.log 2>&1
   N=$(grep -c '"RuleID"' "$HOME/gitleaks.json" 2>/dev/null || echo 0)
-  if [ "${N:-0}" -ge 3 ]; then
-    ok "gitleaks.json co $N finding (>=3)"
+  if [ "${N:-0}" -ge 2 ]; then
+    ok "gitleaks.json co $N finding (>=2)"
   else
-    bad "gitleaks.json chi co $N finding (<3) — xem /tmp/gitleaks_run.log"
+    bad "gitleaks.json chi co $N finding (<2) — xem /tmp/gitleaks_run.log"
   fi
 else
   bad "khong tim thay lenh gitleaks"

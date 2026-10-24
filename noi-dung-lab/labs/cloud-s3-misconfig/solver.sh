@@ -10,13 +10,11 @@ aws --endpoint-url "$ENDPOINT" s3 ls s3://public-assets --recursive --no-sign-re
   | tee /tmp/list.out
 ( grep -q 'backup/app-backup' /tmp/list.out && echo -n LISTED || echo -n NOLIST ) > ~/recon_list_status.txt
 
-if aws --endpoint-url "$ENDPOINT" s3api get-bucket-policy --bucket public-assets \
-     --no-sign-request 2>/dev/null | jq -r '.Policy' > /tmp/policy.json 2>/dev/null; then
-  ( grep -q '"Principal"' /tmp/policy.json && grep -qi 'GetObject' /tmp/policy.json \
-    && echo -n PUBLICPOLICY || echo -n NOPOLICY ) > ~/recon_policy_status.txt
-else
-  echo -n "NOPOLICY_anon_denied" > ~/recon_policy_status.txt
-fi
+# S3 (MinIO/AWS) khong cho doc bucket policy an danh -> chung minh public bang
+# viec LIST + GET object an danh thanh cong (policy chi tiet doc o NV4 voi admin cred).
+aws --endpoint-url "$ENDPOINT" s3 cp s3://public-assets/static/notice.txt - --no-sign-request || true
+( aws --endpoint-url "$ENDPOINT" s3 ls s3://public-assets --no-sign-request >/dev/null 2>&1 \
+  && echo -n PUBLICREAD || echo -n NOPUBLIC ) > ~/recon_policy_status.txt
 
 echo "recon_list_status   = $(cat ~/recon_list_status.txt)"
 echo "recon_policy_status = $(cat ~/recon_policy_status.txt)"
@@ -57,6 +55,7 @@ export AWS_SECRET_ACCESS_KEY
 AWS_ACCESS_KEY_ID="$(grep '^AWS_ACCESS_KEY_ID=' ~/hardening-admin.env | cut -d= -f2)"
 AWS_SECRET_ACCESS_KEY="$(grep '^AWS_SECRET_ACCESS_KEY=' ~/hardening-admin.env | cut -d= -f2)"
 
+aws --endpoint-url "$ENDPOINT" s3api get-bucket-policy --bucket public-assets | jq -r '.Policy' | jq . || true
 aws --endpoint-url "$ENDPOINT" s3api delete-bucket-policy --bucket public-assets
 aws --endpoint-url "$ENDPOINT" s3api put-bucket-versioning \
   --bucket secure-data --versioning-configuration Status=Enabled

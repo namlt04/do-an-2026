@@ -37,8 +37,6 @@ RUN mkdir -p /etc/terraform \
     && printf 'provider_installation {\n  filesystem_mirror {\n    path    = "/opt/tf-mirror"\n    include = ["registry.terraform.io/*/*"]\n  }\n  direct {\n    exclude = ["registry.terraform.io/*/*"]\n  }\n}\n' > /etc/terraform/cli.tfrc
 ENV TF_CLI_CONFIG_FILE=/etc/terraform/cli.tfrc
 
-RUN pip3 install --no-cache-dir checkov==3.2.257 || pip3 install --no-cache-dir checkov==3.2.0 || true
-
 ENV TRIVY_CACHE_DIR=/opt/trivy-cache
 RUN mkdir -p /opt/trivy-cache /tmp/tvchk \
     && printf 'resource "aws_s3_bucket" "x" {\n  bucket = "warm-cache"\n}\n' > /tmp/tvchk/main.tf \

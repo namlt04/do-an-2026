@@ -145,18 +145,18 @@ aws --endpoint-url http://172.33.0.30:9000 s3 ls s3://public-assets --recursive 
 ( grep -q 'backup/app-backup' /tmp/list.out && echo -n LISTED || echo -n NOLIST ) > ~/recon_list_status.txt
 ```
 
-**Bước 3:** Đọc bucket policy để xác nhận nguyên nhân cấu hình sai, đồng thời lưu bằng chứng:
+**Bước 3:** Xác nhận quyền đọc ẩn danh (bằng chứng bucket bị public), đồng thời lưu bằng chứng:
 ```bash
-aws --endpoint-url http://172.33.0.30:9000 s3api get-bucket-policy --bucket public-assets \
-  --no-sign-request | jq -r '.Policy' | tee /tmp/policy.json | jq .
-( grep -q '"Principal"' /tmp/policy.json && grep -qi 'GetObject' /tmp/policy.json \
-  && echo -n PUBLICPOLICY || echo -n NOPOLICY ) > ~/recon_policy_status.txt
+# Tai mot object tinh ma KHONG dung credential -> chung minh GetObject an danh
+aws --endpoint-url http://172.33.0.30:9000 s3 cp s3://public-assets/static/notice.txt - --no-sign-request
+( aws --endpoint-url http://172.33.0.30:9000 s3 ls s3://public-assets --no-sign-request >/dev/null 2>&1 \
+  && echo -n PUBLICREAD || echo -n NOPUBLIC ) > ~/recon_policy_status.txt
 ```
-Quan sát trường `"Principal"` và `"Action"` trong policy để xác định vì sao bucket cho phép truy cập ẩn danh.
+> **Lưu ý:** dịch vụ tương thích S3 (MinIO, và cả AWS thật) **không cho đọc bucket policy khi ẩn danh** — `s3api get-bucket-policy --no-sign-request` sẽ báo `AccessDenied`. Việc **liệt kê và tải object ẩn danh thành công** đã là bằng chứng bucket bị cấu hình public. Nội dung policy chi tiết (`"Principal": "*"`, action `s3:GetObject`/`s3:ListBucket`) sẽ được đọc ở **Nhiệm vụ 4** khi em đã có credential quản trị.
 
-**Điều kiện hoàn thành nhiệm vụ:** Liệt kê thành công (ẩn danh, không dùng credential) danh sách object trong bucket `public-assets` (file `~/recon_list_status.txt` chứa `LISTED`), và đọc được bucket policy chứa `"Principal": "*"` với action `s3:GetObject`/`s3:ListBucket` (file `~/recon_policy_status.txt` chứa `PUBLICPOLICY`).
+**Điều kiện hoàn thành nhiệm vụ:** Liệt kê VÀ tải object ẩn danh (không dùng credential) thành công trên bucket `public-assets` — `~/recon_list_status.txt` chứa `LISTED` và `~/recon_policy_status.txt` chứa `PUBLICREAD` — chứng tỏ bucket cho phép truy cập ẩn danh (misconfiguration). (Nội dung policy chi tiết sẽ đọc ở Nhiệm vụ 4.)
 
-**Câu hỏi 1:** Trong bucket policy vừa đọc, thành phần cụ thể nào biến bucket này thành "public"? Nếu chỉ muốn cho phép đọc file tĩnh công khai (ví dụ ảnh) nhưng KHÔNG cho liệt kê toàn bộ nội dung bucket, cần thay đổi gì trong policy?
+**Câu hỏi 1:** Trong bucket policy (em sẽ đọc được bằng credential quản trị ở Nhiệm vụ 4), thành phần cụ thể nào biến bucket này thành "public"? Nếu chỉ muốn cho phép đọc file tĩnh công khai (ví dụ ảnh) nhưng KHÔNG cho liệt kê toàn bộ nội dung bucket, cần thay đổi gì trong policy?
 Trả lời: _______________________________________
 
 ---
@@ -239,8 +239,11 @@ export AWS_ACCESS_KEY_ID=$(grep '^AWS_ACCESS_KEY_ID=' ~/hardening-admin.env | cu
 export AWS_SECRET_ACCESS_KEY=$(grep '^AWS_SECRET_ACCESS_KEY=' ~/hardening-admin.env | cut -d= -f2)
 ```
 
-**Bước 2:** Gỡ bỏ policy public trên `public-assets` để chặn anonymous access:
+**Bước 2:** Đọc policy public đang áp dụng (giờ đã có quyền `s3:GetBucketPolicy`), rồi gỡ bỏ nó để chặn anonymous access:
 ```bash
+# Doc policy hien tai -> quan sat "Principal":"*" + s3:GetObject/s3:ListBucket (chinh la nguyen nhan public)
+aws --endpoint-url http://172.33.0.30:9000 s3api get-bucket-policy --bucket public-assets | jq -r '.Policy' | jq .
+# Go bo policy public (dua bucket ve private)
 aws --endpoint-url http://172.33.0.30:9000 s3api delete-bucket-policy --bucket public-assets
 ```
 

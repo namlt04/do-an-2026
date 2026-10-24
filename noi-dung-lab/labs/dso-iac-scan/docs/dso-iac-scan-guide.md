@@ -12,13 +12,13 @@ DevSecOps / Cloud Security / IaC
 |---|---|
 | **Tên Lab** | `dso-iac-scan` |
 | **Mức độ** | Trung bình |
-| **Công cụ sử dụng** | `tfsec`, `checkov`, `trivy config`, `terraform` (validate/plan), `grep`, `git diff` |
+| **Công cụ sử dụng** | `tfsec`, `trivy config`, `terraform` (validate/plan), `grep`, `git diff` |
 | **Kiến thức yêu cầu** | Cú pháp cơ bản Terraform (block `resource`, `variable`, HCL); khái niệm cloud cơ bản (VPC, Security Group, S3, IAM, EC2); dòng lệnh Linux; đọc hiểu output JSON/bảng. Bài **độc lập**, các khái niệm cần thiết được nhắc lại ở mục 3. |
 
 **Mục tiêu học tập**
 - Hiểu triết lý **shift-left security**: phát hiện và sửa lỗi cấu hình hạ tầng ở giai đoạn viết mã, TRƯỚC khi triển khai lên cloud thật, thay vì vá lỗi khi đã chạy production.
 - Nắm được các dạng **misconfiguration kinh điển** trong Infrastructure as Code (Security Group mở toàn bộ Internet, S3 public/không mã hóa, secret hardcode, IAM policy quá rộng, tắt logging).
-- Biết cách sử dụng các công cụ **quét tĩnh IaC** (tfsec, checkov, trivy) để liệt kê, phân loại rủi ro theo mức độ nghiêm trọng và đọc hiểu rule ID.
+- Biết cách sử dụng các công cụ **quét tĩnh IaC** (tfsec, trivy) để liệt kê, phân loại rủi ro theo mức độ nghiêm trọng và đọc hiểu rule ID.
 - Ánh xạ được lỗi cấu hình tới nguy cơ thực tế và tới các khung tham chiếu **OWASP IaC**, **CIS Benchmarks**, **MITRE ATT&CK for Cloud**.
 
 **Kỹ năng đạt được**
@@ -39,7 +39,7 @@ Nhiệm vụ của sinh viên là chạy các công cụ quét tĩnh để phát
 > **Lưu ý quan trọng (offline):** Đây là bài **phân tích tĩnh** — Terraform chỉ dùng để `validate`/`plan` cục bộ và để công cụ quét đọc mã. **KHÔNG** có kết nối cloud thật, **KHÔNG** chạy `terraform apply` lên AWS. Toàn bộ diễn ra offline trong các container Labtainer cô lập.
 
 **Vai trò của sinh viên:**
-- Trên container `devsecops` (bàn làm việc của kỹ sư), chạy tfsec/checkov/trivy để tạo báo cáo lỗi ban đầu (baseline) và phân loại theo mức độ.
+- Trên container `devsecops` (bàn làm việc của kỹ sư), chạy tfsec/trivy để tạo báo cáo lỗi ban đầu (baseline) và phân loại theo mức độ.
 - Phân tích từng nhóm lỗi (network, storage, secret, IAM, logging), ánh xạ tới nguy cơ và khung tham chiếu.
 - Sửa mã Terraform trong thư mục dự án để loại bỏ toàn bộ lỗi HIGH/CRITICAL.
 - Quét lại, gửi kết quả tới cổng chặn CI mô phỏng để xác nhận và thu thập flag.
@@ -59,7 +59,7 @@ Bài lab mô phỏng một pipeline CI/CD tối giản, gồm 2 container trên 
 │  ~/gate.sh  (goi cong chan CI)   │        │  HIGH/CRITICAL. Chi tiet lo     │
 │                                   │        │  flag khi tong = 0.             │
 │  Cong cu (offline): tfsec,       │        │                                 │
-│  checkov, trivy, terraform,      │        │                                 │
+│  trivy, terraform,               │        │                                 │
 │  grep, git, jq                   │        │                                 │
 └─────────────────────────────────┘        └───────────────────────────────┘
 
@@ -109,10 +109,8 @@ Sinh viên chỉ thao tác trên container `devsecops`. Container `ci` đóng va
 | `tfsec` | `tfsec <dir>` | Quét nhanh thư mục Terraform, hiển thị lỗi kèm rule ID (ví dụ `aws-ec2-no-public-ingress-sgr`) và mức độ. |
 | `tfsec` | `tfsec <dir> --format json --out <file>` | Xuất báo cáo dạng JSON để đếm/lọc lỗi tự động. |
 | `tfsec` | `tfsec <dir> --minimum-severity HIGH` | Chỉ hiển thị lỗi từ mức HIGH trở lên (phục vụ quality gate). |
-| `checkov` | `checkov -d <dir>` | Quét thư mục IaC bằng bộ rule khác (bổ sung góc nhìn so với tfsec), hiển thị PASSED/FAILED theo check ID (`CKV_AWS_*`). |
-| `checkov` | `checkov -d <dir> --compact -o cli` | Rút gọn output cho dễ đọc trên terminal. |
-| `checkov` | `checkov -d <dir> -o json --output-file-path <dir>` | Xuất kết quả JSON để đối chiếu. |
-| `trivy` | `trivy config <dir>` | Quét cấu hình sai IaC (Terraform/Dockerfile/K8s) bằng engine của Trivy, gom theo mức độ. |
+| `trivy` | `trivy config <dir>` | Quét cấu hình sai IaC (Terraform/Dockerfile/K8s) bằng engine của Trivy (bộ rule khác tfsec, bổ sung góc nhìn), gom theo mức độ. |
+| `trivy` | `trivy config -f json -o <file> <dir>` | Xuất kết quả JSON để đối chiếu/đếm. |
 | `trivy` | `trivy config --severity HIGH,CRITICAL <dir>` | Chỉ báo lỗi HIGH/CRITICAL. |
 | `terraform` | `terraform init -backend=false` | Khởi tạo cục bộ không cần backend từ xa (offline). |
 | `terraform` | `terraform validate` | Kiểm tra cú pháp/hợp lệ của mã sau khi sửa (không kết nối cloud). |
@@ -168,12 +166,12 @@ tfsec . --format json --out ~/baseline.json
 
 **Bước 4:** Đếm số lỗi theo mức độ (dùng để so sánh về sau):
 ```bash
-grep -o '"severity":"[A-Z]*"' ~/baseline.json | sort | uniq -c
+grep -oE '"severity":[[:space:]]*"[A-Z]+"' ~/baseline.json | sort | uniq -c
 ```
 
-**Bước 5:** Chạy chéo bằng `checkov` và `trivy` để bổ sung góc nhìn:
+**Bước 5:** Chạy chéo bằng `trivy` (bộ rule khác tfsec) để bổ sung góc nhìn:
 ```bash
-checkov -d . --compact -o cli
+trivy config .
 trivy config --severity HIGH,CRITICAL .
 ```
 
@@ -181,7 +179,7 @@ trivy config --severity HIGH,CRITICAL .
 
 **Điều kiện hoàn thành nhiệm vụ:** Đã tạo được file `~/baseline.json` chứa kết quả quét, và trong lịch sử lệnh có bản đếm số lỗi HIGH/CRITICAL của baseline (baseline phải có ít nhất một số lỗi HIGH/CRITICAL > 0). `terraform validate` trả về hợp lệ.
 
-**Câu hỏi 1:** Cùng một bộ mã, tfsec và checkov có thể báo số lượng và loại lỗi khác nhau. Theo em, vì sao trong một pipeline DevSecOps người ta thường chạy nhiều hơn một công cụ quét thay vì tin tưởng tuyệt đối vào một công cụ duy nhất?
+**Câu hỏi 1:** Cùng một bộ mã, tfsec và trivy có thể báo số lượng và loại lỗi khác nhau (mỗi công cụ có bộ rule riêng). Theo em, vì sao trong một pipeline DevSecOps người ta thường chạy nhiều hơn một công cụ quét thay vì tin tưởng tuyệt đối vào một công cụ duy nhất?
 Trả lời: _______________________________________
 
 ---
@@ -266,7 +264,7 @@ Resource = ["arn:aws:s3:::${var.app_bucket_name}/*"]
 **Bước 4:** Quét lại và xác nhận nhóm secret/IAM đã sạch:
 ```bash
 tfsec . --minimum-severity HIGH
-checkov -d . --compact -o cli | grep -iE "secret|iam|policy"
+trivy config --severity HIGH,CRITICAL . | grep -iE "secret|iam|policy|key"
 git diff variables.tf iam.tf
 ```
 
@@ -288,14 +286,14 @@ Trả lời: _______________________________________
 cd ~/iac-project
 terraform validate
 tfsec . --format json --out ~/after.json
-grep -o '"severity":"[A-Z]*"' ~/after.json | sort | uniq -c
+grep -oE '"severity":[[:space:]]*"[A-Z]+"' ~/after.json | sort | uniq -c
 trivy config --severity HIGH,CRITICAL .
 ```
 
 **Bước 3:** So sánh baseline và after để định lượng cải thiện:
 ```bash
-echo "== BASELINE =="; grep -o '"severity":"[A-Z]*"' ~/baseline.json | sort | uniq -c
-echo "== AFTER    =="; grep -o '"severity":"[A-Z]*"' ~/after.json | sort | uniq -c
+echo "== BASELINE =="; grep -oE '"severity":[[:space:]]*"[A-Z]+"' ~/baseline.json | sort | uniq -c
+echo "== AFTER    =="; grep -oE '"severity":[[:space:]]*"[A-Z]+"' ~/after.json | sort | uniq -c
 ```
 
 **Bước 4:** Gửi kết quả tới cổng chặn CI mô phỏng. Script này đóng gói mã Terraform hiện tại và gửi tới dịch vụ CI; dịch vụ đó **tự quét lại độc lập** và chỉ trả về flag khi số lỗi HIGH/CRITICAL = 0:

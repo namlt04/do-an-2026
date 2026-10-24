@@ -12,19 +12,19 @@
 |---|---|
 | **Tên Lab** | `dso-secrets-git` |
 | **Mức độ** | Trung bình |
-| **Công cụ sử dụng** | `git`, `gitleaks`, `trufflehog`, `grep`, `curl`, `jq`, `mc` (MinIO Client) |
+| **Công cụ sử dụng** | `git`, `gitleaks`, `grep`, `curl`, `jq`, `mc` (MinIO Client) |
 | **Kiến thức yêu cầu** | Sử dụng dòng lệnh Linux cơ bản; hiểu khái niệm commit/lịch sử của Git ở mức tối thiểu (không cần kinh nghiệm chuyên sâu — lab sẽ nhắc lại ở mục Kiến thức bổ trợ) |
 
 **Mục tiêu học tập**
 - Hiểu vì sao xóa một secret ở HEAD **không** loại bỏ được nó khỏi kho lưu trữ — secret vẫn tồn tại vĩnh viễn trong lịch sử commit và có thể bị truy xuất lại.
 - Nắm được cách kẻ tấn công (T1552 — Unsecured Credentials) đào bới toàn bộ lịch sử Git để tìm khóa AWS, mật khẩu CSDL, API token bị hard-code (CWE-798).
-- Biết dùng công cụ quét secret tự động (gitleaks/trufflehog) và đối chiếu với quét thủ công bằng `git log -p` / `git rev-list`.
+- Biết dùng công cụ quét secret tự động (gitleaks) và đối chiếu với quét thủ công bằng `git log -p` / `git rev-list`.
 - Hiểu quy trình khắc phục đúng chuẩn DevSecOps: xoay vòng (rotate) secret, loại secret khỏi history, đưa secret ra biến môi trường/secret manager, chặn secret ngay từ commit bằng pre-commit hook.
 - Ánh xạ được rủi ro thực tế vào các khung tham chiếu OWASP DevSecOps, MITRE ATT&CK, CWE.
 
 **Kỹ năng đạt được**
 - Kỹ năng duyệt và truy vấn lịch sử Git để phát hiện dữ liệu nhạy cảm đã bị "xóa" ở commit sau nhưng còn trong history.
-- Kỹ năng vận hành gitleaks/trufflehog ở chế độ offline để quét toàn bộ history và đọc báo cáo (rule, commit, file, dòng).
+- Kỹ năng vận hành gitleaks ở chế độ offline để quét toàn bộ history và đọc báo cáo (rule, commit, file, dòng).
 - Kỹ năng dùng credential thu được để xác thực vào một dịch vụ mục tiêu (HTTP API / MinIO object storage) và trích xuất dữ liệu.
 - Kỹ năng khắc phục: viết `.gitignore`, tách secret ra biến môi trường, cấu hình pre-commit hook quét secret trước khi commit, và trình bày quy trình rotate + purge history.
 - Tư duy đánh giá rủi ro: phân biệt "che giấu" (xóa ở HEAD) với "khắc phục thực sự" (rotate + loại khỏi history).
@@ -40,7 +40,7 @@ Sinh viên đóng vai một **security engineer / attacker** đã có quyền đ
 
 **Vai trò của sinh viên:**
 - Trên máy `dev`: duyệt lịch sử Git bằng `git log`, `git rev-list`, `git log -p` để phát hiện các commit đã từng chứa secret.
-- Chạy công cụ quét secret offline (gitleaks/trufflehog) trên toàn bộ history để tự động hóa việc phát hiện và xác định loại secret.
+- Chạy công cụ quét secret offline (gitleaks) trên toàn bộ history để tự động hóa việc phát hiện và xác định loại secret.
 - Dùng credential thu được (AWS key giả / mật khẩu DB / API token) để truy cập dịch vụ mục tiêu (`app` — HTTP API và `storage` — MinIO) và lấy flag.
 - Thực hiện **remediation**: rotate secret, đưa secret ra biến môi trường, cấu hình `.gitignore` + pre-commit hook chặn secret, và trình bày quy trình loại secret khỏi history.
 
@@ -52,7 +52,7 @@ Sinh viên đóng vai một **security engineer / attacker** đã có quyền đ
 |  dev (client)          |           |  app  (HTTP API - target)      |
 |  172.32.0.10           |  HTTP/API |  172.32.0.20 : 8080            |
 |  - git repo ~/repo     |---------->|  Xac thuc bang API token / DB  |
-|  - gitleaks/trufflehog |           |  password; tra flag khi hop le |
+|  - gitleaks |           |  password; tra flag khi hop le |
 |  - curl / jq / mc      |           +--------------------------------+
 |  - ~/rotate_secrets.sh |
 |  (noi sinh vien go     |  S3/API   +--------------------------------+
@@ -82,7 +82,7 @@ Luong: dev dao secret trong history -> dung token/DB password truy cap app
 
 - **MITRE ATT&CK T1552 — Unsecured Credentials:** kỹ thuật attacker tìm credential lộ lọt trong file, lịch sử shell, biến môi trường, hoặc — như bài này — **lịch sử kho mã nguồn (T1552.001 Credentials In Files)**.
 
-- **Quét secret (secret scanning):** công cụ như **gitleaks** và **trufflehog** duyệt qua toàn bộ commit, dùng tập luật regex/entropy để phát hiện chuỗi giống secret (ví dụ pattern `AKIA...` của AWS access key). Điểm mạnh so với quét thủ công: quét được **mọi commit trong history**, không chỉ HEAD.
+- **Quét secret (secret scanning):** công cụ như **gitleaks** duyệt qua toàn bộ commit, dùng tập luật regex/entropy để phát hiện chuỗi giống secret (ví dụ pattern `AKIA...` của AWS access key). Điểm mạnh so với quét thủ công: quét được **mọi commit trong history**, không chỉ HEAD.
 
 - **git filter-repo / BFG Repo-Cleaner:** công cụ để **viết lại lịch sử** nhằm loại bỏ hẳn một file/chuỗi secret khỏi mọi commit. Đây là bước "purge history" — nhưng phải nhớ: purge history **không thay thế** cho rotate, vì secret có thể đã bị sao chép/lộ ở nơi khác.
 
@@ -94,7 +94,7 @@ Luong: dev dao secret trong history -> dung token/DB password truy cap app
 |---|---|
 | Repo git tại `~/repo` trên máy `dev` | Kho mã nguồn đã dựng sẵn, có lịch sử commit trong đó secret từng được thêm rồi bị "xóa" ở commit sau. Đối tượng chính để đào bới. |
 | File cấu hình bị lộ (`deploy/credentials.yaml`) | File từng chứa AWS key giả, DB password, API token; ở HEAD hiện tại đã bị gỡ nhưng còn trong history. |
-| Báo cáo gitleaks/trufflehog | Kết quả quét, cho biết rule khớp, commit hash, đường dẫn file và giá trị secret bị lộ. |
+| Báo cáo gitleaks | Kết quả quét, cho biết rule khớp, commit hash, đường dẫn file và giá trị secret bị lộ. |
 | Dịch vụ `app` (HTTP API, `172.32.0.20:8080`) | Nhận xác thực bằng API token / mật khẩu DB tìm được; trả flag khi credential hợp lệ. Cũng là nơi tiếp nhận yêu cầu rotate. |
 | Dịch vụ `storage` (MinIO, `172.32.0.30:9000`) | Object storage tương thích S3; access key/secret key chính là cặp AWS key giả lộ trong history; bucket `corp-backups` (private) chứa object flag tại `flags/flag.txt`. |
 | `~/rotate_secrets.sh` | Script do lab cung cấp, mô phỏng bước rotate credential (Nhiệm vụ 4). |
@@ -111,7 +111,6 @@ Luong: dev dao secret trong history -> dung token/DB password truy cap app
 | `git` | `git log -S '<chuỗi>' --oneline --all` | "Pickaxe": tìm các commit làm thay đổi số lần xuất hiện của một chuỗi (vd `AKIA`, `password`). |
 | `git` | `git show <commit>:<path>` | In nội dung một file đúng như nó tồn tại tại một commit cụ thể trong quá khứ. |
 | `gitleaks` | `gitleaks detect --source <repo> -v --report-path=<out.json>` | Quét toàn bộ lịch sử Git tìm secret theo tập luật, in chi tiết và xuất báo cáo JSON. |
-| `trufflehog` | `trufflehog git file://<repo> --json` | Quét history kho Git tìm secret (regex + entropy), xuất kết quả JSON (chạy offline, không xác thực trực tuyến). |
 | `grep` | `grep -RniE 'AKIA\|password\|secret\|token' <dir>` | Lọc nhanh chuỗi nghi là secret trong output hoặc file. |
 | `curl` | `curl -s -H 'Authorization: Bearer <token>' http://app:8080/flag` | Gửi request HTTP kèm API token để truy cập dịch vụ `app`. |
 | `jq` | `... \| jq -r '.flag'` | Định dạng và trích trường từ phản hồi JSON. |
@@ -185,7 +184,7 @@ Trả lời: _______________________________________
 
 ### Nhiệm vụ 2 — `scan_secrets`: Quét toàn bộ history và trích xuất secret
 
-**Mục tiêu:** Dùng công cụ quét secret offline (gitleaks / trufflehog) kết hợp với `git log -p` để moi ra chính xác các credential (AWS key giả, DB password, API token) đã lộ trong history.
+**Mục tiêu:** Dùng công cụ quét secret offline (gitleaks) kết hợp với `git log -p` để moi ra chính xác các credential (AWS key giả, DB password, API token) đã lộ trong history.
 
 **Bước 1:** Chạy gitleaks trên toàn bộ lịch sử của repo và xuất báo cáo:
 ```bash
@@ -197,9 +196,10 @@ gitleaks detect --source ~/repo -v --report-path=~/gitleaks.json
 jq -r '.[] | "\(.RuleID)\t\(.Commit)\t\(.File)\t\(.Secret)"' ~/gitleaks.json
 ```
 
-**Bước 3 (đối chiếu / dự phòng):** Nếu muốn kiểm chứng bằng trufflehog:
+**Bước 3 (đối chiếu / dự phòng):** Dùng "pickaxe" của Git để truy ngược các commit từng thêm/xóa chuỗi nhạy cảm (đối chiếu với báo cáo gitleaks):
 ```bash
-trufflehog git file://$HOME/repo --json | jq -r '.Raw // .Redacted'
+git -C ~/repo log -S 'AKIA' --oneline --all
+git -C ~/repo log -S 'password' --oneline --all
 ```
 
 **Bước 4 (xác minh thủ công):** Với commit và file mà công cụ chỉ ra, đọc lại nội dung gốc để lấy đúng giá trị secret:
@@ -219,9 +219,9 @@ EOF
 cat ~/secrets_found.txt
 ```
 
-**Điều kiện hoàn thành nhiệm vụ:** Sinh viên tạo được báo cáo quét (`~/gitleaks.json`, tối thiểu 3 finding) và trích xuất chính xác cả 4 giá trị credential vào `~/secrets_found.txt`. Các giá trị này dùng tiếp ở Nhiệm vụ 3.
+**Điều kiện hoàn thành nhiệm vụ:** Sinh viên tạo được báo cáo quét (`~/gitleaks.json`, tối thiểu 2 finding) và trích xuất chính xác cả 4 giá trị credential vào `~/secrets_found.txt`. Các giá trị này dùng tiếp ở Nhiệm vụ 3.
 
-**Câu hỏi 2:** So sánh việc quét bằng công cụ tự động (gitleaks/trufflehog quét toàn history) với việc chỉ dùng `grep` trên thư mục làm việc hiện tại. Vì sao chỉ `grep` ở HEAD sẽ bỏ sót secret trong bài này, và công cụ quét dựa vào những đặc trưng nào (pattern, entropy) để phát hiện?
+**Câu hỏi 2:** So sánh việc quét bằng công cụ tự động (gitleaks quét toàn history) với việc chỉ dùng `grep` trên thư mục làm việc hiện tại. Vì sao chỉ `grep` ở HEAD sẽ bỏ sót secret trong bài này, và công cụ quét dựa vào những đặc trưng nào (pattern, entropy) để phát hiện?
 Trả lời: _______________________________________
 
 ---

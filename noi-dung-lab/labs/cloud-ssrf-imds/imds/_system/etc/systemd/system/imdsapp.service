@@ -1,0 +1,17 @@
+[Unit]
+Description=IMDS simulator (169.254.169.254) - cloud-ssrf-imds lab
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/ubuntu/imds_app
+ExecStartPre=-/bin/bash -c 'IFACE=$(ip route | awk "/default/{print \$5; exit}"); [ -n "$IFACE" ] && ip addr add 169.254.169.254/32 dev "$IFACE" label "$IFACE:imds" 2>/dev/null; true'
+ExecStart=/usr/bin/python3 /home/ubuntu/imds_app/app.py
+Restart=on-failure
+RestartSec=2
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

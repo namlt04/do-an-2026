@@ -12,7 +12,7 @@ terraform validate
 tfsec . || true
 tfsec . --format json --out "$HOME/baseline.json"
 echo "Baseline severity count:"
-grep -o '"severity":"[A-Z]*"' "$HOME/baseline.json" | sort | uniq -c
+grep -oE '"severity":[[:space:]]*"[A-Z]+"' "$HOME/baseline.json" | sort | uniq -c
 
 {
     echo "cd ~/iac-project"
@@ -20,8 +20,8 @@ grep -o '"severity":"[A-Z]*"' "$HOME/baseline.json" | sort | uniq -c
     echo "terraform validate"
     echo "tfsec ."
     echo "tfsec . --format json --out ~/baseline.json"
-    echo "grep -o '\"severity\":\"[A-Z]*\"' ~/baseline.json | sort | uniq -c"
-    echo "checkov -d . --compact -o cli"
+    echo "grep -oE '\"severity\":[[:space:]]*\"[A-Z]+\"' ~/baseline.json | sort | uniq -c"
+    echo "trivy config ."
     echo "trivy config --severity HIGH,CRITICAL ."
 } >> "$HISTFILE_TARGET"
 
@@ -281,7 +281,7 @@ echo "=== [6/6] Quet lai, git diff, vuot gate va lay flag (Nhiem vu 4) ==="
 terraform validate
 tfsec . --format json --out "$HOME/after.json"
 echo "After severity count:"
-grep -o '"severity":"[A-Z]*"' "$HOME/after.json" | sort | uniq -c
+grep -oE '"severity":[[:space:]]*"[A-Z]+"' "$HOME/after.json" | sort | uniq -c
 
 echo
 echo "--- git diff --stat (bang chung remediation) ---"
@@ -292,7 +292,7 @@ git diff --stat 2>/dev/null
     echo "grep -rniE \"password|secret|access_key\" ~/iac-project"
     echo "git diff variables.tf iam.tf"
     echo "tfsec . --format json --out ~/after.json"
-    echo "grep -o '\"severity\":\"[A-Z]*\"' ~/after.json | sort | uniq -c"
+    echo "grep -oE '\"severity\":[[:space:]]*\"[A-Z]+\"' ~/after.json | sort | uniq -c"
     echo "~/gate.sh"
 } >> "$HISTFILE_TARGET"
 

