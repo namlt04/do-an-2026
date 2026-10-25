@@ -98,7 +98,7 @@ Luong: dev dao secret trong history -> dung token/DB password truy cap app
 | Dịch vụ `app` (HTTP API, `172.32.0.20:8080`) | Nhận xác thực bằng API token / mật khẩu DB tìm được; trả flag khi credential hợp lệ. Cũng là nơi tiếp nhận yêu cầu rotate. |
 | Dịch vụ `storage` (MinIO, `172.32.0.30:9000`) | Object storage tương thích S3; access key/secret key chính là cặp AWS key giả lộ trong history; bucket `corp-backups` (private) chứa object flag tại `flags/flag.txt`. |
 | `~/rotate_secrets.sh` | Script do lab cung cấp, mô phỏng bước rotate credential (Nhiệm vụ 4). |
-| `flag` | Chuỗi mục tiêu, lấy được sau khi dùng credential lộ để truy cập dịch vụ. Dùng để chấm điểm tự động. |
+| `flag` | Chuỗi mục tiêu, lấy được sau khi dùng credential lộ để truy cập dịch vụ. |
 
 **Bảng tùy chọn và cú pháp công cụ sử dụng trong bài**
 
@@ -166,7 +166,7 @@ git log -S 'password' --oneline --all
 git log -S 'AKIA' --oneline --all
 ```
 
-**Bước 5 (ghi lại bằng chứng để chấm điểm):** Xác định đúng commit **thêm** và commit **xóa** file `deploy/credentials.yaml`, rồi lưu hash của chúng vào một file worksheet:
+**Bước 5 (ghi lại kết quả):** Xác định đúng commit **thêm** và commit **xóa** file `deploy/credentials.yaml`, rồi lưu hash của chúng vào một file worksheet:
 ```bash
 cat > ~/recon_answers.txt <<EOF
 ADD_COMMIT=<hash_commit_them_deploy_credentials.yaml>
@@ -208,7 +208,7 @@ git log -p -- deploy/credentials.yaml
 git show <commit_hash>:deploy/credentials.yaml
 ```
 
-**Bước 5 (ghi lại bằng chứng để chấm điểm):** Ghi lại chính xác 4 giá trị credential thu được vào worksheet:
+**Bước 5 (ghi lại kết quả):** Ghi lại chính xác 4 giá trị credential thu được vào worksheet:
 ```bash
 cat > ~/secrets_found.txt <<EOF
 AWS_ACCESS_KEY_ID=<gia_tri_dao_duoc>
@@ -243,7 +243,7 @@ mc ls leak
 mc ls --recursive leak
 ```
 
-**Bước A3:** Đọc object chứa flag và lưu lại (dùng để chấm điểm):
+**Bước A3:** Đọc object chứa flag và lưu lại:
 ```bash
 mc cat leak/corp-backups/flags/flag.txt | tee ~/loot_storage.txt
 ```
@@ -260,7 +260,7 @@ curl -s -H "Authorization: Bearer <API_TOKEN>" http://app:8080/flag | jq .
 curl -s -u appuser:<db_password> http://app:8080/flag | jq .
 ```
 
-**Bước B3:** Trích flag từ phản hồi JSON và lưu lại (dùng để chấm điểm):
+**Bước B3:** Trích flag từ phản hồi JSON và lưu lại:
 ```bash
 curl -s -H "Authorization: Bearer <API_TOKEN>" http://app:8080/flag | jq -r '.flag' | tee ~/loot_api.txt
 ```
@@ -280,7 +280,7 @@ Trả lời: _______________________________________
 ```bash
 ~/rotate_secrets.sh
 ```
-Script sẽ báo kết quả và lưu "rotate proof" vào `~/loot_rotate.txt` nếu thành công. Sau đó, tự kiểm chứng credential CŨ không còn truy cập được, đồng thời ghi lại kết quả chuẩn hóa để chấm điểm:
+Script sẽ báo kết quả và lưu "rotate proof" vào `~/loot_rotate.txt` nếu thành công. Sau đó, tự kiểm chứng credential CŨ không còn truy cập được, đồng thời ghi lại kết quả chuẩn hóa:
 ```bash
 mc alias set leak http://storage:9000 <ACCESS_KEY_CU> <SECRET_KEY_CU>
 mc ls leak > ~/rotate_verify.log 2>&1
@@ -318,7 +318,7 @@ HOOK
 chmod +x ~/repo/.git/hooks/pre-commit
 ```
 
-**Bước 5 — Kiểm chứng hook hoạt động:** Thử tạo một thay đổi có chứa secret giả và commit; hook phải chặn. Ghi lại kết quả chuẩn hóa để chấm điểm:
+**Bước 5 — Kiểm chứng hook hoạt động:** Thử tạo một thay đổi có chứa secret giả và commit; hook phải chặn. Ghi lại kết quả chuẩn hóa:
 ```bash
 cd ~/repo
 echo 'aws_secret = "AKIAFAKE1234567890EX"' > test_leak.txt

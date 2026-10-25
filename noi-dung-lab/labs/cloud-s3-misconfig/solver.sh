@@ -10,8 +10,6 @@ aws --endpoint-url "$ENDPOINT" s3 ls s3://public-assets --recursive --no-sign-re
   | tee /tmp/list.out
 ( grep -q 'backup/app-backup' /tmp/list.out && echo -n LISTED || echo -n NOLIST ) > ~/recon_list_status.txt
 
-# S3 (MinIO/AWS) khong cho doc bucket policy an danh -> chung minh public bang
-# viec LIST + GET object an danh thanh cong (policy chi tiet doc o NV4 voi admin cred).
 aws --endpoint-url "$ENDPOINT" s3 cp s3://public-assets/static/notice.txt - --no-sign-request || true
 ( aws --endpoint-url "$ENDPOINT" s3 ls s3://public-assets --no-sign-request >/dev/null 2>&1 \
   && echo -n PUBLICREAD || echo -n NOPUBLIC ) > ~/recon_policy_status.txt

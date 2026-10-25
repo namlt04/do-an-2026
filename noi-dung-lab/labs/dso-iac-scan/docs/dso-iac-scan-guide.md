@@ -301,7 +301,7 @@ echo "== AFTER    =="; grep -oE '"severity":[[:space:]]*"[A-Z]+"' ~/after.json |
 ~/gate.sh
 ```
 
-**Bước 5:** Ghi lại flag lấy được (được `~/gate.sh` tự động lưu) vào file kết quả để chấm điểm:
+**Bước 5:** Ghi lại flag lấy được (được `~/gate.sh` tự động lưu) vào file kết quả:
 ```bash
 cat ~/flag.txt
 ```

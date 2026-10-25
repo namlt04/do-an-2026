@@ -4,12 +4,7 @@ PW="${1:-}"
 
 log() { echo "[app fixlocal] $*"; }
 
-# App container chay NO_PRIVILEGE -> systemd KHONG activate unit (khong co bus).
-# Vi vay socat forward (/var/run/docker.sock -> host-sim:2375) duoc khoi dong
-# NGAY TRONG CMD cua container (xem Dockerfile), chay moi lan start/restart/reboot.
-# fixlocal chi doi socket san sang de xac nhan.
-
-log "doi /var/run/docker.sock (socat forward tu CMD) san sang..."
+log "doi /var/run/docker.sock san sang..."
 ok=0
 for i in $(seq 1 20); do
     if docker -H unix:///var/run/docker.sock version >/dev/null 2>&1; then

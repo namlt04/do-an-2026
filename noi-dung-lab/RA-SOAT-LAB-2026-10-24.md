@@ -186,3 +186,36 @@ Lỗi phát hiện (nghiêm trọng — lab không minh hoạ đúng điều nó
 - VM đang chạy bản CŨ (còn comment #SUM/#DOC đầy đủ) trong khi **repo đã dọn comment** (commit "Don comment toan bo 5 bai lab"). Khác biệt chủ yếu là comment → KHÔNG ảnh hưởng hành vi chấm điểm.
 - Các bản vá vòng này đã sửa trong **repo** (nguồn chuẩn) và **deploy xuống VM** để test. Lab 4 & 5 đã **rebuild image** trên VM.
 - **Việc còn lại:** regenerate `.docx` guide cho lab 1/2/3 (đã sửa `.md`) bằng pandoc; commit toàn bộ thay đổi vào repo.
+
+---
+
+# VÒNG DỌN CHUYÊN NGHIỆP + REBUILD SẠCH (2026-10-26)
+
+**A. Dọn comment code:** đã xóa các comment giải thích (tiếng Việt) thêm khi fix, trong
+`cloud-ssrf-imds/storage/_bin/fixlocal.sh`, `storage/.../minio-start.sh`,
+`dso-docker-escape/app/_bin/fixlocal.sh`, `dso-docker-escape` app Dockerfile,
+`cloud-s3-misconfig/solver.sh`. Giữ: shebang, `# shellcheck`, `#tfsec:ignore`, hằng số credential, nội dung heredoc.
+
+**B. Dọn "ngôn ngữ chấm điểm" trong 5 guide:** bỏ "để chấm điểm", "file quy ước",
+"đây là file dùng để chấm điểm", "(dùng để chấm điểm)"; viết lại "Ghi chú chấm điểm" và note lộ "proxy"
+cho chuyên nghiệp. **Giữ nguyên các lệnh tạo file bằng chứng** → checkwork không hỏng. Giữ note nhập email/mã SV
+(hướng dẫn chuẩn, cần cho định danh). Regenerate `.docx` cả 5 guide.
+
+**C. Ẩn solver.sh khỏi bản phát học sinh — ĐÃ XÁC MINH (không cần đổi):**
+bộ đóng gói chuẩn `scripts/designer/bin/create-imodules.sh` chỉ đưa vào bản phát các thư mục
+`config/`, `instr_config/`, `docs/`, `bin/` của mỗi lab. `solver.sh` nằm ở GỐC lab → **không được đóng gói**
+(kiểm tra logic `git ls-files`: 0/5 lab ship solver). Lưu ý: KHÔNG đưa solver vào `instr_config/` vì thư mục
+đó LẠI được phát cho học sinh.
+
+**D. Rebuild sạch `-f -N` (no-cache, mô phỏng VM mới) + validate lại — TẤT CẢ PASS:**
+
+| Lab | Build no-cache | URL 404? | checkwork | Reboot-resilient |
+|---|---|---|---|---|
+| 1 dso-iac-scan | ✅ (tfsec v1.28.13, trivy 0.74.0, terraform 1.9.8 tải lại OK) | Không | ✅ 4/4 | — |
+| 2 dso-secrets-git | ✅ (gitleaks 8.18.4, mc OK) | Không | ✅ 9/9 | — |
+| 3 cloud-s3-misconfig | ✅ (aws-cli 1.38.38, MinIO active) | Không | ✅ 5/5 | — |
+| 4 cloud-ssrf-imds | ✅ (4 image) | Không | ✅ 4/4 | ✅ web/imds/minio tự lên sau plain restart |
+| 5 dso-docker-escape | ✅ (app + host-sim) | Không | ✅ 6/6 | ✅ docker.sock + escimg sau plain restart |
+
+→ **Kết luận:** cả 5 lab build lại từ số 0 (no-cache) không lỗi, không URL chết → **tương thích với Labtainer/VM mới**.
+Lab 4 & 5 giữ khả năng sống sót reboot trên image vừa build. Môi trường build cần Internet (tải tfsec/trivy/terraform/gitleaks/aws-cli/apt) — đây là yêu cầu lúc BUILD, lab vẫn chạy offline khi đã dựng image.

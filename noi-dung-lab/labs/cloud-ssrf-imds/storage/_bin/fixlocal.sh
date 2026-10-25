@@ -12,8 +12,6 @@ set -a
 source "$HOME_DIR/minio_env.sh"
 set +a
 
-# MinIO chay bang systemd service (enable -> auto-start moi lan boot/restart,
-# khong chi dua vao fixlocal lan dau). Wrapper minio-start.sh tu source minio_env.sh.
 echo "$PASS" | sudo -S systemctl daemon-reload
 echo "$PASS" | sudo -S systemctl enable minio.service
 echo "$PASS" | sudo -S systemctl restart minio.service
@@ -31,7 +29,6 @@ if [ "$READY" -ne 1 ]; then
     echo "CANH BAO: MinIO khong san sang sau ~20s, xem journalctl -u minio" >&2
 fi
 
-# Seed bucket/flag (du lieu nam trong miniodata -> ton tai qua restart).
 /usr/local/bin/mc alias set local http://127.0.0.1:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" --api S3v4 >/dev/null 2>&1
 /usr/local/bin/mc mb -p local/fin-reports >/dev/null 2>&1
 /usr/local/bin/mc cp "$HOME_DIR/flag_seed.txt" local/fin-reports/flag.txt >/dev/null 2>&1
