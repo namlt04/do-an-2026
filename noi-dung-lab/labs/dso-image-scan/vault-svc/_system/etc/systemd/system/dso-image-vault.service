@@ -1,0 +1,12 @@
+[Unit]
+Description=DSO Image Scan vault service
+After=network-online.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/app
+ExecStart=/usr/bin/python3 /home/ubuntu/app/vault_server.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

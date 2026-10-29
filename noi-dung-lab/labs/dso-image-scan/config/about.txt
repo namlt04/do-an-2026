@@ -1,0 +1,2 @@
+dso-image-scan: Phan tich Docker image de phat hien secret con lai trong layer, quet CVE va hardening image.
+Sinh vien dung docker save, Trivy va curl trong moi truong Labtainer offline.

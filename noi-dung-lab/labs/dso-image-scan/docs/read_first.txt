@@ -1,0 +1,30 @@
+Chào mừng bạn đến với bài thực hành:
+
+  DSO-IMAGE-SCAN
+  Bảo mật Image Container: Săn Secret trong Layer & Quét lỗ hổng Image
+  SecLab PTIT — Học viện Công nghệ Bưu chính Viễn thông
+
+══════════════════════════════════════════════════
+
+  KỊCH BẢN:
+  Bạn là DevSecOps engineer được giao rà soát Docker image
+  "internal-app:1.0" trước khi đẩy lên registry sản xuất.
+  Có tin đồn image chứa secret bị lộ và dùng base image cũ nhiều CVE.
+
+  NHIỆM VỤ CỦA BẠN:
+  1. Điều tra lịch sử layer → tìm layer đáng ngờ
+  2. Giải nén layer → trích xuất secret bị lộ
+  3. Quét CVE + dùng secret lấy flag từ vault-svc
+  4. Viết lại Dockerfile an toàn & quét đối chiếu
+
+══════════════════════════════════════════════════
+
+  BẮT ĐẦU:
+  • Đọc lab manual:     cat /docs/dso-image-scan.md
+  • Liệt kê image:     docker images
+  • Xem hints:          cat /root/workspace/hints.txt
+
+  MÁY TRẠM CỦA BẠN:  workstation (172.60.2.10)
+  MỤC TIÊU:           vault-svc   (172.60.2.20:8080)
+
+══════════════════════════════════════════════════
