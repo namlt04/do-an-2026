@@ -42,10 +42,11 @@ RUN mkdir -p /opt/trivy-cache /tmp/tvchk \
     && printf 'resource "aws_s3_bucket" "x" {\n  bucket = "warm-cache"\n}\n' > /tmp/tvchk/main.tf \
     && (trivy --cache-dir /opt/trivy-cache config /tmp/tvchk || true) \
     && rm -rf /tmp/tvchk \
-    && chmod -R a+rX /opt/trivy-cache
+    && chmod -R a+rwX /opt/trivy-cache
 ENV TRIVY_SKIP_CHECK_UPDATE=true
 ENV TRIVY_SKIP_DB_UPDATE=true
 ENV TRIVY_SKIP_JAVA_DB_UPDATE=true
+RUN printf 'export TF_CLI_CONFIG_FILE=/etc/terraform/cli.tfrc\nexport TRIVY_CACHE_DIR=/opt/trivy-cache\nexport TRIVY_SKIP_CHECK_UPDATE=true\nexport TRIVY_SKIP_DB_UPDATE=true\nexport TRIVY_SKIP_JAVA_DB_UPDATE=true\n' > /etc/profile.d/devsecops-tools.sh
 ADD $labdir/$imagedir/sys_tar/sys.tar /
 ADD $labdir/sys_$lab.tar.gz /
 RUN useradd -ms /bin/bash $user_name
