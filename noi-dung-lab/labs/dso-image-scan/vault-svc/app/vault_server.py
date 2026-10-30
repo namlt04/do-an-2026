@@ -9,7 +9,10 @@ def health():
 
 @app.route("/flag", methods=["GET", "POST"])
 def get_flag():
-    token = request.headers.get("Authorization", "").removeprefix("Bearer ").strip()
+    token = request.headers.get("Authorization", "")
+    if token.startswith("Bearer "):
+        token = token[len("Bearer "):]
+    token = token.strip()
     if token != VALID_API_KEY:
         return jsonify(error="invalid API key"), 403
     with open("/home/ubuntu/flag_seed.txt") as stream:

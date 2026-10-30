@@ -28,11 +28,19 @@ Chạy `docker history --no-trunc internal-app:1.0 | tee ~/findings.txt`; xác �
 
 ### Nhiệm vụ 2 — `extract_secret`
 
-Chạy `docker save internal-app:1.0 -o ~/image.tar`, giải nén các `layer.tar`, tìm credential, lưu key vào `~/secret.txt`. Điều kiện: key bắt đầu `AKIA`. Câu hỏi: nêu hai cách đưa secret vào build/runtime mà không lưu trong image.
+Xuất image và giải nén từng layer:
+
+```bash
+docker save internal-app:1.0 -o ~/image.tar
+mkdir -p ~/layers && tar -xf ~/image.tar -C ~/layers
+cd ~/layers && for l in blobs/sha256/*; do tar -tf $l 2>/dev/null | grep -E '\.env|secrets' && echo "  <- $l"; done
+```
+
+Giải nén layer chứa credential (`cd ~/layers && tar -xf blobs/sha256/<layer> app/secrets/aws-credentials.txt`; layer có `.wh.` là layer xoá file), đọc `aws_access_key_id` và lưu đúng key vào `~/secret.txt` (một dòng). Điều kiện: key bắt đầu `AKIA`. Câu hỏi: nêu hai cách đưa secret vào build/runtime mà không lưu trong image.
 
 ### Nhiệm vụ 3 — `scan_cves`
 
-Chạy `trivy image --offline-scan --severity HIGH,CRITICAL internal-app:1.0 | tee ~/cve-report.txt`. Điều kiện: báo cáo có HIGH/CRITICAL. Câu hỏi: vì sao CVE base image phải được xử lý cùng secret?
+Chạy `trivy image --offline-scan --severity HIGH,CRITICAL internal-app:1.0 | tee ~/cve-report.txt` (CSDL lỗ hổng đã được nạp sẵn, chạy offline). Điều kiện: báo cáo có HIGH/CRITICAL. Câu hỏi: vì sao CVE base image phải được xử lý cùng secret?
 
 ### Nhiệm vụ 4 — `get_flag`
 
@@ -40,7 +48,26 @@ Chạy `curl -s -H "Authorization: Bearer $(cat ~/secret.txt)" http://vault-svc:
 
 ### Nhiệm vụ 5 — `harden_image`
 
-Tạo `~/Dockerfile.secure` có ít nhất hai `FROM`, `.dockerignore` loại `.env` và `secrets/`, chạy non-root và không COPY secret. Build/scan đối chiếu. Điều kiện: Dockerfile thỏa các tiêu chí. Câu hỏi: ba biện pháp này chặn các bước tấn công thế nào?
+Mã nguồn sạch nằm ở `~/app-src/`. Tạo `~/Dockerfile.secure` (multi-stage, ít nhất hai `FROM`, chạy non-root, không COPY `.env`/`secrets`) và `~/.dockerignore` loại `.env` và `secrets/`, ví dụ:
+
+```
+*
+!app-src/
+.env
+secrets/
+```
+
+Build và quét đối chiếu:
+
+```bash
+cd ~ && docker build --network none -f Dockerfile.secure -t internal-app:secure .
+docker history internal-app:secure
+trivy image --offline-scan --severity HIGH,CRITICAL internal-app:secure | tail -5
+```
+
+Điều kiện: Dockerfile và `.dockerignore` thỏa các tiêu chí. Câu hỏi: ba biện pháp này chặn các bước tấn công thế nào?
+
+Sau khi hoàn thành, chạy `checkwork` để kiểm tra kết quả.
 
 ## 5. Ánh xạ khung tham chiếu
 

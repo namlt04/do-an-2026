@@ -1,5 +1,5 @@
 ARG registry
-FROM $registry/labtainer.network
+FROM $registry/labtainer.network2
 ARG lab
 ARG labdir
 ARG imagedir
@@ -11,11 +11,36 @@ LABEL version=$version
 ENV APT_SOURCE $apt_source
 RUN /usr/bin/apt-source.sh
 RUN apt-get update && apt-get install -y --no-install-recommends docker.io jq curl tar gzip ca-certificates && \
-    curl -fsSL https://github.com/aquasecurity/trivy/releases/download/v0.57.1/trivy_0.57.1_Linux-64bit.tar.gz | tar -xz -C /usr/local/bin trivy && \
     rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL -o /tmp/trivy.tar.gz \
+        https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_Linux-64bit.tar.gz \
+    && tar -xzf /tmp/trivy.tar.gz -C /usr/local/bin trivy \
+    && chmod +x /usr/local/bin/trivy && rm -f /tmp/trivy.tar.gz
+
+RUN curl -fsSL -o /tmp/ggcr.tar.gz \
+        https://github.com/google/go-containerregistry/releases/download/v0.20.2/go-containerregistry_Linux_x86_64.tar.gz \
+    && mkdir -p /opt/base-images \
+    && tar -xzf /tmp/ggcr.tar.gz -C /tmp crane \
+    && /tmp/crane pull --platform linux/amd64 python:3.8.0-slim /opt/base-images/python-3.8.0-slim.tar \
+    && rm -f /tmp/ggcr.tar.gz /tmp/crane \
+    && chmod -R a+rX /opt/base-images
+
+ENV TRIVY_CACHE_DIR=/opt/trivy-cache
+RUN mkdir -p /opt/trivy-cache \
+    && trivy image --cache-dir /opt/trivy-cache --download-db-only \
+    && chmod -R a+rwX /opt/trivy-cache
+ENV TRIVY_SKIP_CHECK_UPDATE=true
+ENV TRIVY_SKIP_DB_UPDATE=true
+ENV TRIVY_SKIP_JAVA_DB_UPDATE=true
+ENV TRIVY_DISABLE_VEX_NOTICE=true
+RUN printf 'export TRIVY_CACHE_DIR=/opt/trivy-cache\nexport TRIVY_SKIP_CHECK_UPDATE=true\nexport TRIVY_SKIP_DB_UPDATE=true\nexport TRIVY_SKIP_JAVA_DB_UPDATE=true\nexport TRIVY_DISABLE_VEX_NOTICE=true\n' > /etc/profile.d/trivy.sh
+
+RUN mkdir -p /etc/docker && printf '{\n  "storage-driver": "vfs"\n}\n' > /etc/docker/daemon.json
 ADD $labdir/$imagedir/sys_tar/sys.tar /
 ADD $labdir/sys_$lab.tar.gz /
-RUN useradd -ms /bin/bash $user_name && echo "$user_name:$password" | chpasswd && adduser $user_name sudo
+RUN useradd -ms /bin/bash $user_name && echo "$user_name:$password" | chpasswd && adduser $user_name sudo && \
+    usermod -aG docker $user_name
 USER $user_name
 ENV HOME /home/$user_name
 ADD $labdir/$imagedir/home_tar/home.tar $HOME

@@ -14,17 +14,18 @@ Chào mừng bạn đến với bài thực hành:
   NHIỆM VỤ CỦA BẠN:
   1. Điều tra lịch sử layer → tìm layer đáng ngờ
   2. Giải nén layer → trích xuất secret bị lộ
-  3. Quét CVE + dùng secret lấy flag từ vault-svc
-  4. Viết lại Dockerfile an toàn & quét đối chiếu
+  3. Quét CVE bằng Trivy (offline)
+  4. Dùng secret lấy flag từ vault-svc
+  5. Viết lại Dockerfile an toàn & quét đối chiếu
 
 ══════════════════════════════════════════════════
 
   BẮT ĐẦU:
-  • Đọc lab manual:     cat /docs/dso-image-scan.md
-  • Liệt kê image:     docker images
-  • Xem hints:          cat /root/workspace/hints.txt
+  • Liệt kê image:      docker images
+  • Mã nguồn ứng dụng:  ~/app-src/
+  • Làm theo lab manual dso-image-scan (file .docx đi kèm bài)
 
-  MÁY TRẠM CỦA BẠN:  workstation (172.60.2.10)
-  MỤC TIÊU:           vault-svc   (172.60.2.20:8080)
+  MÁY TRẠM CỦA BẠN:  workstation (172.36.0.10)
+  MỤC TIÊU:           vault-svc   (172.36.0.20:8080)
 
 ══════════════════════════════════════════════════
