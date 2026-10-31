@@ -1,0 +1,2 @@
+dso-cicd-jenkins: Khai thac Jenkins cau hinh sai (anonymous access, Script Console RCE), trich xuat credential, pivot sang Docker Registry v2 lay flag, va hardening Jenkins.
+Sinh vien dung curl, jq tren moi truong Labtainer offline.

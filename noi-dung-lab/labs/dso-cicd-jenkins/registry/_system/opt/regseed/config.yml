@@ -1,0 +1,14 @@
+version: 0.1
+log:
+  level: warn
+http:
+  addr: :5000
+auth:
+  htpasswd:
+    realm: acme-registry
+    path: /auth/htpasswd
+storage:
+  filesystem:
+    rootdirectory: /var/lib/registry
+  delete:
+    enabled: false

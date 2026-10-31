@@ -1,0 +1,26 @@
+Chao mung ban den voi bai thuc hanh:
+
+  DSO-CICD-JENKINS
+  Bao mat CI/CD: Khai thac Jenkins cau hinh sai & pivot sang Registry
+  SecLab PTIT - Hoc vien Cong nghe Buu chinh Vien thong
+
+==================================================
+
+  KICH BAN:
+  Ban la attacker da co cho dung trong mang noi bo ACME DevOps. Phat hien
+  mot may chu Jenkins cau hinh sai (truy cap an danh, Script Console mo).
+
+  NHIEM VU CUA BAN:
+  1. Trinh sat Jenkins qua REST API (an danh)
+  2. RCE qua Script Console, lay flag tren may CI
+  3. Trich xuat credential registry bi lo trong build log
+  4. Pivot sang Docker Registry v2 bang credential danh cap, lay flag
+  5. Hardening Jenkins (thu hoi quyen an danh, khoa Script Console)
+
+==================================================
+
+  MAY CUA BAN:  client   (172.39.0.30)
+  MUC TIEU:     jenkins  (172.39.0.10:8080)
+                registry (172.39.0.20:5000)
+
+==================================================

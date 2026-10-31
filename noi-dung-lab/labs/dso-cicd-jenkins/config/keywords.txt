@@ -1,0 +1,1 @@
+devsecops cicd jenkins script-console rce credential registry pivot owasp-cicd mitre-t1078 mitre-t1059
