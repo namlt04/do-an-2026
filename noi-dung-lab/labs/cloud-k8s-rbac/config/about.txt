@@ -1,0 +1,2 @@
+cloud-k8s-rbac: Lam dung ServiceAccount token + RBAC qua rong, doc secret lan trong ConfigMap, tao pod hostPath de thoat ra node lay flag, va hardening cum Kubernetes.
+Sinh vien dung kubectl, base64, jq tren cum k3s 1 node trong moi truong Labtainer offline.

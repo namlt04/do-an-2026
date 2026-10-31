@@ -1,0 +1,25 @@
+Chao mung ban den voi bai thuc hanh:
+
+  CLOUD-K8S-RBAC
+  Bao mat Kubernetes: RBAC qua rong, secret lo trong ConfigMap, pod escape
+  SecLab PTIT - Hoc vien Cong nghe Buu chinh Vien thong
+
+==================================================
+
+  KICH BAN:
+  Ban da co shell trong pod "web-app" (namespace app) bi chiem. Pod duoc gan
+  ServiceAccount token voi quyen RBAC qua rong.
+
+  NHIEM VU CUA BAN:
+  1. Doc SA token, liet ke quyen bang kubectl auth can-i
+  2. Doc secret qua API + phat hien secret lan trong ConfigMap
+  3. Tao pod hostPath de thoat ra node, doc flag tren node
+  4. Hardening cum: RBAC least-priv, tach secret, Pod Security Standards
+
+==================================================
+
+  MAY CUA BAN:  attacker  (172.40.0.10)  - mo phong shell trong pod
+  CUM:          k8s-node  (172.40.0.20:6443) - k3s 1 node
+  kubectl da tro san toi API server bang token cua web-sa.
+
+==================================================
