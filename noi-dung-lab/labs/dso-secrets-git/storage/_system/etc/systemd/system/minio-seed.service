@@ -1,0 +1,16 @@
+[Unit]
+Description=Seed MinIO (corp-backups user/flag) - dso-secrets-git lab
+After=minio.service network.target
+Wants=minio.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+Group=ubuntu
+ExecStart=/bin/bash /usr/local/bin/minio-seed.sh
+RemainAfterExit=yes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

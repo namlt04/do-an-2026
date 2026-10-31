@@ -1,0 +1,19 @@
+[Unit]
+Description=MinIO Object Storage (corp-backups) - dso-secrets-git lab
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+Environment=MINIO_ROOT_USER=miniolabadmin
+Environment=MINIO_ROOT_PASSWORD=Lab-Adm1n-R00t-2024-DoNotShare
+ExecStartPre=/bin/mkdir -p /home/ubuntu/miniodata
+ExecStart=/usr/local/bin/minio server /home/ubuntu/miniodata --address :9000 --console-address :9001
+Restart=on-failure
+RestartSec=2
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
