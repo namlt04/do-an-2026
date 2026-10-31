@@ -1,0 +1,2 @@
+dso-supplychain-sca: Sinh SBOM, quet SCA phat hien phu thuoc dinh CVE, khai thac CVE phu thuoc tren appserver de lay flag, va dung security gate.
+Sinh vien dung syft, trivy (DB offline), npm tren moi truong Labtainer offline.
