@@ -25,8 +25,8 @@ const D = {
   l2: {
     email: 'minhnh.b22at190@stu.ptit.edu.vn',
     key: 'AKIA08c8b88901377b0c02b0',
-    trivyOs: 'debian 10.2 — Total: 136 (HIGH: 109, CRITICAL: 27)',
-    trivyPy: 'python-pkg — Total: 5 (HIGH: 5, CRITICAL: 0)',
+    trivyOs: 'debian 10.2 - Total: 136 (HIGH: 109, CRITICAL: 27)',
+    trivyPy: 'python-pkg - Total: 5 (HIGH: 5, CRITICAL: 0)',
     flag: '4e6b49a23959a1dd2384',
     checkwork: [['inspect_layers', 'Phân tích lịch sử layer', 'Y'], ['extract_secret', 'Trích xuất secret từ layer', 'Y'],
       ['scan_cves', 'Quét CVE bằng Trivy', 'Y'], ['get_flag', 'Lấy flag từ vault-svc', 'Y'],
@@ -48,8 +48,8 @@ h2('Mục tiêu');
 p('Trong tuần 1, nhóm thực hiện hai bài thực hành đầu tiên theo lộ trình kịch bản đã sắp xếp lại (từ cơ bản đến chuyên sâu) trên môi trường Labtainer, đóng vai trò sinh viên làm bài từ đầu đến cuối: khởi động bài lab, thực hiện lần lượt các nhiệm vụ theo hướng dẫn, lấy flag và chấm điểm tự động bằng `checkwork`. Toàn bộ quá trình được chụp ảnh màn hình làm minh chứng.');
 h2('Phân công thực hiện');
 table(['STT', 'Bài thực hành', 'Mã lab', 'Người thực hiện'], [700, 3700, 2000, 3068], [
-  ['1', 'Bảo mật hạ tầng dưới dạng mã (IaC) — shift-left', 'dso-iac-scan', 'Lê Thành Nam — B22DCAT202'],
-  ['2', 'Bảo mật Docker image — secret trong layer & CVE', 'dso-image-scan', 'Nguyễn Hồng Minh — B22DCAT190'],
+  ['1', 'Bảo mật hạ tầng dưới dạng mã (IaC) - shift-left', 'dso-iac-scan', 'Lê Thành Nam - B22DCAT202'],
+  ['2', 'Bảo mật Docker image - secret trong layer & CVE', 'dso-image-scan', 'Nguyễn Hồng Minh - B22DCAT190'],
 ]);
 h2('Môi trường thực hiện');
 b('Máy ảo Labtainer (VMware): Ubuntu 18.04, Docker 20.10.7, khoảng 3 GB RAM; các bài lab chạy trong các container cô lập, offline khi làm bài.',
@@ -59,7 +59,7 @@ img('l0_novnc.png', 'Màn hình máy ảo Labtainer hiển thị trên trình du
 
 // ---------------- LAB 1 ----------------
 h1('BÀI THỰC HÀNH 1: BẢO MẬT HẠ TẦNG DƯỚI DẠNG MÃ (DSO-IAC-SCAN)');
-p('Người thực hiện: Lê Thành Nam — B22DCAT202 (email khởi động lab: ' + D.l1.email + ').');
+p('Người thực hiện: Lê Thành Nam - B22DCAT202 (email khởi động lab: ' + D.l1.email + ').');
 h2('Mục đích');
 b('Hiểu triết lý shift-left security: phát hiện và sửa lỗi cấu hình hạ tầng ngay ở giai đoạn viết mã Terraform, trước khi triển khai lên cloud.',
   'Nhận diện các misconfiguration kinh điển trong IaC: Security Group mở 0.0.0.0/0, S3 công khai/không mã hóa, secret hardcode, IAM policy quá rộng, thiếu logging.',
@@ -73,7 +73,7 @@ h3('Khởi động bài lab');
 p('Tại terminal Labtainer trên máy ảo, chạy lệnh khởi động và nhập email của sinh viên. Labtainer tạo 2 container và mở terminal của container `devsecops`.');
 code('labtainer -r dso-iac-scan');
 img('l1_01_start.png', 'Khởi động bài lab dso-iac-scan với email sinh viên');
-h3('Nhiệm vụ 1 — Quét baseline và phân loại rủi ro');
+h3('Nhiệm vụ 1 - Quét baseline và phân loại rủi ro');
 p('Khởi tạo Terraform (offline, dùng provider mirror có sẵn), kiểm tra cú pháp, sau đó quét toàn bộ dự án bằng tfsec và trivy để lấy báo cáo ban đầu.');
 code('cd ~/iac-project\nterraform init -backend=false\nterraform validate');
 img('l1_02_init.png', 'Khởi tạo và kiểm tra cấu hình Terraform');
@@ -84,7 +84,7 @@ img('l1_04_baseline.png', 'Thống kê số lỗi baseline theo mức độ nghi
 p(`Baseline ghi nhận ${D.l1.baseline}. Quét bổ sung bằng trivy cho kết quả theo từng file (${D.l1.trivyBaseline} lỗi), trong đó có AWS-0028 (EC2 chưa bắt buộc IMDSv2).`);
 code('trivy config --severity HIGH,CRITICAL .');
 img('l1_05_trivy.png', 'Kết quả quét cấu hình bằng trivy config');
-h3('Nhiệm vụ 2 — Khắc phục lỗi mạng và lưu trữ');
+h3('Nhiệm vụ 2 - Khắc phục lỗi mạng và lưu trữ');
 p('Tìm các rule mở toàn bộ Internet và cấu hình S3 không an toàn:');
 code('grep -rniE "0.0.0.0/0" ~/iac-project\ngrep -rniE "acl|public|encryption|versioning" ~/iac-project/storage.tf');
 img('l1_06_net_storage_findings.png', 'Phát hiện Security Group mở 0.0.0.0/0 và S3 public');
@@ -92,12 +92,12 @@ p('Sửa `network.tf`: SSH (22) và MySQL (3306) chỉ cho phép từ dải qu�
 img('l1_07_fix_network_diff.png', 'git diff thể hiện thay đổi Security Group');
 code('terraform validate\ntfsec . --minimum-severity HIGH');
 img('l1_08_after_task2.png', 'Quét lại sau khi khắc phục nhóm lỗi mạng và lưu trữ');
-h3('Nhiệm vụ 3 — Loại bỏ secret hardcode và siết quyền IAM');
+h3('Nhiệm vụ 3 - Loại bỏ secret hardcode và siết quyền IAM');
 code('grep -rniE "password|secret|access_key|private_key|token" ~/iac-project');
 img('l1_09_secret_findings.png', 'Phát hiện mật khẩu và secret key hardcode trong variables.tf');
 p('Trong `variables.tf`, bỏ giá trị mặc định của `db_password` và `aws_secret_key`, đánh dấu `sensitive = true` (giá trị được cấp lúc chạy qua biến môi trường/secret manager). Trong `iam.tf`, thay policy `Action = "*"`, `Resource = "*"` bằng quyền tối thiểu `s3:GetObject`, `s3:PutObject` trên đúng bucket ứng dụng. Đồng thời sửa `compute.tf`: bắt buộc IMDSv2 (`http_tokens = "required"`) và mã hóa ổ đĩa gốc.');
 img('l1_10_fix_secret_iam_diff.png', 'git diff thể hiện việc loại bỏ secret và áp dụng least-privilege IAM');
-h3('Nhiệm vụ 4 — Quét lại toàn diện và vượt cổng chặn CI');
+h3('Nhiệm vụ 4 - Quét lại toàn diện và vượt cổng chặn CI');
 code(`terraform validate\ntfsec . --format json --out ~/after.json\ngrep -oE '"severity":[[:space:]]*"[A-Z]+"' ~/after.json | sort | uniq -c`);
 img('l1_11_after_scan.png', 'So sánh số lỗi trước và sau khi khắc phục');
 p(`Sau khi khắc phục: ${D.l1.after}. Gửi mã tới cổng chặn CI; dịch vụ ci tự quét lại độc lập, xác nhận HIGH=0, CRITICAL=0, trả về GATE PASSED và flag cá thể hóa.`);
@@ -111,7 +111,7 @@ p(`Kết quả: hoàn thành ${D.l1.checkwork.filter(r => r[2] === 'Y').length}/
 
 // ---------------- LAB 2 ----------------
 h1('BÀI THỰC HÀNH 2: BẢO MẬT DOCKER IMAGE (DSO-IMAGE-SCAN)');
-p('Người thực hiện: Nguyễn Hồng Minh — B22DCAT190 (email khởi động lab: ' + D.l2.email + ').');
+p('Người thực hiện: Nguyễn Hồng Minh - B22DCAT190 (email khởi động lab: ' + D.l2.email + ').');
 h2('Mục đích');
 b('Hiểu tính bất biến của layer Docker: lệnh `RUN rm` ở layer sau chỉ che file, dữ liệu ở layer trước vẫn còn trong image.',
   'Trích xuất secret bị lộ từ layer bằng `docker save`, quét lỗ hổng (CVE) của image bằng Trivy ở chế độ offline.',
@@ -124,23 +124,23 @@ h2('Nội dung thực hành');
 h3('Khởi động bài lab');
 code('labtainer -r dso-image-scan\ndocker images');
 img('l2_01_start.png', 'Khởi động bài lab dso-image-scan và liệt kê image');
-h3('Nhiệm vụ 1 — Phân tích lịch sử layer');
+h3('Nhiệm vụ 1 - Phân tích lịch sử layer');
 code('docker history --no-trunc internal-app:1.0 | tee ~/findings.txt');
 img('l2_02_history.png', 'Lịch sử layer: COPY .env, COPY secrets/aws-credentials.txt rồi RUN rm');
 p('Lịch sử cho thấy hai layer COPY đưa `.env` và `secrets/aws-credentials.txt` vào image, sau đó một layer `RUN rm -f ...` xóa chúng. Do layer là bất biến, nội dung file vẫn nằm trong layer COPY.');
-h3('Nhiệm vụ 2 — Trích xuất secret từ layer');
+h3('Nhiệm vụ 2 - Trích xuất secret từ layer');
 code(`docker save internal-app:1.0 -o ~/image.tar\nmkdir -p ~/layers && tar -xf ~/image.tar -C ~/layers\ncd ~/layers && for l in blobs/sha256/*; do tar -tf $l 2>/dev/null | grep -E '\\.env|secrets' && echo "  <- $l"; done`);
 p(`Image được xuất theo định dạng OCI (các layer nằm trong \`blobs/sha256/\`). Giải nén layer chứa \`app/secrets/aws-credentials.txt\` thu được khóa \`${D.l2.key}\` (bắt đầu bằng AKIA, cá thể hóa theo sinh viên) và lưu vào \`~/secret.txt\`.`);
 img('l2_03_extract_secret.png', 'Trích xuất credential còn sót trong layer image');
-h3('Nhiệm vụ 3 — Quét CVE bằng Trivy');
+h3('Nhiệm vụ 3 - Quét CVE bằng Trivy');
 code('trivy image --offline-scan --severity HIGH,CRITICAL internal-app:1.0 | tee ~/cve-report.txt');
 img('l2_04_trivy.png', 'Kết quả quét lỗ hổng image bằng Trivy (offline)');
 p(`Kết quả: hệ điều hành ${D.l2.trivyOs}; thư viện ${D.l2.trivyPy}. Base image cũ (python:3.8.0-slim, Debian 10.2) là nguồn chính của các lỗ hổng.`);
-h3('Nhiệm vụ 4 — Dùng secret lấy flag từ vault-svc');
+h3('Nhiệm vụ 4 - Dùng secret lấy flag từ vault-svc');
 code('curl -s -H "Authorization: Bearer $(cat ~/secret.txt)" http://vault-svc:8080/flag | jq -r .flag | tee ~/flag_result.txt');
 img('l2_05_flag.png', `Dùng khóa bị lộ để lấy flag ${D.l2.flag} từ vault-svc`);
-p('Chuỗi tấn công: image phân phối nội bộ → secret còn trong layer → gọi API nội bộ bằng khóa hợp lệ → lấy được dữ liệu bí mật. Gửi khóa sai, dịch vụ trả về lỗi 403.');
-h3('Nhiệm vụ 5 — Hardening image');
+p('Chuỗi tấn công: từ image phân phối nội bộ, kẻ tấn công tìm được secret còn sót trong layer, dùng khóa hợp lệ đó gọi API nội bộ và lấy được dữ liệu bí mật. Gửi khóa sai, dịch vụ trả về lỗi 403.');
+h3('Nhiệm vụ 5 - Hardening image');
 p('Viết lại `~/Dockerfile.secure` theo multi-stage build (2 lệnh FROM), chỉ copy mã nguồn sạch từ `~/app-src`, tạo và chạy bằng user `appuser` (không phải root); tạo `~/.dockerignore` loại `.env` và `secrets/`. Build lại offline và kiểm tra lịch sử layer không còn bước COPY secret.');
 code('FROM python:3.8.0-slim AS build\nWORKDIR /src\nCOPY app-src/ /src/\n\nFROM python:3.8.0-slim\nWORKDIR /app\nCOPY --from=build /src/app.py /src/requirements.txt /app/\nRUN useradd -r -u 10001 appuser && chown -R appuser /app\nUSER appuser\nCMD ["python", "app.py"]');
 code('docker build --network none -f Dockerfile.secure -t internal-app:secure .\ndocker history internal-app:secure');
@@ -159,13 +159,13 @@ b('Cài đặt noVNC trên máy ảo Labtainer, cho phép thao tác và trình c
   'Hoàn thành bài 2 (dso-image-scan): checkwork 6/6 mục tiêu đạt, trích xuất được secret từ layer, quét CVE offline, lấy flag và hardening image.');
 h2('Khó khăn và cách khắc phục');
 p('Bản nháp bài 2 khi build và chạy thử phát sinh một số lỗi, đã được sửa và kiểm thử lại (rebuild sạch, chấm điểm khi chưa làm ra N, làm xong ra Y):');
-b('Phiên bản Trivy v0.57.1 không còn bản phát hành (404) → chuyển sang v0.74.0, nạp sẵn CSDL lỗ hổng để chạy offline; thư mục cache cấp quyền ghi cho sinh viên.',
-  '`str.removeprefix` không có trên Python 3.8 của vault-svc → thay bằng xử lý chuỗi tương thích.',
-  'File `.env` chưa được cá thể hóa khóa → bổ sung vào HASH_REPLACE để khớp với credential.',
-  'Thư mục build chứa secret nằm ngay trong home của sinh viên (có thể đọc trực tiếp, bỏ qua bài) → xóa sau khi build image; build offline bằng base image nạp sẵn.',
-  'Script trong `_bin` nằm ở `~/.local/bin` chứ không phải `~/_bin`; thiếu file placeholder cho goal flag khiến grader lỗi khi chưa làm bài; file có ký tự xuống dòng CRLF → đã sửa toàn bộ.',
-  '`docker save` trên Docker mới xuất định dạng OCI; terminal sinh viên của Labtainer đặt `IFS=\' \'` nên vòng lặp `for l in $(...)` không tách dòng → hướng dẫn duyệt layer bằng glob `blobs/sha256/*`.',
-  'Lệnh `su -` mở terminal sinh viên xóa biến môi trường của Dockerfile khiến Trivy tự tải CSDL từ Internet → khai báo biến `TRIVY_*` trong `/etc/profile.d/trivy.sh` để chạy offline.');
+b('Phiên bản Trivy v0.57.1 không còn bản phát hành (lỗi 404), nhóm chuyển sang v0.74.0, nạp sẵn CSDL lỗ hổng để chạy offline và cấp quyền ghi thư mục cache cho sinh viên.',
+  'Hàm `str.removeprefix` không có trên Python 3.8 của vault-svc, nên được thay bằng cách xử lý chuỗi tương thích.',
+  'File `.env` chưa được cá thể hóa khóa; nhóm bổ sung file này vào HASH_REPLACE để khớp với credential.',
+  'Thư mục build chứa secret nằm ngay trong home của sinh viên (có thể đọc trực tiếp, bỏ qua bài). Nhóm cho xóa thư mục này sau khi build image và build offline bằng base image nạp sẵn.',
+  'Script trong `_bin` nằm ở `~/.local/bin` chứ không phải `~/_bin`; thiếu file placeholder cho goal flag khiến grader lỗi khi chưa làm bài; một số file có ký tự xuống dòng CRLF. Các lỗi này đều đã được sửa.',
+  '`docker save` trên Docker mới xuất định dạng OCI, đồng thời terminal sinh viên của Labtainer đặt `IFS=\' \'` nên vòng lặp `for l in $(...)` không tách dòng. Hướng dẫn được sửa để duyệt layer bằng glob `blobs/sha256/*`.',
+  'Lệnh `su -` mở terminal sinh viên làm mất biến môi trường của Dockerfile, khiến Trivy tự tải CSDL từ Internet. Nhóm khai báo biến `TRIVY_*` trong `/etc/profile.d/trivy.sh` để chạy offline.');
 
 // ===== XML helpers =====
 const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -176,7 +176,7 @@ const inline = t => t.split(/(`[^`]+`)/).filter(Boolean).map(s =>
 const para = (style, inner, extra = '') => `<w:p><w:pPr><w:pStyle w:val="${style}"/>${extra}</w:pPr>${inner}</w:p>`;
 const NEWPAGE = '<w:pageBreakBefore/>';
 const field = (style, instr, ppr = '') =>
-  `<w:p><w:pPr><w:pStyle w:val="${style}"/>${ppr}</w:pPr><w:r><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:instrText xml:space="preserve">${instr}</w:instrText></w:r><w:r><w:fldChar w:fldCharType="separate"/></w:r>${run('Nhấn chuột phải → Update Field để cập nhật.')}<w:r><w:fldChar w:fldCharType="end"/></w:r></w:p>`;
+  `<w:p><w:pPr><w:pStyle w:val="${style}"/>${ppr}</w:pPr><w:r><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:instrText xml:space="preserve">${instr}</w:instrText></w:r><w:r><w:fldChar w:fldCharType="separate"/></w:r>${run('Nhấn chuột phải, chọn Update Field để cập nhật.')}<w:r><w:fldChar w:fldCharType="end"/></w:r></w:p>`;
 
 const TEXT_W_EMU = Math.round((11907 - 1021 - 1418) / 1440 * 914400) - 60000;
 function pngSize(buf) { return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) }; }
@@ -236,11 +236,11 @@ async function main() {
   }
   out.push(para('BTL-H0', run('TÀI LIỆU THAM KHẢO'), NEWPAGE));
   for (const r of [
-    'Labtainers — Lab Designer User Guide, Naval Postgraduate School (https://github.com/mfthomps/Labtainers).',
-    'Aqua Security — tfsec documentation (https://aquasecurity.github.io/tfsec/).',
-    'Aqua Security — Trivy documentation (https://trivy.dev/).',
-    'Docker Docs — Dockerfile best practices, multi-stage builds (https://docs.docker.com/build/building/best-practices/).',
-    'CIS Docker Benchmark; OWASP Infrastructure as Code Security Cheat Sheet; MITRE ATT&CK T1552 — Unsecured Credentials.',
+    'Labtainers - Lab Designer User Guide, Naval Postgraduate School (https://github.com/mfthomps/Labtainers).',
+    'Aqua Security - tfsec documentation (https://aquasecurity.github.io/tfsec/).',
+    'Aqua Security - Trivy documentation (https://trivy.dev/).',
+    'Docker Docs - Dockerfile best practices, multi-stage builds (https://docs.docker.com/build/building/best-practices/).',
+    'CIS Docker Benchmark; OWASP Infrastructure as Code Security Cheat Sheet; MITRE ATT&CK T1552 - Unsecured Credentials.',
   ]) out.push(para('BTL-NumerRef', run(r), '<w:jc w:val="left"/>'));
 
   doc = head + out.join('') + tail;
