@@ -1,0 +1,20 @@
+{
+	admin off
+	auto_https off
+	order coraza_waf first
+}
+
+:80 {
+	# /flag2,/flag3: khong qua WAF, chuyen thang toi dich vu issuer tren webapp.
+	@flags path /flag2 /flag3
+	handle @flags {
+		reverse_proxy webapp:8099
+	}
+	# Toan bo luu luong con lai di qua WAF Coraza roi toi webapp lo hong.
+	handle {
+		coraza_waf {
+			include /etc/coraza/main.conf
+		}
+		reverse_proxy webapp:8080
+	}
+}

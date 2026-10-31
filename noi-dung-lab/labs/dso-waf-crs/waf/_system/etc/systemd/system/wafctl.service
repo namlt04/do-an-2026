@@ -1,0 +1,16 @@
+[Unit]
+Description=dso-waf-crs wafctl helper (cham/kiem thu, dieu khien trang thai WAF) on :9091
+After=network.target caddy.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/wafctl
+ExecStart=/usr/bin/python3 /opt/wafctl/wafctl.py
+Restart=on-failure
+RestartSec=2
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

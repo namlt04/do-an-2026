@@ -1,0 +1,2 @@
+dso-waf-crs: Trien khai WAF ModSecurity v3 + OWASP CRS tren nginx reverse proxy de bao ve runtime mot ung dung web lo hong.
+Sinh vien khai thac SQLi/XSS/path-traversal bang curl, bat che do chan, so sanh DAST (nikto) truoc/sau WAF va khu false positive bang rule exclusion khoanh vung. Moi truong Labtainer offline.

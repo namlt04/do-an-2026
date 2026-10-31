@@ -1,0 +1,12 @@
+Tai lieu huong dan: file://LAB_DOCS/dso-waf-crs.docx
+
+Mo bang cach chuot phai chon "Open Link".
+
+Tom tat:
+- Ban dong vai DevSecOps engineer. Container "client" (172.38.0.10) la noi ban go lenh
+  tan cong va chay DAST (curl, nikto).
+- Muc tieu la "webapp" (172.38.0.30:8080) - ung dung web lo hong, va "waf"
+  (172.38.0.20:80) - reverse proxy nginx + ModSecurity v3 + OWASP CRS dat truoc webapp.
+- Cau hinh WAF duoc thuc hien tren terminal container "waf" (dung lenh chuyen terminal
+  cua Labtainer, vd moreterm.sh waf).
+- Sau khi hoan thanh cac nhiem vu, chay: checkwork
