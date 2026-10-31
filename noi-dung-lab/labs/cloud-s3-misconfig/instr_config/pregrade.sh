@@ -18,7 +18,7 @@ if [ ! -z "$is_sqlite" ]; then
    done
 fi
 
-if [ "$destdir" = "client" ]; then
+if [[ "$destdir" == *client* ]]; then
   for pf in creds_access_key.txt creds_secret_key.txt; do
     [ -s "$pf" ] || printf '__MISSING__\n' > "$pf"
   done

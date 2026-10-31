@@ -7,3 +7,4 @@ COPY busybox /bin/ls
 COPY busybox /bin/hostname
 COPY busybox /bin/mount
 COPY busybox /bin/id
+COPY busybox /bin/sleep

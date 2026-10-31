@@ -110,7 +110,7 @@ Luong: dev dao secret trong history -> dung token/DB password truy cap app
 | `git` | `git log -p [-- <path>]` | Hiển thị diff đầy đủ của từng commit (có thể giới hạn theo file); nội dung secret bị thêm/xóa sẽ hiện ra trong diff. |
 | `git` | `git log -S '<chuỗi>' --oneline --all` | "Pickaxe": tìm các commit làm thay đổi số lần xuất hiện của một chuỗi (vd `AKIA`, `password`). |
 | `git` | `git show <commit>:<path>` | In nội dung một file đúng như nó tồn tại tại một commit cụ thể trong quá khứ. |
-| `gitleaks` | `gitleaks detect --source <repo> -v --report-path=<out.json>` | Quét toàn bộ lịch sử Git tìm secret theo tập luật, in chi tiết và xuất báo cáo JSON. |
+| `gitleaks` | `gitleaks detect --source <repo> -v --report-path <out.json>` | Quét toàn bộ lịch sử Git tìm secret theo tập luật, in chi tiết và xuất báo cáo JSON. |
 | `grep` | `grep -RniE 'AKIA\|password\|secret\|token' <dir>` | Lọc nhanh chuỗi nghi là secret trong output hoặc file. |
 | `curl` | `curl -s -H 'Authorization: Bearer <token>' http://app:8080/flag` | Gửi request HTTP kèm API token để truy cập dịch vụ `app`. |
 | `jq` | `... \| jq -r '.flag'` | Định dạng và trích trường từ phản hồi JSON. |
@@ -188,7 +188,7 @@ Trả lời: _______________________________________
 
 **Bước 1:** Chạy gitleaks trên toàn bộ lịch sử của repo và xuất báo cáo:
 ```bash
-gitleaks detect --source ~/repo -v --report-path=~/gitleaks.json
+gitleaks detect --source ~/repo -v --report-path ~/gitleaks.json
 ```
 
 **Bước 2:** Đọc báo cáo, xem các rule đã khớp, commit và file liên quan:
