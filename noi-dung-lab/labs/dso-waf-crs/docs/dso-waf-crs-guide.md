@@ -100,7 +100,7 @@ Công ty đang vận hành một ứng dụng web nội bộ (`webapp`) còn t�
 | Coraza conf | `SecRuleEngine On` \| `DetectionOnly` \| `Off` | Bật/tắt chế độ chặn của WAF (trong `coraza.conf`). |
 | CRS setup | `setvar:tx.blocking_paranoia_level=<1..4>` | Đặt paranoia level trong `crs-setup.conf`. |
 | Exclusion (khoanh vùng) | `SecRule REQUEST_URI "@beginsWith /<path>" "id:<n>,phase:1,pass,nolog,ctl:ruleRemoveTargetById=<ruleId>;ARGS:<param>"` | Loại 1 rule chỉ cho 1 tham số trên 1 đường dẫn — cách khử false positive đúng phạm vi. |
-| `tail` / `grep` | `sudo tail -n 50 /var/log/coraza/audit.log` · `grep -E 'id "9[0-9]{5}"' ...` | Theo dõi và lọc audit log để tìm rule ID đã khớp và anomaly score. |
+| `tail` / `grep` | `sudo tail -n 80 /var/log/coraza/audit.log` · `grep -oE 'id \\"[0-9]+\\"' ...` | Theo dõi và lọc audit log để tìm rule ID đã khớp và anomaly score. Coraza ghi audit log dạng **JSON**: rule ID nằm trong `messages[].error_message` dưới dạng `[id \"942100\"]` (dấu nháy bị escape), nên grep theo `id \\"[0-9]+\\"`. |
 | `nikto` | `nikto -h http://<IP>:<port> -o <out> -Format txt` | Quét lỗ hổng web động (DAST) nhanh, xuất báo cáo. |
 
 ---
@@ -198,9 +198,9 @@ curl -s -i "http://172.38.0.20/search?q=<script>alert(1)</script>"
 ```
 Kỳ vọng: các request này trả về **HTTP/1.1 403 Forbidden**.
 
-**Bước 7:** Trên `waf`, đọc audit log để xác nhận rule CRS đã khớp:
+**Bước 7:** Trên `waf`, đọc audit log để xác nhận rule CRS đã khớp. Coraza ghi audit log dạng JSON; liệt kê các rule ID vừa khớp:
 ```bash
-sudo tail -n 50 /var/log/coraza/audit.log | grep -E 'id "9[0-9]{5}"|Access denied|anomaly'
+sudo tail -n 80 /var/log/coraza/audit.log | grep -oE 'id \\"[0-9]+\\"' | sort -u
 ```
 
 **Bước 8:** Trên `client`, lấy **Flag 2** (chỉ phát khi WAF thực sự đang chặn tấn công và vẫn cho request hợp lệ đi qua):
@@ -236,9 +236,9 @@ grep -c '^+ ' ~/dast_WAF.txt
 ```
 Kỳ vọng: số cảnh báo khi quét qua WAF **giảm rõ rệt** so với quét trực tiếp; nhiều request tấn công bị 403.
 
-**Bước 4:** Trên `waf`, đối chiếu bằng cách đếm số request bị chặn trong audit log:
+**Bước 4:** Trên `waf`, đối chiếu bằng cách đếm số request bị chặn trong audit log (Coraza đánh dấu giao dịch bị chặn bằng `interrupted`):
 ```bash
-sudo grep -c "Access denied\|403" /var/log/coraza/audit.log
+sudo grep -c interrupted /var/log/coraza/audit.log
 ```
 
 **Điều kiện hoàn thành nhiệm vụ:** Tồn tại hai báo cáo DAST (`~/dast_noWAF.txt` và `~/dast_WAF.txt`); số lượng cảnh báo của bản quét qua WAF nhỏ hơn bản quét trực tiếp (hoặc báo cáo qua WAF ghi nhận request bị chặn 403).
@@ -258,10 +258,12 @@ curl -s -i "http://172.38.0.20/feedback?comment=Hay%20them%20nut%20UNION%20SELEC
 ```
 Quan sát: request hợp lệ này bị trả **403** (false positive).
 
-**Bước 2:** Trên `waf`, xác định **rule ID** đã chặn nhầm và tham số vi phạm từ audit log:
+**Bước 2:** Trên `waf`, xác định **rule ID** đã chặn nhầm từ audit log (JSON của Coraza; lấy đúng giao dịch `/feedback` gần nhất rồi trích các rule ID):
 ```bash
-sudo tail -n 40 /var/log/coraza/audit.log | grep -E 'id "[0-9]+"|/feedback|ARGS:comment'
+sudo grep feedback /var/log/coraza/audit.log | grep '"messages"' | tail -1 \
+  | grep -oE 'id \\"[0-9]+\\"' | grep -oE '[0-9]+' | sort -u
 ```
+Kết quả gồm rule SQLi nhóm `942xxx` (ví dụ `942190`) cần loại cho `ARGS:comment`; rule `949110` là rule cộng dồn anomaly (KHÔNG loại rule này).
 Ghi lại rule ID (ví dụ một rule trong nhóm 942xxx SQLi) và tham số `ARGS:comment`.
 
 **Bước 3:** Trên `waf`, viết **rule exclusion khoanh vùng** vào file `/etc/coraza/custom-rules.conf` — chỉ loại đúng rule đó, chỉ cho tham số `comment` trên đường dẫn `/feedback`:

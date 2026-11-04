@@ -35,9 +35,11 @@ kubectl auth can-i --list -n app
 ### Nhiệm vụ 2 — `loot_secrets`
 
 ```bash
-kubectl get secret db-credentials -n app -o jsonpath='{.data.username}' | base64 -d; echo
-kubectl get secret db-credentials -n app -o jsonpath='{.data.password}' | base64 -d; echo
-kubectl get configmap app-config -n app -o yaml | grep -iE 'legacy_api_key|secret|key'
+{
+  kubectl get secret db-credentials -n app -o jsonpath='{.data.username}' | base64 -d; echo
+  kubectl get secret db-credentials -n app -o jsonpath='{.data.password}' | base64 -d; echo
+  kubectl get configmap app-config -n app -o yaml | grep -iE 'legacy_api_key|secret|key'
+} | tee ~/loot.txt
 ```
 
 Lưu kết quả vào `~/loot.txt` (username/password đã giải mã và dòng secret lẫn trong ConfigMap). Điều kiện: lấy được secret và phát hiện secret trong ConfigMap. Câu hỏi: vì sao để secret trong ConfigMap là anti-pattern?
