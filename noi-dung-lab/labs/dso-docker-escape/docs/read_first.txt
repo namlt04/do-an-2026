@@ -1,3 +1,0 @@
-Tai lieu huong dan: file://LAB_DOCS/dso-docker-escape.docx
-
-Mo bang cach chuot phai chon file va "Open Link".

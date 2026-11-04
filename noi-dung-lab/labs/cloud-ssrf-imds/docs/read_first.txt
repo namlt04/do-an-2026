@@ -1,3 +1,0 @@
-Tai lieu huong dan: file://LAB_DOCS/cloud-ssrf-imds.docx
-
-Mo bang cach chuot phai chon "Open Link".
