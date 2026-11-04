@@ -1,10 +1,10 @@
 #!/bin/bash
-# Chay sau parameterization (flag da duoc bom vao /flag1.txt, /opt/issuer/flag*.txt).
-# $1 = mat khau sudo.
+# Runs after parameterization (flags have been injected into /flag1.txt, /opt/issuer/flag*.txt).
+# $1 = sudo password.
 set -u
 PASS="${1:-}"
 
-# Quyen doc cho tien trinh dich vu (chay bang user ubuntu).
+# Read permission for the service process (runs as user ubuntu).
 echo "$PASS" | sudo -S chmod 644 /flag1.txt 2>/dev/null
 echo "$PASS" | sudo -S chmod 644 /opt/issuer/flag2.txt /opt/issuer/flag3.txt 2>/dev/null
 echo "$PASS" | sudo -S chmod 755 /opt/issuer 2>/dev/null

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# Dung san storage cho Docker Registry v2 (storage driver filesystem) voi mot
-# image acme/app:1.0 ma lop layer chua flag_pivot (ca the hoa theo sinh vien).
+# Pre-build the storage for Docker Registry v2 (filesystem storage driver) with an
+# image acme/app:1.0 whose layer contains flag_pivot (individualized per student).
 import hashlib, io, json, os, gzip, tarfile, shutil
 
 ROOT = "/var/lib/registry/docker/registry/v2"
@@ -24,7 +24,7 @@ def link(path, digest):
     with open(path, "w") as f:
         f.write("sha256:" + digest)
 
-# 1) layer: tar.gz chua flag_pivot.txt
+# 1) layer: tar.gz containing flag_pivot.txt
 raw = io.BytesIO()
 tf = tarfile.open(fileobj=raw, mode="w")
 content = ("flag_pivot=" + FLAG + "\n").encode()
@@ -37,7 +37,7 @@ with gzip.GzipFile(fileobj=gz, mode="wb", mtime=0) as g:
 layer_bytes = gz.getvalue()
 layer_digest = write_blob(layer_bytes)
 
-# 2) config blob (OCI/docker image config toi gian)
+# 2) config blob (minimal OCI/docker image config)
 config = {
     "architecture": "amd64", "os": "linux",
     "config": {"Labels": {"maintainer": "acme-devops"}},
@@ -58,7 +58,7 @@ manifest = {
 manifest_bytes = json.dumps(manifest).encode()
 manifest_digest = write_blob(manifest_bytes)
 
-# 4) lien ket trong repository
+# 4) links inside the repository
 base = os.path.join(ROOT, "repositories", REPO)
 link(os.path.join(base, "_layers", "sha256", layer_digest, "link"), layer_digest)
 link(os.path.join(base, "_layers", "sha256", config_digest, "link"), config_digest)

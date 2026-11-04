@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-# Ung dung web noi bo "imgshop" - CO Y de lo hong (SQLi / reflected XSS /
-# path traversal) phuc vu bai lab dso-waf-crs. Chay tren webapp:8080, dat
-# sau reverse proxy waf. KHONG dung trong thuc te.
+# Internal web app "imgshop" - DELIBERATELY vulnerable (SQLi / reflected XSS /
+# path traversal) for the dso-waf-crs lab. Runs on webapp:8080, placed
+# behind the waf reverse proxy. NOT for real-world use.
 import os
 
 from flask import Flask, Response, request
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
-# Thu muc "tai lieu san pham" - diem xuat phat cua chuc nang download.
+# The "product documents" directory - starting point of the download feature.
 BASE = os.path.join(APP_DIR, "files")
 
 app = Flask(__name__)
@@ -36,8 +36,8 @@ def health():
 
 @app.route("/product")
 def product():
-    # LO HONG SQLi (minh hoa): ghep thang tham so vao cau truy van, phan chieu
-    # lai cho nguoi dung. Khong co CSDL that; muc tiC la tao payload de WAF chan.
+    # SQLi VULNERABILITY (demo): concatenates the parameter straight into the query,
+    # reflected back to the user. No real DB; the goal is to craft a payload for the WAF to block.
     pid = request.args.get("id", "")
     query = "SELECT id,name,price FROM products WHERE id='%s'" % pid
     body = "Truy van thuc thi: %s\nKet qua tra cuu san pham id=%s\n" % (query, pid)
@@ -46,8 +46,8 @@ def product():
 
 @app.route("/download")
 def download():
-    # LO HONG Path Traversal: noi thang ten file nguoi dung nhap vao BASE, khong
-    # kiem tra/chuan hoa -> cho phep doc file ngoai pham vi (vd ../../../flag1.txt).
+    # Path Traversal VULNERABILITY: joins the user-supplied filename straight onto BASE,
+    # no validation/normalization -> allows reading files outside scope (e.g. ../../../flag1.txt).
     name = request.args.get("file", "")
     target = os.path.join(BASE, name)
     try:
@@ -59,7 +59,7 @@ def download():
 
 @app.route("/search")
 def search():
-    # LO HONG Reflected XSS: phan chieu tham so q vao HTML khong escape.
+    # Reflected XSS VULNERABILITY: reflects the q parameter into HTML without escaping.
     q = request.args.get("q", "")
     return Response(
         "<html><body><h2>Ket qua tim kiem</h2>"
@@ -70,9 +70,9 @@ def search():
 
 @app.route("/feedback")
 def feedback():
-    # Chuc nang HOP LE: nguoi dung gui gop y (co the chua tu khoa ky thuat giong
-    # payload). Tai tang ung dung LUON tra 200; viec chan nham (false positive)
-    # neu co la do WAF/CRS, va duoc khu bang rule exclusion khoanh vung.
+    # LEGITIMATE feature: the user submits feedback (which may contain technical
+    # keywords resembling a payload). At the app layer it ALWAYS returns 200; any wrong
+    # blocking (false positive) comes from the WAF/CRS, and is removed with a scoped exclusion rule.
     comment = request.args.get("comment", "")
     return Response(
         "<html><body><h2>Cam on ban da gui phan hoi</h2>"

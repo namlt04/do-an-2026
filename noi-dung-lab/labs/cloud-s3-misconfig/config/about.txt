@@ -1,5 +1,6 @@
-cloud-s3-misconfig: Khai thac bucket object storage (MinIO, tuong thich S3) bi cau
-hinh sai cho phep truy cap an danh. Sinh vien liet ke/tai backup tu bucket cong
-khai, tim credential bi lo trong file cau hinh, dung credential do xac thuc vao
-bucket rieng tu de lay flag, roi dong vai DevSecOps engineer khac phuc: go public
-policy, ap dung least privilege, bat versioning. Muc do: Trung binh.
+cloud-s3-misconfig: Exploit a misconfigured object storage bucket (MinIO, S3-
+compatible) that allows anonymous access. The student lists/downloads a backup from
+the public bucket, finds a credential leaked in a config file, uses that credential
+to authenticate into the private bucket to get the flag, then acts as a DevSecOps
+engineer to remediate: remove the public policy, apply least privilege, enable
+versioning. Level: Medium.

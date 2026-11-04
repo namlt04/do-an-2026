@@ -11,9 +11,9 @@ LABEL version=$version
 ENV APT_SOURCE $apt_source
 RUN /usr/bin/apt-source.sh
 
-# WAF stack: Caddy (reverse proxy) + module coraza-caddy (Coraza v3, cung SecLang
-# + OWASP CRS nhu ModSecurity). Build caddy kem module bang xcaddy luc build (co
-# internet); runtime OFFLINE. Go toolchain chi dung luc build, go sau do.
+# WAF stack: Caddy (reverse proxy) + coraza-caddy module (Coraza v3, same SecLang
+# + OWASP CRS as ModSecurity). Build caddy with the module via xcaddy at build time (has
+# internet); runtime is OFFLINE. Go toolchain is only used at build time, removed afterwards.
 #   - Go 1.22.6 (+GOTOOLCHAIN auto), xcaddy, Caddy v2.11.4, coraza-caddy v2.6.2, OWASP CRS v4.10.0
 RUN apt-get update && apt-get install -y --no-install-recommends \
         curl ca-certificates git python3 python3-pip \

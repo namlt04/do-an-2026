@@ -1,12 +1,12 @@
 #!/bin/bash
 # =====================================================================
-# solver.sh - LOI GIAI MAU dso-waf-crs (dung de tu kiem thu dat goal).
-# Chay tren container client. Hoan toan offline (chi curl/nikto).
+# solver.sh - SAMPLE SOLUTION dso-waf-crs (used to self-test reaching the goals).
+# Runs on the client container. Fully offline (only curl/nikto).
 #
-# Luu y ve kiem chung tu dong: solver chay tren client, KHONG the sua truc
-# tiep file cau hinh cua container waf. Do do Nhiem vu 2 & 4 (v6n doi hoi
-# sua cau hinh WAF) duoc dieu khien qua dich vu helper "wafctl" (waf:9091)
-# - xem BUILD-NOTES. Sinh vien that su se tu sua cau hinh tren terminal waf.
+# Note on automatic verification: the solver runs on client, it CANNOT directly
+# edit the config files of the waf container. So Tasks 2 & 4 (which still require
+# editing the WAF config) are driven through the helper service "wafctl" (waf:9091)
+# - see BUILD-NOTES. A real student edits the config themselves on the waf terminal.
 # =====================================================================
 set -u
 WAF="waf"

@@ -1,13 +1,13 @@
-# imgproxy-portal - cau hinh chong SSRF
+# imgproxy-portal - SSRF protection configuration
 #
-# MAC DINH (trang thai de khai thac o Nhiem vu 1-3): ssrf_protection: false
-# -> chuc nang /fetch?url=... se tai ho BAT KY dia chi nao ma khong kiem tra,
-# ke ca dia chi noi bo/link-local (IMDS gia).
+# DEFAULT (exploitable state for Tasks 1-3): ssrf_protection: false
+# -> the /fetch?url=... feature fetches ANY address without any check,
+# including internal/link-local addresses (the fake IMDS).
 #
-# Nhiem vu 4 (harden_ssrf_imds): goi POST /admin/harden se dat lai
-# ssrf_protection: true (ghi de file nay). Khi do /fetch chi cho phep cac
-# host co trong allow_hosts; MOI dich khac (bao gom ca IMDS, loopback,
-# cac dai IP noi bo/link-local ben duoi) deu bi tu choi (HTTP 403).
+# Task 4 (harden_ssrf_imds): a POST /admin/harden request resets
+# ssrf_protection: true (overwrites this file). Then /fetch only allows
+# hosts listed in allow_hosts; EVERY other target (including IMDS, loopback,
+# the internal/link-local IP ranges below) is denied (HTTP 403).
 ssrf_protection: false
 
 allow_hosts:

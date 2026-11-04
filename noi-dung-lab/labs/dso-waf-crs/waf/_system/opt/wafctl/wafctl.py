@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-# wafctl - dich vu ho tro cham/kiem thu (KHONG nam trong de bai sinh vien).
-# GRADE_CONTAINER va solver chay tren "client" nhung cau hinh WAF nam tren "waf".
-# Dich vu nay cho solver (tu client) dua WAF ve dung trang thai runtime can kiem
-# chung; sinh vien tu sua cau hinh tren terminal waf theo huong dan. Hai cach
-# deu dan toi cung end-state; viec cham dua tren flag that do issuer phat.
-# Chay bang root tren cong 9091 (can ghi /etc/coraza va restart service coraza).
+# wafctl - grading/testing helper service (NOT part of the student's assignment).
+# GRADE_CONTAINER and solver run on "client" but the WAF config lives on "waf".
+# This service lets the solver (from client) bring the WAF to the correct runtime
+# state for verification; the student edits the config on the waf terminal per the
+# guide. Both paths reach the same end-state; grading uses the real flag issued.
+# Runs as root on port 9091 (needs to write /etc/coraza and restart the coraza service).
 import re
 import subprocess
 

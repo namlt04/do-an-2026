@@ -1,17 +1,17 @@
 #!/bin/bash
-# Chay tren GRADE_CONTAINER=client sau khi stoplab.
-# Chi dung bash/grep/sed/awk (grader khong co jq/git).
-# Tao placeholder cho moi file feeding goal de checkwork khong crash khi chua giai.
+# Runs on GRADE_CONTAINER=client after stoplab.
+# Uses only bash/grep/sed/awk (the grader has no jq/git).
+# Create a placeholder for every goal-feeding file so checkwork does not crash before solving.
 homedir=$1
 destdir=$2
 home="$homedir/$destdir"
 out="$home/.local/result"
 mkdir -p "$out"
 
-# ---- Flag files: chuan hoa ve 1 dong (token dau tien), tao placeholder neu thieu ----
+# ---- Flag files: normalize to 1 line (first token), create placeholder if missing ----
 for ff in flag1.txt flag2.txt flag3.txt; do
     if [ -s "$home/$ff" ]; then
-        # lay token dau tien (loai khoang trang / newline / ky tu la), giu nguyen neu la chuoi flag
+        # take the first token (strip whitespace / newline / odd chars), keep as-is if it is a flag string
         val=$(tr -d '\r' < "$home/$ff" | awk 'NF {print $1; exit}')
         if [ -n "$val" ]; then
             printf '%s\n' "$val" > "$home/$ff"
@@ -23,7 +23,7 @@ for ff in flag1.txt flag2.txt flag3.txt; do
     fi
 done
 
-# ---- DAST compare: can 2 bao cao, so sanh so canh bao qua WAF < truc tiep ----
+# ---- DAST compare: needs 2 reports, compare warning count through WAF < direct ----
 ok_dast=NO
 noapp="$home/dast_noWAF.txt"
 wafr="$home/dast_WAF.txt"
@@ -32,7 +32,7 @@ if [ -s "$noapp" ] && [ -s "$wafr" ]; then
     c_waf=$(grep -c '^+ ' "$wafr" 2>/dev/null)
     [ -z "$c_direct" ] && c_direct=0
     [ -z "$c_waf" ] && c_waf=0
-    # Dat OK neu: so canh bao qua WAF nho hon truc tiep, HOAC bao cao WAF co bang chung bi chan (403)
+    # Set OK if: warning count through WAF is lower than direct, OR the WAF report has evidence of blocking (403)
     if [ "$c_waf" -lt "$c_direct" ] || grep -qE '403|Forbidden' "$wafr"; then
         ok_dast=OK
     fi

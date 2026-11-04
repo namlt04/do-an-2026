@@ -1,30 +1,30 @@
 #!/usr/bin/env python3
-# Dich vu phat flag cua bai lab dso-waf-crs. Chay tren webapp:8099 (container
-# KHONG co terminal cho sinh vien -> khong the cat flag). Flag chi duoc phat khi
-# dich vu TU KIEM CHUNG trang thai RUNTIME THAT cua WAF bang cach gui request
-# QUA reverse proxy "waf" va quan sat ma tra ve.
+# Flag issuer service for the dso-waf-crs lab. Runs on webapp:8099 (the container
+# has NO terminal for the student -> they cannot cat the flag). The flag is only
+# issued when the service SELF-VERIFIES the REAL RUNTIME state of the WAF by sending
+# a request THROUGH the "waf" reverse proxy and observing the returned code.
 #
-#   /flag2 : phat Flag 2 khi (SQLi qua WAF -> 403) VA (request hop le -> 200).
-#            => ModSecurity dang o che do chan (On) va proxy hoat dong.
-#   /flag3 : phat Flag 3 khi (feedback hop le -> 200) VA (SQLi /product -> 403)
-#            VA (XSS that tren /feedback -> 403).
-#            => exclusion da duoc viet KHOANH VUNG (khong tat engine, khong bo
-#               rule toan cuc): chuc nang hop le hoat dong lai ma tan cong van bi chan.
+#   /flag2 : issues Flag 2 when (SQLi through WAF -> 403) AND (valid request -> 200).
+#            => ModSecurity is in blocking mode (On) and the proxy works.
+#   /flag3 : issues Flag 3 when (valid feedback -> 200) AND (SQLi /product -> 403)
+#            AND (real XSS on /feedback -> 403).
+#            => the exclusion was written SCOPED (engine not disabled, rules not
+#               removed globally): valid functionality works again while attacks stay blocked.
 #
-# Thiet ke chong bypass: chi so sanh end-state that cua WAF, khong tin bat ky
-# file nao sinh vien tu khai. Gia tri flag la per-student (HASH_REPLACE).
+# Anti-bypass design: only compares the WAF's real end-state, does not trust any
+# file the student self-declares. The flag value is per-student (HASH_REPLACE).
 import urllib.error
 import urllib.request
 
 from flask import Flask, Response
 
-WAF = "http://waf"  # resolve qua ADD-HOST -> 172.38.0.20:80
+WAF = "http://waf"  # resolved via ADD-HOST -> 172.38.0.20:80
 FLAG2_FILE = "/opt/issuer/flag2.txt"
 FLAG3_FILE = "/opt/issuer/flag3.txt"
 
-# Cac payload tham chieu. CO THE TINH CHINH luc build (xem BUILD-NOTES) de khop
-# hanh vi thuc te cua CRS: benign_feedback phai bi chan (403) TRUOC exclusion va
-# duoc phep (200) SAU exclusion; xss_feedback phai LUON bi chan (403).
+# Reference payloads. MAY BE TUNED at build time (see BUILD-NOTES) to match the
+# real behavior of CRS: benign_feedback must be blocked (403) BEFORE the exclusion and
+# allowed (200) AFTER the exclusion; xss_feedback must ALWAYS be blocked (403).
 SQLI = "/product?id=1'%20OR%20'1'='1"
 BENIGN = "/search?q=ao-thun-mau-xanh"
 BENIGN_FEEDBACK = (

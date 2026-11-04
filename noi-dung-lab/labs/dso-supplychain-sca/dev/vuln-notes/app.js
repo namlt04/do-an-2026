@@ -13,9 +13,9 @@ app.get('/', (req, res) => {
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
-// Trang ghi chu render bang EJS 3.1.6 (CVE-2022-29078). Du lieu nguoi dung
-// (req.query) duoc dua truc tiep lam options/locals cho res.render -> cho phep
-// o nhiem options va thuc thi ma khi render template.
+// Notes page rendered with EJS 3.1.6 (CVE-2022-29078). User-supplied data
+// (req.query) is passed directly as options/locals to res.render -> allowing
+// options pollution and code execution when the template is rendered.
 app.get('/notes', (req, res) => {
   res.render('page', req.query);
 });

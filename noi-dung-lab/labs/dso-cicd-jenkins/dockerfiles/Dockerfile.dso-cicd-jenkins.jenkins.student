@@ -10,7 +10,7 @@ ARG version
 LABEL version=$version
 ENV APT_SOURCE $apt_source
 RUN /usr/bin/apt-source.sh
-# Jenkins LTS 2.462.3 (ho tro Java 17). Tai war luc build; runtime offline, KHONG plugin.
+# Jenkins LTS 2.462.3 (supports Java 17). Download the war at build time; runtime offline, NO plugins.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         openjdk-17-jre-headless curl ca-certificates \
     && rm -rf /var/lib/apt/lists/*

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Chay o container client (noi sinh vien thao tac va noi cham diem gom artifact).
+# Runs on the client container (where the student works and where grading collects artifacts).
 set -u
 HOME_DIR="/home/ubuntu"
 touch "$HOME_DIR/flag1.txt" "$HOME_DIR/flag2.txt" "$HOME_DIR/flag3.txt"

@@ -5,12 +5,12 @@
 }
 
 :80 {
-	# /flag2,/flag3: khong qua WAF, chuyen thang toi dich vu issuer tren webapp.
+	# /flag2,/flag3: bypass the WAF, forwarded straight to the issuer service on webapp.
 	@flags path /flag2 /flag3
 	handle @flags {
 		reverse_proxy webapp:8099
 	}
-	# Toan bo luu luong con lai di qua WAF Coraza roi toi webapp lo hong.
+	# All remaining traffic passes through the Coraza WAF then to the vulnerable webapp.
 	handle {
 		coraza_waf {
 			include /etc/coraza/main.conf

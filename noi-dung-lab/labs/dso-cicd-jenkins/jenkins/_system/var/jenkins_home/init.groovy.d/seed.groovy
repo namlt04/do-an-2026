@@ -6,9 +6,9 @@ import jenkins.install.InstallState
 
 def j = Jenkins.instance
 
-// Cau hinh sai co chu dich (phuc vu bai hoc): khong xac thuc, an danh toan quyen.
-// NO_AUTHENTICATION + UNSECURED + InstallState.RUNNING => bo setup wizard, trang
-// chu tra 200 kem header X-Jenkins, /api/json va /scriptText mo cho an danh.
+// Intentional misconfiguration (for the lesson): no authentication, anonymous full access.
+// NO_AUTHENTICATION + UNSECURED + InstallState.RUNNING => skip setup wizard, home
+// page returns 200 with the X-Jenkins header, /api/json and /scriptText open to anonymous.
 j.setSecurityRealm(SecurityRealm.NO_AUTHENTICATION)
 j.setAuthorizationStrategy(AuthorizationStrategy.UNSECURED)
 j.setInstallState(InstallState.RUNNING)

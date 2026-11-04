@@ -13,7 +13,7 @@ RUN /usr/bin/apt-source.sh
 RUN apt-get update && apt-get install -y --no-install-recommends \
         curl ca-certificates apache2-utils python3 \
     && rm -rf /var/lib/apt/lists/*
-# Docker Registry v2 (distribution) binary that - tai luc build, chay offline.
+# Docker Registry v2 (distribution) real binary - downloaded at build time, runs offline.
 RUN curl -fsSL -o /tmp/registry.tgz \
         https://github.com/distribution/distribution/releases/download/v2.8.3/registry_2.8.3_linux_amd64.tar.gz \
     && tar -xzf /tmp/registry.tgz -C /usr/local/bin registry \

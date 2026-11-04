@@ -1,6 +1,6 @@
 #!/bin/bash
-# Seed idempotent cho MinIO, chay sau khi minio.service san sang. Chay moi lan boot
-# (qua minio-seed.service) de bucket/user/flag luon ton tai ke ca sau restart.
+# Idempotent seed for MinIO, runs after minio.service is ready. Runs on every boot
+# (via minio-seed.service) so the bucket/user/flag always exist even after a restart.
 set -u
 EP="http://127.0.0.1:9000"
 RU="miniolabadmin"; RP="Lab-Adm1n-R00t-2024-DoNotShare"

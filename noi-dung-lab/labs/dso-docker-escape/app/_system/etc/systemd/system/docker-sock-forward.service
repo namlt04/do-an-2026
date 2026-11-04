@@ -7,8 +7,8 @@ Wants=network-online.target
 [Service]
 Type=simple
 ExecStartPre=-/bin/rm -f /var/run/docker.sock
-# CO CHU DICH: mode=666 (socket cho phep moi user doc/ghi) mo phong dung sai lam cau
-# hinh "Docker socket bi lo" ma bai lab day sinh vien nhan dien va khai thac.
+# INTENTIONAL: mode=666 (socket readable/writable by any user) deliberately simulates the
+# "exposed Docker socket" misconfiguration this lab teaches students to spot and exploit.
 ExecStart=/usr/bin/socat UNIX-LISTEN:/var/run/docker.sock,fork,reuseaddr,mode=666 TCP:172.35.0.5:2375
 Restart=always
 RestartSec=2

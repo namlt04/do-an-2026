@@ -6,12 +6,12 @@ After=network.target
 [Service]
 Type=simple
 ExecStartPre=-/bin/mkdir -p /var/lib/docker
-# --storage-driver=vfs : tuong thich cao nhat khi chay dind long trong container da
-#   privileged cua Labtainer (tranh loi overlay-tren-overlay tren mot so kernel VM).
-# --iptables=false      : tranh phu thuoc kernel module iptables/NAT co the khong co
-#   san/khong duoc phep thao tac trong moi truong nested-privileged (xem BUILD-NOTES.md).
-# -H unix:// + -H tcp:// : mo CA HAI, giong dung mo ta trong de bai (docker.sock ma
-#   sinh vien thay tren app that ra la socat forward toi cong TCP nay).
+# --storage-driver=vfs : highest compatibility when running dind nested inside Labtainer's
+#   privileged container (avoids overlay-on-overlay errors on some VM kernels).
+# --iptables=false      : avoids depending on iptables/NAT kernel modules that may be absent
+#   or disallowed in the nested-privileged environment (see BUILD-NOTES.md).
+# -H unix:// + -H tcp:// : expose BOTH, matching the task description (the docker.sock the
+#   student sees on app is actually a socat forward to this TCP port).
 ExecStart=/usr/bin/dockerd \
     --host=unix:///var/run/docker.sock \
     --host=tcp://0.0.0.0:2375 \
