@@ -93,15 +93,14 @@ table(['Mục tiêu (goal)', 'Nội dung', 'KQ'], [3200, 4800, 900], [
   ['harvest_creds', 'Thu thập credential registry', 'Y'],
   ['pivot_registry', 'Pivot registry, trích flag_pivot', 'Y'],
   ['harden_jenkins', 'Bật xác thực, chặn ẩn danh', 'Y'],
-  ['lab_complete', 'Hoàn thành toàn bộ bài', 'Y'],
 ]);
-p('Kết quả: hoàn thành 6/6 mục tiêu; flag_ci `9b2c723ecd6344d3`, flag_pivot `5e622307a8d09bec`.');
+p('Kết quả: hoàn thành 5/5 mục tiêu; flag_ci `9b2c723ecd6344d3`, flag_pivot `5e622307a8d09bec`.');
 
 // ---------------- KET LUAN ----------------
 h1('KẾT LUẬN');
 h2('Kết quả đạt được');
 b('Hoàn thành bài 7 (cloud-ssrf-imds): checkwork 10/10; khai thác SSRF đánh cắp credential IMDS, lấy flag và khắc phục nhiều lớp (IMDSv2, allowlist, least privilege).',
-  'Hoàn thành bài 8 (dso-cicd-jenkins): checkwork 6/6; RCE qua Script Console trên Jenkins thật, pivot vào Docker Registry trích flag, và hardening Jenkins.',
+  'Hoàn thành bài 8 (dso-cicd-jenkins): checkwork 5/5; RCE qua Script Console trên Jenkins thật, pivot vào Docker Registry trích flag, và hardening Jenkins.',
   'Cả hai bài đều được thực hiện bằng cách sao chép đúng từng dòng lệnh trong hướng dẫn, xác nhận hướng dẫn chạy đúng và bài lab thực sự làm được.');
 
 render(C, {

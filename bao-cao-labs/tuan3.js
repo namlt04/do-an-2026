@@ -97,15 +97,14 @@ table(['Mục tiêu (goal)', 'Nội dung', 'KQ'], [3200, 4800, 900], [
   ['deploy_waf', 'Bật Coraza blocking, 403 (Flag 2)', 'Y'],
   ['dast_compare', 'DAST trước/sau WAF', 'Y'],
   ['tune_falsepositive', 'Exclusion khoanh vùng (Flag 3)', 'Y'],
-  ['lab_complete', 'Hoàn thành toàn bộ bài', 'Y'],
 ]);
-p('Kết quả: hoàn thành 5/5 mục tiêu; Flag 1 `157e831c22fed4fc`, Flag 2 `0b9bc41358207e95`, Flag 3 `3d78090ce6ff1e9a`.');
+p('Kết quả: hoàn thành 4/4 mục tiêu; Flag 1 `157e831c22fed4fc`, Flag 2 `0b9bc41358207e95`, Flag 3 `3d78090ce6ff1e9a`.');
 
 // ---------------- KET LUAN ----------------
 h1('KẾT LUẬN');
 h2('Kết quả đạt được');
 b('Hoàn thành bài 5 (cloud-s3-misconfig): checkwork 5/5; khai thác bucket cấu hình sai, trích credential từ backup, lấy flag và hardening (private + versioning).',
-  'Hoàn thành bài 6 (dso-waf-crs): checkwork 5/5; khai thác backend, triển khai Coraza + OWASP CRS chặn tấn công, đánh giá DAST và khử false positive bằng exclusion khoanh vùng, lấy đủ 3 flag.',
+  'Hoàn thành bài 6 (dso-waf-crs): checkwork 4/4; khai thác backend, triển khai Coraza + OWASP CRS chặn tấn công, đánh giá DAST và khử false positive bằng exclusion khoanh vùng, lấy đủ 3 flag.',
   'Cả hai bài đều được thực hiện bằng cách sao chép đúng từng dòng lệnh trong hướng dẫn, xác nhận hướng dẫn chạy đúng và bài lab thực sự làm được.');
 
 render(C, {

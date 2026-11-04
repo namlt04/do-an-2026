@@ -54,9 +54,8 @@ table(['Mục tiêu (goal)', 'Nội dung', 'KQ'], [3200, 4800, 900], [
   ['escape_via_privileged', 'Đường thoát thay thế (tùy chọn)', 'Y'],
   ['get_flag', 'Đọc flag trên host', 'Y'],
   ['harden_container', 'Hardening cấu hình container', 'Y'],
-  ['lab_complete', 'Hoàn thành toàn bộ bài', 'Y'],
 ]);
-p('Kết quả: hoàn thành 6/6 mục tiêu; canary host `bf06603e0be2471146c3`, flag `1d5cd1864f434e4a`.');
+p('Kết quả: hoàn thành 5/5 mục tiêu; canary host `bf06603e0be2471146c3`, flag `1d5cd1864f434e4a`.');
 
 // ---------------- LAB 10 ----------------
 h1('BÀI THỰC HÀNH 10: LEO THANG ĐẶC QUYỀN KUBERNETES RBAC (CLOUD-K8S-RBAC)');
@@ -91,15 +90,14 @@ table(['Mục tiêu (goal)', 'Nội dung', 'KQ'], [3200, 4800, 900], [
   ['loot_secrets', 'Moi secret & secret trong ConfigMap', 'Y'],
   ['escape_node', 'Thoát ra node qua hostPath pod', 'Y'],
   ['harden_cluster', 'Least privilege + Pod Security', 'Y'],
-  ['lab_complete', 'Hoàn thành toàn bộ bài', 'Y'],
 ]);
-p('Kết quả: hoàn thành 5/5 mục tiêu; flag `e200a6d4d36d0165`.');
+p('Kết quả: hoàn thành 4/4 mục tiêu; flag `e200a6d4d36d0165`.');
 
 // ---------------- KET LUAN ----------------
 h1('KẾT LUẬN');
 h2('Kết quả đạt được');
-b('Hoàn thành bài 9 (dso-docker-escape): checkwork 6/6; thoát container qua Docker socket bị lộ, đọc flag trên host và hardening theo CIS Docker Benchmark.',
-  'Hoàn thành bài 10 (cloud-k8s-rbac): checkwork 5/5; leo thang đặc quyền trên node k3s thật, moi secret, thoát ra node qua hostPath, và khắc phục theo least privilege + Pod Security.',
+b('Hoàn thành bài 9 (dso-docker-escape): checkwork 5/5; thoát container qua Docker socket bị lộ, đọc flag trên host và hardening theo CIS Docker Benchmark.',
+  'Hoàn thành bài 10 (cloud-k8s-rbac): checkwork 4/4; leo thang đặc quyền trên node k3s thật, moi secret, thoát ra node qua hostPath, và khắc phục theo least privilege + Pod Security.',
   'Cả hai bài đều được thực hiện bằng cách sao chép đúng từng dòng lệnh trong hướng dẫn, xác nhận hướng dẫn chạy đúng và bài lab thực sự làm được.');
 h2('Tổng kết toàn bộ 10 bài lab');
 p('Qua 5 tuần, nhóm đã hoàn thành đủ 10 bài thực hành DevSecOps/Cloud Security trên Labtainer (checkwork đạt toàn bộ mục tiêu ở mỗi bài), bao quát: bảo mật IaC, bảo mật Docker image, secret trong Git, chuỗi cung ứng (SBOM/SCA), object storage, WAF, SSRF/IMDS, CI/CD, docker escape và Kubernetes RBAC.');

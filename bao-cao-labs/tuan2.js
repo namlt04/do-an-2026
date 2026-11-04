@@ -111,15 +111,14 @@ table(['Mục tiêu (goal)', 'Nội dung', 'KQ'], [3000, 5000, 900], [
   ['scan_dependencies', 'Quét SCA offline, xác định CVE', 'Y'],
   ['exploit_dependency', 'Khai thác EJS RCE lấy flag', 'Y'],
   ['remediate_and_gate', 'Nâng phiên bản & dựng CI gate', 'Y'],
-  ['lab_complete', 'Hoàn thành toàn bộ bài', 'Y'],
 ]);
-p('Kết quả: hoàn thành 5/5 mục tiêu; SBOM 75 thành phần; flag `b920868a213641b084fd`; toàn bộ chạy offline.');
+p('Kết quả: hoàn thành 4/4 mục tiêu; SBOM 75 thành phần; flag `b920868a213641b084fd`; toàn bộ chạy offline.');
 
 // ---------------- KET LUAN ----------------
 h1('KẾT LUẬN');
 h2('Kết quả đạt được');
 b('Hoàn thành bài 3 (dso-secrets-git): checkwork 16/16 mục tiêu đạt; trích xuất secret từ lịch sử Git, khai thác lấy 2 flag, rotate khóa và cài pre-commit hook chặn secret.',
-  'Hoàn thành bài 4 (dso-supplychain-sca): checkwork 5/5 mục tiêu đạt; sinh SBOM, quét SCA offline, khai thác EJS RCE, nâng phiên bản và dựng security gate — toàn bộ chạy offline.',
+  'Hoàn thành bài 4 (dso-supplychain-sca): checkwork 4/4 mục tiêu đạt; sinh SBOM, quét SCA offline, khai thác EJS RCE, nâng phiên bản và dựng security gate — toàn bộ chạy offline.',
   'Cả hai bài đều được thực hiện bằng cách sao chép đúng từng dòng lệnh trong hướng dẫn, xác nhận hướng dẫn chạy đúng và bài lab thực sự làm được.');
 
 render(C, {
