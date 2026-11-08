@@ -26,7 +26,7 @@ Jenkins tách Authentication (bạn là ai) và Authorization (được làm gì
 
 ## 4. Các nhiệm vụ của bài thực hành
 
-Khởi động bằng `imodule https://github.com/ptit2026/pen_lab_2026/raw/refs/heads/main/dso-cicd-jenkins.tar`, sau đó `labtainer dso-cicd-jenkins`.
+Khởi động bằng `imodule https://github.com/namlt04/do-an-2026/raw/refs/heads/master/imodule/dso-cicd-jenkins.tar`, sau đó `labtainer dso-cicd-jenkins`.
 
 ### Nhiệm vụ 1 — `recon_jenkins`
 

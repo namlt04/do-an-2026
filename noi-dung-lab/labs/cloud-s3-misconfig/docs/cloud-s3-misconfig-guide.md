@@ -110,7 +110,7 @@ Trong quá trình đánh giá an ninh hạ tầng cloud nội bộ của một d
 Để tải bài thực hành, sinh viên thực hiện câu lệnh:
 
 ```bash
-imodule https://github.com/ptit2026/pen_lab_2026/raw/refs/heads/main/cloud-s3-misconfig.tar
+imodule https://github.com/namlt04/do-an-2026/raw/refs/heads/master/imodule/cloud-s3-misconfig.tar
 ```
 
 Để khởi động bài thực hành, sinh viên dùng câu lệnh:

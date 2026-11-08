@@ -124,7 +124,7 @@ Sinh viên đóng vai **attacker** đã có shell trong pod `web-app`, thực hi
 Để tải bài thực hành, sinh viên thực hiện câu lệnh:
 
 ```bash
-imodule https://github.com/ptit2026/pen_lab_2026/raw/refs/heads/main/cloud-k8s-rbac.tar
+imodule https://github.com/namlt04/do-an-2026/raw/refs/heads/master/imodule/cloud-k8s-rbac.tar
 ```
 
 Để khởi động bài thực hành, sinh viên dùng câu lệnh:

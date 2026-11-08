@@ -130,7 +130,7 @@ Kiến trúc mà mã Terraform ĐỊNH mô tả (mục tiêu triển khai):
 Để tải bài thực hành, sinh viên thực hiện câu lệnh:
 
 ```bash
-imodule https://github.com/ptit2026/pen_lab_2026/raw/refs/heads/main/dso-iac-scan.tar
+imodule https://github.com/namlt04/do-an-2026/raw/refs/heads/master/imodule/dso-iac-scan.tar
 ```
 
 Để khởi động bài thực hành, sinh viên dùng câu lệnh:

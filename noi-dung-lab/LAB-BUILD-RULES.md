@@ -192,7 +192,7 @@ Bám đúng bài mẫu `_ref-sample-lab-t1057.txt`. Tiếng Việt, xưng "sinh 
 2. **1. Giới thiệu lab** — bảng: Tên Lab (mã), Mức độ, Công cụ sử dụng, Kiến thức yêu cầu; rồi **Mục tiêu học tập** (3–5 gạch), **Kỹ năng đạt được** (3–5 gạch, thiên bảo mật).
 3. **2. Kịch bản** — Tình huống · Vai trò của sinh viên · **Sơ đồ mạng** (mô tả text container/IP/dịch vụ/luồng).
 4. **3. Kiến thức bổ trợ** — Kiến thức nền tảng · bảng "Thành phần cần quan sát" · **bảng "Công cụ & cú pháp"**.
-5. **4. Các nhiệm vụ** — mở đầu bằng `imodule https://github.com/ptit2026/pen_lab_2026/raw/refs/heads/main/<lab>.tar` + `labtainer <lab>` + ghi chú nhập mã sinh viên; rồi **Nhiệm vụ 1..N**, mỗi nhiệm vụ: Mục tiêu · các **Bước** kèm lệnh (dùng `<...>` cho chỗ SV tự điền) · **Điều kiện hoàn thành nhiệm vụ** (đo được) · **Câu hỏi** + dòng "Trả lời: ____".
+5. **4. Các nhiệm vụ** — mở đầu bằng `imodule https://github.com/namlt04/do-an-2026/raw/refs/heads/master/imodule/<lab>.tar` + `labtainer <lab>` + ghi chú nhập mã sinh viên; rồi **Nhiệm vụ 1..N**, mỗi nhiệm vụ: Mục tiêu · các **Bước** kèm lệnh (dùng `<...>` cho chỗ SV tự điền) · **Điều kiện hoàn thành nhiệm vụ** (đo được) · **Câu hỏi** + dòng "Trả lời: ____".
 6. (tuỳ chọn) **5. Ánh xạ khung tham chiếu.**
 
 - **KHÔNG** đưa mục "Ghi chú triển khai (cho người xây lab)" và **không** lộ giá trị flag/lời giải vào file `.docx` phát cho sinh viên.

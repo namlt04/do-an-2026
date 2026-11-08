@@ -20,7 +20,7 @@ Chuỗi cung ứng phần mềm (MITRE T1195, OWASP A06:2021): phần lớn mã 
 
 ## 4. Các nhiệm vụ của bài thực hành
 
-Khởi động bằng `imodule https://github.com/ptit2026/pen_lab_2026/raw/refs/heads/main/dso-supplychain-sca.tar`, sau đó `labtainer dso-supplychain-sca`.
+Khởi động bằng `imodule https://github.com/namlt04/do-an-2026/raw/refs/heads/master/imodule/dso-supplychain-sca.tar`, sau đó `labtainer dso-supplychain-sca`.
 
 ### Nhiệm vụ 1 — `generate_sbom`
 

@@ -20,7 +20,7 @@ RBAC Kubernetes: ServiceAccount + Role/RoleBinding quyết định danh tính đ
 
 ## 4. Các nhiệm vụ của bài thực hành
 
-Khởi động bằng `imodule https://github.com/ptit2026/pen_lab_2026/raw/refs/heads/main/cloud-k8s-rbac.tar`, sau đó `labtainer cloud-k8s-rbac`.
+Khởi động bằng `imodule https://github.com/namlt04/do-an-2026/raw/refs/heads/master/imodule/cloud-k8s-rbac.tar`, sau đó `labtainer cloud-k8s-rbac`.
 
 ### Nhiệm vụ 1 — `recon_rbac`
 

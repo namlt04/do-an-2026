@@ -20,7 +20,7 @@ Layer Docker là bất biến: `RUN rm` chỉ che file ở layer mới, còn d�
 
 ## 4. Các nhiệm vụ của bài thực hành
 
-Khởi động bằng `imodule https://github.com/ptit2026/pen_lab_2026/raw/refs/heads/main/dso-image-scan.tar`, sau đó `labtainer dso-image-scan`.
+Khởi động bằng `imodule https://github.com/namlt04/do-an-2026/raw/refs/heads/master/imodule/dso-image-scan.tar`, sau đó `labtainer dso-image-scan`.
 
 ### Nhiệm vụ 1 — `inspect_layers`
 

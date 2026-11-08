@@ -53,7 +53,7 @@ Xem file mẫu `_ref-sample-lab-t1057.txt` (bài atk-mitre-t1057) để nắm gi
 - **Bảng công cụ & cú pháp** (Công cụ | Tùy chọn/Cú pháp | Mô tả tác dụng) — rất quan trọng, liệt kê lệnh chính sẽ dùng
 
 **4. Các nhiệm vụ của bài thực hành**
-- Câu mở đầu về `imodule ...` và `labtainer <ten-lab>` (dùng placeholder URL: `https://github.com/ptit2026/pen_lab_2026/raw/refs/heads/main/<ten-lab>.tar`)
+- Câu mở đầu về `imodule ...` và `labtainer <ten-lab>` (dùng placeholder URL: `https://github.com/namlt04/do-an-2026/raw/refs/heads/master/imodule/<ten-lab>.tar`)
 - Ghi chú nhập mã sinh viên khi được hỏi (dùng để chấm điểm)
 - Các **Nhiệm vụ 1..N** (đặt tên goal ngắn kiểu `scan_network`, `exploit_x`, `get_flag`, `harden_x`), mỗi nhiệm vụ gồm:
   - Mô tả mục tiêu nhiệm vụ
