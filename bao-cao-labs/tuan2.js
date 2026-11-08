@@ -58,22 +58,14 @@ code("cat > ~/repo/.git/hooks/pre-commit <<'HOOK'\n#!/bin/sh\ngitleaks protect -
 img('l3_05_harden.png', 'Rotate khóa (khóa cũ bị DENIED), pre-commit hook chặn commit chứa secret (COMMIT_BLOCKED)');
 h2('Kết quả thực hiện');
 p('Chạy `checkwork dso-secrets-git` để chấm điểm tự động:');
-img('l3_06_checkwork.png', 'Kết quả chấm điểm tự động bài dso-secrets-git: 16/16 mục tiêu đạt (Y)');
+img('l3_06_checkwork.png', 'Kết quả chấm điểm tự động bài dso-secrets-git: 4/4 mục tiêu đạt (Y)');
 table(['Mục tiêu (goal)', 'Nội dung', 'KQ'], [3400, 4600, 900], [
   ['g_recon_history', 'Trinh sát lịch sử Git tìm secret', 'Y'],
   ['g_scan_secrets', 'Quét và trích xuất secret', 'Y'],
-  ['g_flag_storage', 'Lấy flag từ MinIO storage', 'Y'],
-  ['g_flag_api', 'Lấy flag từ API nội bộ', 'Y'],
-  ['g_exploit_get_flag', 'Khai thác secret lấy flag', 'Y'],
-  ['g_rotate_proof', 'Rotate secret đã lộ', 'Y'],
-  ['g_harden_rotate', 'Kiểm chứng khóa cũ bị vô hiệu', 'Y'],
-  ['g_harden_shiftleft', 'Cài pre-commit hook (shift-left)', 'Y'],
-  ['g_remediation_harden', 'Hoàn tất khắc phục', 'Y'],
-  ['r_recon_ok / r_gitleaks_ok', 'Đáp án trinh sát & gitleaks đúng', 'Y'],
-  ['r_creds_ok / r_oldkey_denied', 'Trích đúng secret; khóa cũ bị chặn', 'Y'],
-  ['r_gitignore_env / r_hook_ok / r_hook_blocked', '.gitignore, hook cài & chặn đúng', 'Y'],
+  ['g_exploit_get_flag', 'Khai thác secret lấy 2 flag (MinIO + API)', 'Y'],
+  ['g_remediation_harden', 'Rotate khóa, .gitignore & pre-commit hook', 'Y'],
 ]);
-p('Kết quả: hoàn thành 16/16 mục tiêu; flag storage `9196d3bf1fca04c42eeb`, flag API `99dd917cc01739de0884`.');
+p('Kết quả: hoàn thành 4/4 mục tiêu; flag storage `9196d3bf1fca04c42eeb`, flag API `99dd917cc01739de0884`.');
 
 // ---------------- LAB 4 ----------------
 h1('BÀI THỰC HÀNH 4: BẢO MẬT CHUỖI CUNG ỨNG PHẦN MỀM (DSO-SUPPLYCHAIN-SCA)');
@@ -119,7 +111,7 @@ p('Kết quả: hoàn thành 4/4 mục tiêu; SBOM 75 thành phần; flag `9f4f0
 // ---------------- KET LUAN ----------------
 h1('KẾT LUẬN');
 h2('Kết quả đạt được');
-b('Hoàn thành bài 3 (dso-secrets-git): checkwork 16/16 mục tiêu đạt; trích xuất secret từ lịch sử Git, khai thác lấy 2 flag, rotate khóa và cài pre-commit hook chặn secret.',
+b('Hoàn thành bài 3 (dso-secrets-git): checkwork 4/4 mục tiêu đạt; trích xuất secret từ lịch sử Git, khai thác lấy 2 flag, rotate khóa và cài pre-commit hook chặn secret.',
   'Hoàn thành bài 4 (dso-supplychain-sca): checkwork 4/4 mục tiêu đạt; sinh SBOM, quét SCA offline, khai thác EJS RCE, nâng phiên bản và dựng security gate — toàn bộ chạy offline.',
   'Cả hai bài đều được thực hiện bằng cách sao chép đúng từng dòng lệnh trong hướng dẫn, xác nhận hướng dẫn chạy đúng và bài lab thực sự làm được.');
 

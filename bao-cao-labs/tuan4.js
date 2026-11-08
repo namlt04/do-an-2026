@@ -47,15 +47,14 @@ p('Bật IMDSv2 (bắt buộc token PUT trước GET), bật allowlist chặn SS
 code('curl -s -X POST http://imds/admin/enable-imdsv2\ncurl -s -X POST http://web:8080/admin/harden\ncurl -s -o /dev/null -w "%{http_code}" "http://web:8080/fetch?url=http://imds/latest/meta-data/"');
 img('l7_04_harden.jpg', 'Sau hardening: SSRF GET không còn credential (IMDSv2), request tới imds bị chặn 403 (allowlist)');
 h2('Kết quả thực hiện');
-img('l7_05_checkwork.jpg', 'Kết quả chấm điểm tự động bài cloud-ssrf-imds: 10/10 mục tiêu đạt (Y)');
+img('l7_05_checkwork.png', 'Kết quả chấm điểm tự động bài cloud-ssrf-imds: 4/4 mục tiêu đạt (Y)');
 table(['Mục tiêu (goal)', 'Nội dung', 'KQ'], [3200, 4800, 900], [
   ['g_discover_ssrf', 'Phát hiện SSRF tới mục tiêu nội bộ', 'Y'],
   ['g_steal_credentials', 'Đánh cắp credential IMDS qua SSRF', 'Y'],
   ['g_access_storage_get_flag', 'Dùng credential lấy flag', 'Y'],
   ['g_harden_ssrf_imds', 'Khắc phục: IMDSv2 + allowlist', 'Y'],
-  ['r_discover_ssrf ... r_remediation_ok', '6 result phụ (đường dẫn SSRF, loot, chặn, IMDSv2, remediation)', 'Y'],
 ]);
-p('Kết quả: hoàn thành 10/10 mục tiêu (4 goal + 6 result); flag `1abf1851b680c989`.');
+p('Kết quả: hoàn thành 4/4 mục tiêu; flag `1abf1851b680c989`.');
 
 // ---------------- LAB 8 ----------------
 h1('BÀI THỰC HÀNH 8: KHAI THÁC CI/CD JENKINS & PIVOT REGISTRY (DSO-CICD-JENKINS)');
@@ -99,7 +98,7 @@ p('Kết quả: hoàn thành 5/5 mục tiêu; flag_ci `9b2c723ecd6344d3`, flag_p
 // ---------------- KET LUAN ----------------
 h1('KẾT LUẬN');
 h2('Kết quả đạt được');
-b('Hoàn thành bài 7 (cloud-ssrf-imds): checkwork 10/10; khai thác SSRF đánh cắp credential IMDS, lấy flag và khắc phục nhiều lớp (IMDSv2, allowlist, least privilege).',
+b('Hoàn thành bài 7 (cloud-ssrf-imds): checkwork 4/4; khai thác SSRF đánh cắp credential IMDS, lấy flag và khắc phục nhiều lớp (IMDSv2, allowlist, least privilege).',
   'Hoàn thành bài 8 (dso-cicd-jenkins): checkwork 5/5; RCE qua Script Console trên Jenkins thật, pivot vào Docker Registry trích flag, và hardening Jenkins.',
   'Cả hai bài đều được thực hiện bằng cách sao chép đúng từng dòng lệnh trong hướng dẫn, xác nhận hướng dẫn chạy đúng và bài lab thực sự làm được.');
 
