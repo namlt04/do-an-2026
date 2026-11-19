@@ -38,6 +38,22 @@ Nhập email/mã sinh viên khi được hỏi (flag sinh riêng theo mã của 
 
 ---
 
+## Câu lệnh tham khảo (cú pháp chung — tự ghép, tự điền `<...>`)
+
+| Mục đích | Cú pháp chung |
+|---|---|
+| Lấy HTTP header (phiên bản) | `curl -s -D - -o /dev/null http://jenkins:8080/ \| grep -i "<HEADER>"` |
+| Gọi REST API (recon) | `curl -s "http://jenkins:8080/api/json?pretty=true" \| jq` |
+| Chạy Groovy (Script Console) | `curl -s --data-urlencode 'script=<GROOVY>' http://jenkins:8080/scriptText` |
+| Đọc build log của job | `curl -s "http://jenkins:8080/job/<JOB>/lastBuild/consoleText"` |
+| Xác thực & duyệt Registry v2 | `curl -s -u <USER>:<PASS> http://registry:5000/v2/_catalog` · `.../v2/<REPO>/tags/list` |
+| Lấy manifest / blob | `curl -s -u <USER>:<PASS> -H 'Accept: ...manifest.v2+json' .../manifests/<TAG>` · `.../blobs/<DIGEST> -o <FILE>` |
+| Giải nén layer | `tar -xf <LAYER>.tar` |
+
+> Đây chỉ là "từ vựng" lệnh. Bạn tự chọn job/endpoint, tự viết Groovy và tự tìm credential + chuỗi pivot.
+
+---
+
 ## Nhiệm vụ 1 — `recon_jenkins`: Trinh sát & phát hiện authorization cấu hình sai
 **Mục tiêu:** Lấy phiên bản Jenkins và liệt kê job qua REST API **ở trạng thái ẩn danh** — khẳng định lỗ hổng phân quyền.
 

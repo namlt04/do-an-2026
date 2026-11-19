@@ -35,6 +35,21 @@ Nhập email/mã sinh viên khi được hỏi (flag sinh riêng theo mã của 
 
 ---
 
+## Câu lệnh tham khảo (cú pháp chung — tự ghép, tự điền `<...>`)
+
+| Mục đích | Cú pháp chung |
+|---|---|
+| Gửi request khai thác / kiểm thử | `curl -s -i "http://<HOST>:<PORT>/<ENDPOINT>?<THAM_SỐ>=<PAYLOAD>"` |
+| Chỉ xem mã trạng thái (200/403) | `curl -s -o /dev/null -w "%{http_code}\n" "<URL>"` |
+| Quét DAST tự động | `nikto -h http://<HOST>:<PORT>` |
+| Khởi động lại / xem trạng thái WAF | `sudo systemctl restart <SERVICE>` · `systemctl status <SERVICE>` |
+| Sửa cấu hình CRS/Coraza | sửa file SecLang trong `/etc/coraza/` (bật/tắt rule, đổi paranoia level) |
+| Đọc audit log WAF | `tail -n <N> <AUDIT_LOG>` · `grep -i "<RULE_ID|chuỗi>" <AUDIT_LOG>` |
+
+> Đây chỉ là "từ vựng" lệnh. Bạn tự chọn endpoint/payload, tự ghép chuỗi và tự sửa cấu hình cho từng nhiệm vụ.
+
+---
+
 ## Nhiệm vụ 1 — `exploit_direct`: Khai thác khi CHƯA có WAF
 **Mục tiêu:** Chứng minh `webapp` có lỗ hổng thật bằng cách tấn công **trực tiếp** (bỏ qua WAF) và đọc được **Flag 1**.
 

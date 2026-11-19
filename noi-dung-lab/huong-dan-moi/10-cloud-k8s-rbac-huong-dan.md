@@ -20,6 +20,21 @@ labtainer cloud-k8s-rbac
 
 ---
 
+## Câu lệnh tham khảo (cú pháp chung — tự ghép, tự điền `<...>`)
+
+| Mục đích | Cú pháp chung |
+|---|---|
+| Tự kiểm tra quyền của mình | `kubectl auth can-i <VERB> <RESOURCE> -n <NAMESPACE>` |
+| Đọc & giải mã Secret | `kubectl get secret <TÊN> -n <NS> -o jsonpath='{.data.<KEY>}' \| base64 -d` |
+| Xem toàn bộ ConfigMap | `kubectl get configmap <TÊN> -n <NS> -o yaml` |
+| Tạo & chờ pod, exec lệnh | `kubectl apply -f <FILE>.yaml` · `kubectl wait --for=condition=Ready pod/<TÊN> -n <NS>` · `kubectl exec <TÊN> -n <NS> -- <CMD>` |
+| Chuyển sang kubeconfig admin | `export KUBECONFIG=~/.kube/admin-config` |
+| Gắn nhãn Pod Security | `kubectl label ns <NS> pod-security.kubernetes.io/enforce=restricted --overwrite` |
+
+> Đây chỉ là "từ vựng" lệnh. Bài mức 4/4: bạn tự tra tài liệu `kubectl`, tự dựng manifest Pod hostPath và tự ghép chuỗi khai thác.
+
+---
+
 ## Nhiệm vụ 1 & 2 — Trinh sát RBAC và moi secret
 **Mục tiêu:**
 - Xác định ServiceAccount hiện có **những quyền gì** trong namespace `app` (đặc biệt: có list được `secrets` và create được `pods` không?).

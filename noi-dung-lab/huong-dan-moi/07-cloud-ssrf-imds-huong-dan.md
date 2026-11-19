@@ -41,6 +41,20 @@ Nhập email/mã sinh viên khi được hỏi (flag sinh riêng theo mã của 
 
 ---
 
+## Câu lệnh tham khảo (cú pháp chung — tự ghép, tự điền `<...>`)
+
+| Mục đích | Cú pháp chung |
+|---|---|
+| Gọi chức năng fetch (điểm SSRF) | `curl -s "http://web:8080/fetch?url=<URL_ĐÍCH>"` |
+| Parse JSON trả về | `curl -s "<URL>" \| jq .` · `jq -r '.<FIELD>' <FILE>` |
+| Nạp credential tạm thời | `export AWS_ACCESS_KEY_ID=<AK>` · `export AWS_SECRET_ACCESS_KEY=<SK>` |
+| Thao tác object storage (MinIO) | `aws --endpoint-url http://storage:9000 s3 ls` · `... s3 cp s3://<BUCKET>/<KEY> <LOCAL>` |
+| Gọi endpoint quản trị (hardening) | `curl -s -X POST "http://<HOST>/<ENDPOINT_ADMIN>"` |
+
+> Đây chỉ là "từ vựng" lệnh. Bạn tự chọn đích SSRF, tự dò đường dẫn IMDS và tự ghép chuỗi khai thác. Mọi request khai thác phải đi **qua** `web:8080/fetch?url=...`.
+
+---
+
 ## Nhiệm vụ 1 — `discover_ssrf`: Phát hiện & xác nhận SSRF
 **Mục tiêu:** Chứng minh chức năng "fetch URL" của webapp có thể bị ép gọi tới đích nội bộ mà `client` không trực tiếp tới được.
 
