@@ -1,0 +1,13 @@
+[Unit]
+Description=devops-waf-crs Caddy + Coraza WAF reverse proxy (:80)
+After=network-online.target
+
+[Service]
+User=root
+Environment=HOME=/root XDG_DATA_HOME=/root/.local/share XDG_CONFIG_HOME=/root/.config
+ExecStart=/usr/local/bin/caddy run --environ --config /etc/caddy/Caddyfile --adapter caddyfile
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

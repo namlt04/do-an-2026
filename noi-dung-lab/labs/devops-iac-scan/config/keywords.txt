@@ -1,0 +1,6 @@
+security
+devops
+cloud
+iac
+terraform
+static analysis

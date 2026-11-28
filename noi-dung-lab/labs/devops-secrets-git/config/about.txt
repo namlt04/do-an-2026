@@ -1,0 +1,6 @@
+devops-secrets-git: Detect, exploit and remediate secrets leaked in Git history.
+Students dig through the commit history to find a fake AWS key / DB password / API
+token that was "deleted" at HEAD but still lives in history, use those credentials
+to access the HTTP API (app) and the MinIO object store (storage) to get the flag,
+then remediate (rotate secrets, .gitignore, secret-scanning pre-commit hook).
+Difficulty: Intermediate.

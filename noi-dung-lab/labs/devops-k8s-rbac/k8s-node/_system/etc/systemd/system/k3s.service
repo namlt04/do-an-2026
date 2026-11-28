@@ -1,0 +1,21 @@
+[Unit]
+Description=k3s single-node (devops-k8s-rbac)
+After=network-online.target
+
+[Service]
+User=root
+ExecStart=/usr/local/bin/k3s server \
+  --disable traefik --disable servicelb --disable metrics-server \
+  --snapshotter=native \
+  --write-kubeconfig /etc/rancher/k3s/k3s.yaml --write-kubeconfig-mode 644 \
+  --kube-apiserver-arg=token-auth-file=/opt/k3s/tokens.csv \
+  --kubelet-arg=cgroups-per-qos=false \
+  --kubelet-arg=enforce-node-allocatable= \
+  --kubelet-arg=cgroup-driver=cgroupfs \
+  --kubelet-arg=fail-swap-on=false
+Restart=always
+RestartSec=5
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target

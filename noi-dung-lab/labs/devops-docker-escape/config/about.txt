@@ -1,0 +1,9 @@
+devops-docker-escape: Escape a misconfigured Docker container to take over the "host"
+(MITRE ATT&CK T1611 - Escape to Host). The student plays a pentester with a shell in the
+`app` container, performs recon to discover the exposed Docker socket (/var/run/docker.sock),
+uses that socket to control the real Docker daemon running on the simulated host container
+(`host-sim`, docker-in-docker), creates a new container mounting the whole "host" rootfs and
+reads the flag at /root/flag.txt. Then, playing a DevOps engineer, rewrites the `docker run`
+configuration to be safe (drop privileged, drop the docker.sock mount, cap-drop=ALL,
+non-root, seccomp) and checks it against the CIS Docker Benchmark. The lab runs offline,
+no network needed. Level: Advanced.

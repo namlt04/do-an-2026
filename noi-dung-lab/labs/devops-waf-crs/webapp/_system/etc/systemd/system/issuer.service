@@ -1,0 +1,17 @@
+[Unit]
+Description=devops-waf-crs flag issuer (WAF runtime verification) on :8099
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/issuer
+ExecStart=/usr/bin/python3 /opt/issuer/issuer.py
+Restart=on-failure
+RestartSec=2
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

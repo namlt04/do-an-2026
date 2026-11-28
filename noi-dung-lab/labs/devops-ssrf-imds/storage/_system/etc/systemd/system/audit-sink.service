@@ -1,0 +1,19 @@
+[Unit]
+Description=MinIO audit sink (writes access log for Stage 3 grading) - devops-ssrf-imds lab
+After=network.target
+Before=minio.service
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+Environment=AUDIT_LOG=/home/ubuntu/minio_audit.log
+Environment=SINK_PORT=9100
+ExecStart=/usr/bin/python3 /opt/minio-audit/audit-sink.py
+Restart=on-failure
+RestartSec=2
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

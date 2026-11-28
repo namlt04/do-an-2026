@@ -1,0 +1,16 @@
+[Unit]
+Description=devops-waf-crs wafctl helper (grading/testing, WAF state control) on :9091
+After=network.target caddy.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/wafctl
+ExecStart=/usr/bin/python3 /opt/wafctl/wafctl.py
+Restart=on-failure
+RestartSec=2
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,20 @@
+[Unit]
+Description=MinIO Object Storage (S3-compatible) - devops-s3-misconfig lab
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+Environment=MINIO_ROOT_USER=labadmin
+Environment=MINIO_ROOT_PASSWORD=Labtainer_M1n10_Root_2026_s3misconfig
+Environment=MINIO_BROWSER=off
+ExecStartPre=/bin/mkdir -p /data/minio
+ExecStart=/usr/local/bin/minio server /data/minio --address :9000 --console-address :9001
+Restart=on-failure
+RestartSec=2
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

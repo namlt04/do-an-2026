@@ -1,0 +1,5 @@
+Infrastructure as Code security (shift-left). Students act as a DevOps engineer:
+statically scan Terraform code with tfsec/checkov/trivy, triage the risks, fix classic
+misconfigurations (Security Group open to 0.0.0.0/0, public/unencrypted S3, hardcoded
+secrets, IAM Action:*/Resource:*, missing logging), and pass the CI quality gate
+(0 HIGH/CRITICAL) to obtain the flag. The lab runs fully offline in isolated containers.

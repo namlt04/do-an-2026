@@ -1,0 +1,8 @@
+cloud
+s3
+object-storage
+minio
+misconfiguration
+devops
+data-exposure
+credentials

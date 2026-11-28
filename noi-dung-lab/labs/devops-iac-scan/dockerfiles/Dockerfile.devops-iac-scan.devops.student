@@ -1,0 +1,62 @@
+ARG registry
+FROM $registry/labtainer.network
+ARG lab
+ARG labdir
+ARG imagedir
+ARG user_name
+ARG password
+ARG apt_source
+ARG version
+LABEL version=$version
+ENV APT_SOURCE $apt_source
+RUN /usr/bin/apt-source.sh
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        curl ca-certificates git jq unzip python3 python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL -o /usr/local/bin/tfsec \
+        https://github.com/aquasecurity/tfsec/releases/download/v1.28.13/tfsec-linux-amd64 \
+    && chmod +x /usr/local/bin/tfsec
+
+RUN curl -fsSL -o /tmp/trivy.tar.gz \
+        https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_Linux-64bit.tar.gz \
+    && tar -xzf /tmp/trivy.tar.gz -C /usr/local/bin trivy \
+    && chmod +x /usr/local/bin/trivy && rm -f /tmp/trivy.tar.gz
+
+RUN curl -fsSL -o /tmp/tf.zip \
+        https://releases.hashicorp.com/terraform/1.9.8/terraform_1.9.8_linux_amd64.zip \
+    && unzip -o /tmp/tf.zip -d /usr/local/bin && chmod +x /usr/local/bin/terraform \
+    && rm -f /tmp/tf.zip
+
+RUN mkdir -p /tmp/mreq \
+    && printf 'terraform {\n  required_providers {\n    aws = {\n      source  = "hashicorp/aws"\n      version = "5.72.0"\n    }\n  }\n}\n' > /tmp/mreq/main.tf \
+    && cd /tmp/mreq \
+    && terraform providers mirror -platform=linux_amd64 /opt/tf-mirror \
+    && rm -rf /tmp/mreq
+RUN mkdir -p /etc/terraform \
+    && printf 'provider_installation {\n  filesystem_mirror {\n    path    = "/opt/tf-mirror"\n    include = ["registry.terraform.io/*/*"]\n  }\n  direct {\n    exclude = ["registry.terraform.io/*/*"]\n  }\n}\n' > /etc/terraform/cli.tfrc
+ENV TF_CLI_CONFIG_FILE=/etc/terraform/cli.tfrc
+
+ENV TRIVY_CACHE_DIR=/opt/trivy-cache
+RUN mkdir -p /opt/trivy-cache /tmp/tvchk \
+    && printf 'resource "aws_s3_bucket" "x" {\n  bucket = "warm-cache"\n}\n' > /tmp/tvchk/main.tf \
+    && (trivy --cache-dir /opt/trivy-cache config /tmp/tvchk || true) \
+    && rm -rf /tmp/tvchk \
+    && chmod -R a+rwX /opt/trivy-cache
+ENV TRIVY_SKIP_CHECK_UPDATE=true
+ENV TRIVY_SKIP_DB_UPDATE=true
+ENV TRIVY_SKIP_JAVA_DB_UPDATE=true
+RUN printf 'export TF_CLI_CONFIG_FILE=/etc/terraform/cli.tfrc\nexport TRIVY_CACHE_DIR=/opt/trivy-cache\nexport TRIVY_SKIP_CHECK_UPDATE=true\nexport TRIVY_SKIP_DB_UPDATE=true\nexport TRIVY_SKIP_JAVA_DB_UPDATE=true\n' > /etc/profile.d/devops-tools.sh
+ADD $labdir/$imagedir/sys_tar/sys.tar /
+ADD $labdir/sys_$lab.tar.gz /
+RUN useradd -ms /bin/bash $user_name
+RUN echo "$user_name:$password" | chpasswd
+RUN adduser $user_name sudo
+
+USER $user_name
+ENV HOME /home/$user_name
+ADD $labdir/$imagedir/home_tar/home.tar $HOME
+RUN rm -f $HOME/home.tar
+ADD $labdir/$lab.tar.gz $HOME
+USER root
+CMD ["/bin/bash", "-c", "exec /sbin/init --log-target=journal 3>&1"]

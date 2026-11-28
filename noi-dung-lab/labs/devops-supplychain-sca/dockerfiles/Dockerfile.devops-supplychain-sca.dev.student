@@ -1,0 +1,48 @@
+ARG registry
+FROM $registry/labtainer.network2
+ARG lab
+ARG labdir
+ARG imagedir
+ARG user_name
+ARG password
+ARG apt_source
+ARG version
+LABEL version=$version
+ENV APT_SOURCE $apt_source
+RUN /usr/bin/apt-source.sh
+RUN apt-get update && apt-get install -y --no-install-recommends nodejs npm jq curl git ca-certificates tar gzip && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL -o /tmp/trivy.tar.gz \
+        https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_Linux-64bit.tar.gz \
+    && tar -xzf /tmp/trivy.tar.gz -C /usr/local/bin trivy \
+    && chmod +x /usr/local/bin/trivy && rm -f /tmp/trivy.tar.gz
+
+RUN curl -fsSL -o /tmp/syft.tar.gz \
+        https://github.com/anchore/syft/releases/download/v1.18.1/syft_1.18.1_linux_amd64.tar.gz \
+    && tar -xzf /tmp/syft.tar.gz -C /usr/local/bin syft \
+    && chmod +x /usr/local/bin/syft && rm -f /tmp/syft.tar.gz
+
+ENV TRIVY_CACHE_DIR=/opt/trivy-cache
+RUN mkdir -p /opt/trivy-cache \
+    && trivy --cache-dir /opt/trivy-cache image --download-db-only \
+    && chmod -R a+rwX /opt/trivy-cache
+ENV TRIVY_SKIP_CHECK_UPDATE=true
+ENV TRIVY_SKIP_DB_UPDATE=true
+ENV TRIVY_SKIP_JAVA_DB_UPDATE=true
+ENV TRIVY_DISABLE_VEX_NOTICE=true
+RUN printf 'export TRIVY_CACHE_DIR=/opt/trivy-cache\nexport TRIVY_SKIP_CHECK_UPDATE=true\nexport TRIVY_SKIP_DB_UPDATE=true\nexport TRIVY_SKIP_JAVA_DB_UPDATE=true\nexport TRIVY_DISABLE_VEX_NOTICE=true\n' > /etc/profile.d/trivy.sh
+
+ADD $labdir/$imagedir/sys_tar/sys.tar /
+ADD $labdir/sys_$lab.tar.gz /
+RUN useradd -ms /bin/bash $user_name && echo "$user_name:$password" | chpasswd && adduser $user_name sudo
+USER $user_name
+ENV HOME /home/$user_name
+ADD $labdir/$imagedir/home_tar/home.tar $HOME
+RUN rm -f $HOME/home.tar
+ADD $labdir/$lab.tar.gz $HOME
+RUN cd $HOME/vuln-notes && npm install --no-audit --no-fund --loglevel=error \
+    && npm cache add ejs@3.1.10 \
+    && printf 'prefer-offline=true\naudit=false\nfund=false\n' > $HOME/.npmrc
+USER root
+CMD ["/bin/bash", "-c", "exec /sbin/init --log-target=journal 3>&1"]

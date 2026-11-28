@@ -1,0 +1,17 @@
+[Unit]
+Description=devops-waf-crs vulnerable webapp (imgshop) on :8080
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/webapp
+ExecStart=/usr/bin/python3 /home/ubuntu/webapp/app.py
+Restart=on-failure
+RestartSec=2
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

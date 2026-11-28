@@ -1,0 +1,2 @@
+devops-waf-crs: Deploy a Coraza v3 WAF + OWASP CRS on a Caddy reverse proxy to protect the runtime of a vulnerable web application.
+The student exploits SQLi/XSS/path-traversal with curl, enables blocking mode, compares DAST (nikto) before/after the WAF and removes false positives with a scoped exclusion rule. Offline Labtainer environment.

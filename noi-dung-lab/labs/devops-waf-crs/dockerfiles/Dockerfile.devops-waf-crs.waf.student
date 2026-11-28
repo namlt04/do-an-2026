@@ -1,0 +1,49 @@
+ARG registry
+FROM $registry/labtainer.network2
+ARG lab
+ARG labdir
+ARG imagedir
+ARG user_name
+ARG password
+ARG apt_source
+ARG version
+LABEL version=$version
+ENV APT_SOURCE $apt_source
+RUN /usr/bin/apt-source.sh
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        curl ca-certificates git python3 python3-pip \
+    && pip3 install --no-cache-dir flask==3.0.3 \
+    && rm -rf /var/lib/apt/lists/* /root/.cache/pip
+
+RUN curl -fsSL -o /tmp/go.tgz https://go.dev/dl/go1.22.6.linux-amd64.tar.gz \
+    && tar -C /usr/local -xzf /tmp/go.tgz && rm -f /tmp/go.tgz
+
+ENV PATH=/usr/local/go/bin:/root/go/bin:$PATH
+ENV HOME=/root
+ENV GOTOOLCHAIN=auto
+RUN go install github.com/caddyserver/xcaddy/cmd/xcaddy@v0.4.2 \
+    && xcaddy build v2.11.4 --with github.com/corazawaf/coraza-caddy/v2@v2.6.2 \
+         --output /usr/local/bin/caddy \
+    && /usr/local/bin/caddy version
+
+RUN mkdir -p /etc/coraza \
+    && cd /tmp \
+    && curl -fsSL -o crs.tar.gz https://github.com/coreruleset/coreruleset/archive/refs/tags/v4.10.0.tar.gz \
+    && tar -xzf crs.tar.gz \
+    && mv coreruleset-4.10.0 /etc/coraza/crs \
+    && cp /etc/coraza/crs/crs-setup.conf.example /etc/coraza/crs/crs-setup.conf \
+    && rm -f /tmp/crs.tar.gz
+
+RUN rm -rf /usr/local/go /root/go /root/.cache/go-build
+
+ADD $labdir/$imagedir/sys_tar/sys.tar /
+ADD $labdir/sys_$lab.tar.gz /
+RUN useradd -ms /bin/bash $user_name && echo "$user_name:$password" | chpasswd && adduser $user_name sudo
+USER $user_name
+ENV HOME /home/$user_name
+ADD $labdir/$imagedir/home_tar/home.tar $HOME
+RUN rm -f $HOME/home.tar
+ADD $labdir/$lab.tar.gz $HOME
+USER root
+CMD ["/bin/bash", "-c", "exec /sbin/init --log-target=journal 3>&1"]

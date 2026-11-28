@@ -1,0 +1,7 @@
+devops-ssrf-imds: Exploit SSRF in the "import document by URL" feature of the
+FinPortal web application to force the server to read a mock Instance Metadata
+Service (IMDS), steal the temporary credentials of an IAM role, then use those
+credentials to access cloud object storage (MinIO) and retrieve the flag.
+Reproduces the 2019 Capital One incident. Ends with hardening: an SSRF
+allowlist, IMDSv2 enforcement (token + hop limit), and least-privilege
+recommendations. Level: Advanced.

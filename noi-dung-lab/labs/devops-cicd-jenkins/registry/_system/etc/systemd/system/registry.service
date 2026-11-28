@@ -1,0 +1,11 @@
+[Unit]
+Description=Docker Registry v2 (devops-cicd-jenkins)
+After=network-online.target
+
+[Service]
+User=ubuntu
+ExecStart=/usr/local/bin/registry serve /opt/regseed/config.yml
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

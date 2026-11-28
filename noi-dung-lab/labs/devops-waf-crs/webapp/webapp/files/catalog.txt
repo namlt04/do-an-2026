@@ -1,0 +1,4 @@
+imgshop - product catalog (valid file to demonstrate the /download feature)
+- SP001  T-shirt          120000
+- SP002  Jeans            350000
+- SP003  Sneakers         890000

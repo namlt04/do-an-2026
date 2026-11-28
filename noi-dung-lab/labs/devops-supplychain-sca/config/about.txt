@@ -1,0 +1,2 @@
+devops-supplychain-sca: Generate an SBOM, run an SCA scan to find CVE-affected dependencies, exploit a vulnerable dependency on the appserver to get the flag, and build a security gate.
+The student uses syft, trivy (offline DB) and npm in an offline Labtainer environment.

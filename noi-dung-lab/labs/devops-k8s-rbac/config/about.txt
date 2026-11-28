@@ -1,0 +1,2 @@
+devops-k8s-rbac: Abuse a ServiceAccount token with overly broad RBAC, read a secret leaked in a ConfigMap, create a hostPath pod to escape to the node and get the flag, then harden the Kubernetes cluster.
+Students use kubectl, base64 and jq on a single-node k3s cluster in an offline Labtainer environment.

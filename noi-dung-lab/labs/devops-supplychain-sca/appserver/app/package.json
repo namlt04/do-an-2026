@@ -1,0 +1,11 @@
+{
+  "name": "vuln-notes",
+  "version": "1.0.0",
+  "description": "Internal notes API (co phu thuoc dinh CVE)",
+  "main": "app.js",
+  "scripts": { "start": "node app.js" },
+  "dependencies": {
+    "express": "4.21.2",
+    "ejs": "3.1.6"
+  }
+}

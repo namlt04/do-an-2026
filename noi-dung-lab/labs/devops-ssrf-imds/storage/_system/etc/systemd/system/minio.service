@@ -1,0 +1,17 @@
+[Unit]
+Description=MinIO Object Storage (fin-reports) - devops-ssrf-imds lab
+After=network.target audit-sink.service
+Wants=audit-sink.service
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+ExecStart=/bin/bash /usr/local/bin/minio-start.sh
+Restart=on-failure
+RestartSec=2
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

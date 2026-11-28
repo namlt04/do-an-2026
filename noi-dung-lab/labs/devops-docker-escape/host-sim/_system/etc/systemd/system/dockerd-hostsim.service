@@ -1,0 +1,31 @@
+[Unit]
+Description=Docker Engine simulating the host machine (devops-docker-escape / host-sim)
+Documentation=none
+After=network.target
+
+[Service]
+Type=simple
+ExecStartPre=-/bin/mkdir -p /var/lib/docker
+# --storage-driver=vfs : highest compatibility when running dind nested inside Labtainer's
+#   privileged container (avoids overlay-on-overlay errors on some VM kernels).
+# --iptables=false      : avoids depending on iptables/NAT kernel modules that may be absent
+#   or disallowed in the nested-privileged environment (see BUILD-NOTES.md).
+# -H unix:// + -H tcp:// : expose BOTH, matching the task description (the docker.sock the
+#   student sees on app is actually a socat forward to this TCP port).
+ExecStart=/usr/bin/dockerd \
+    --host=unix:///var/run/docker.sock \
+    --host=tcp://0.0.0.0:2375 \
+    --storage-driver=vfs \
+    --iptables=false \
+    --data-root=/var/lib/docker \
+    --pidfile=/var/run/docker.pid
+Restart=on-failure
+RestartSec=2
+TimeoutStartSec=30
+LimitNOFILE=1048576
+LimitNPROC=infinity
+LimitCORE=infinity
+TasksMax=infinity
+
+[Install]
+WantedBy=multi-user.target

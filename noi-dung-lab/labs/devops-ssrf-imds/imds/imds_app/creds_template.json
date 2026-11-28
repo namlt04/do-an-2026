@@ -1,0 +1,9 @@
+{
+  "Code": "Success",
+  "LastUpdated": "2026-01-01T00:00:00Z",
+  "Type": "AWS-HMAC",
+  "AccessKeyId": "AKIAIMDSRUNKEYID",
+  "SecretAccessKey": "SECRETRUNSECRETKEY",
+  "Token": "RUNSESSIONTOKEN",
+  "Expiration": "2026-01-01T06:00:00Z"
+}

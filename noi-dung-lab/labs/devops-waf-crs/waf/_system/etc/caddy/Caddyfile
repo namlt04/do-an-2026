@@ -1,0 +1,18 @@
+{
+	admin off
+	auto_https off
+	order coraza_waf first
+}
+
+:80 {
+	@flags path /flag2 /flag3
+	handle @flags {
+		reverse_proxy webapp:8099
+	}
+	handle {
+		coraza_waf {
+			include /etc/coraza/main.conf
+		}
+		reverse_proxy webapp:8080
+	}
+}

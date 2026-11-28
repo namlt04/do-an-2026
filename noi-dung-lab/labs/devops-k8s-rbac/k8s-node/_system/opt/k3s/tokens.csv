@@ -1,0 +1,2 @@
+WEBTOKENSEED,web-user,web-uid,"system:authenticated"
+ADMINTOKENSEED,admin-user,admin-uid,"system:masters"

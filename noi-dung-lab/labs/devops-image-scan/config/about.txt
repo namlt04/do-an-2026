@@ -1,0 +1,2 @@
+devops-image-scan: analyze a Docker image to find secrets left behind in its layers, scan it for CVEs and harden it.
+Students use docker save, Trivy and curl in an offline Labtainer environment.

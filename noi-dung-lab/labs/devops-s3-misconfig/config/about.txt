@@ -1,0 +1,6 @@
+devops-s3-misconfig: Exploit a misconfigured object storage bucket (MinIO, S3-
+compatible) that allows anonymous access. The student lists/downloads a backup from
+the public bucket, finds a credential leaked in a config file, uses that credential
+to authenticate into the private bucket to get the flag, then acts as a DevOps
+engineer to remediate: remove the public policy, apply least privilege, enable
+versioning. Level: Medium.

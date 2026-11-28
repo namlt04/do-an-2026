@@ -1,0 +1,14 @@
+devops-ssrf-imds - quick notes for the client machine
+
+Hosts on the lab network (SSRF_NET 172.34.0.0/24), reachable by DNS name or IP:
+  web      (172.34.0.20)  - FinPortal web application, port 8080
+  imds     (172.34.0.40)  - mock IMDS (simulates 169.254.169.254), port 80
+  storage  (172.34.0.30)  - MinIO object storage, port 9000
+
+You have NO shell on web/imds/storage - every action must be performed from
+here (client) using Firefox, curl, jq or aws.
+
+See the lab guide (docs) for details. Record your results in:
+  ~/creds.txt        - temporary credential JSON obtained via SSRF (Task 2)
+  ~/loot.txt         - ONLY the final flag retrieved from storage (Task 3)
+  ~/remediation.txt  - your hardening answer (Task 4)

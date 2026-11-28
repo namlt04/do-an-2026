@@ -1,0 +1,2 @@
+devops-cicd-jenkins: Exploit a misconfigured Jenkins (anonymous access, Script Console RCE), extract a credential, pivot into a Docker Registry v2 to get the flag, and harden Jenkins.
+The student uses curl and jq in an offline Labtainer environment.
